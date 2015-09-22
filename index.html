@@ -1,5 +1,5 @@
 <!doctype html>
-<html class="theme-next use-motion ">
+<html class="theme-next use-motion theme-next-mist">
 <head>
   
 
@@ -26,7 +26,7 @@
 <link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.5.1"/>
 
 
-    <meta name="description" content="算法、java、nodejs、oracle 全栈技术博客" />
+    <meta name="description" content="java程序员、爱开源、喜欢nodejs、前端js、oracle数据库、分布式技术...<br/>改变世界的是这么一群人,他们寻找梦想中的乐园,当他们找不到时,就亲手创造了她..." />
 
 
 
@@ -39,20 +39,20 @@
   <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.1" />
 
 
-<meta name="description" content="算法、java、nodejs、oracle 全栈技术博客">
+<meta name="description" content="java程序员、爱开源、喜欢nodejs、前端js、oracle数据库、分布式技术...改变世界的是这么一群人,他们寻找梦想中的乐园,当他们找不到时,就亲手创造了她...">
 <meta property="og:type" content="website">
 <meta property="og:title" content="蓝精灵儿的技术博客">
 <meta property="og:url" content="http://yoursite.com/index.html">
 <meta property="og:site_name" content="蓝精灵儿的技术博客">
-<meta property="og:description" content="算法、java、nodejs、oracle 全栈技术博客">
+<meta property="og:description" content="java程序员、爱开源、喜欢nodejs、前端js、oracle数据库、分布式技术...改变世界的是这么一群人,他们寻找梦想中的乐园,当他们找不到时,就亲手创造了她...">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="蓝精灵儿的技术博客">
-<meta name="twitter:description" content="算法、java、nodejs、oracle 全栈技术博客">
+<meta name="twitter:description" content="java程序员、爱开源、喜欢nodejs、前端js、oracle数据库、分布式技术...改变世界的是这么一群人,他们寻找梦想中的乐园,当他们找不到时,就亲手创造了她...">
 
 
 <script type="text/javascript" id="hexo.configuration">
   var CONFIG = {
-    scheme: '',
+    scheme: 'Mist',
     sidebar: 'post'
   };
 </script>
@@ -72,6 +72,16 @@
   </div>
 <![endif]-->
   
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?93b1a723d246349c4cace650dee4a731";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
 
 
 
@@ -107,54 +117,47 @@
     <ul id="menu" class="menu menu-left">
       
         
-        <li class="menu-item menu-item-主页">
+        <li class="menu-item menu-item-home">
           <a href="/" rel="section">
-            <i class="menu-item-icon icon-next-主页"></i> <br />
-            menu.主页
+            <i class="menu-item-icon icon-next-home"></i> <br />
+            首页
           </a>
         </li>
       
         
-        <li class="menu-item menu-item-分类页">
-          <a href="/categories" rel="section">
-            <i class="menu-item-icon icon-next-分类页"></i> <br />
-            menu.分类页
-          </a>
-        </li>
-      
-        
-        <li class="menu-item menu-item-归档页">
+        <li class="menu-item menu-item-archives">
           <a href="/archives" rel="section">
-            <i class="menu-item-icon icon-next-归档页"></i> <br />
-            menu.归档页
+            <i class="menu-item-icon icon-next-archives"></i> <br />
+            归档
           </a>
         </li>
       
         
-        <li class="menu-item menu-item-标签页">
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            <i class="menu-item-icon icon-next-categories"></i> <br />
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
           <a href="/tags" rel="section">
-            <i class="menu-item-icon icon-next-标签页"></i> <br />
-            menu.标签页
+            <i class="menu-item-icon icon-next-tags"></i> <br />
+            标签
           </a>
         </li>
       
         
-        <li class="menu-item menu-item-关于">
+        <li class="menu-item menu-item-about">
           <a href="/about" rel="section">
-            <i class="menu-item-icon icon-next-关于"></i> <br />
-            menu.关于
+            <i class="menu-item-icon icon-next-about"></i> <br />
+            关于
           </a>
         </li>
       
 
       
-      
-        <li class="menu-item menu-item-search">
-          <a href="#" class="st-search-show-outputs">
-            <i class="menu-item-icon icon-next-search"></i> <br />
-            搜索
-          </a>
-        </li>
       
     </ul>
   
@@ -163,6 +166,10 @@
     <div class="site-search">
       
   
+  <form class="site-search-form">
+    <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+  </form>
+
 
 <script type="text/javascript">
   (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
@@ -217,6 +224,13 @@
         
 
         
+          
+            <span class="post-comments-count">
+              &nbsp; | &nbsp;
+              <a href="/2015/09/22/hello-world/#comments" itemprop="discussionUrl">
+                <span class="post-comments-count ds-thread-count" data-thread-key="2015/09/22/hello-world/" itemprop="commentsCount"></span>
+              </a>
+            </span>
           
         
       </div>
@@ -287,27 +301,27 @@
           <img class="site-author-image" src="/images/lanjingling.jpg" alt="lanjingling" itemprop="image"/>
           <p class="site-author-name" itemprop="name">lanjingling</p>
         </div>
-        <p class="site-description motion-element" itemprop="description">算法、java、nodejs、oracle 全栈技术博客</p>
+        <p class="site-description motion-element" itemprop="description">java程序员、爱开源、喜欢nodejs、前端js、oracle数据库、分布式技术...<br/>改变世界的是这么一群人,他们寻找梦想中的乐园,当他们找不到时,就亲手创造了她...</p>
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
-            <a href="/">
+            <a href="/archives">
               <span class="site-state-item-count">1</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
 
           <div class="site-state-item site-state-categories">
-            
+            <a href="/categories">
               <span class="site-state-item-count">0</span>
               <span class="site-state-item-name">分类</span>
-              
+              </a>
           </div>
 
           <div class="site-state-item site-state-tags">
-            
+            <a href="/tags">
               <span class="site-state-item-count">0</span>
               <span class="site-state-item-name">标签</span>
-              
+              </a>
           </div>
 
         </nav>
@@ -315,6 +329,20 @@
         
 
         <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/lanjingling" target="_blank">github</a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://blog.csdn.net/liuxiao723846" target="_blank">csdn</a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/1925780475" target="_blank">weibo</a>
+              </span>
+            
           
         </div>
 
@@ -338,7 +366,7 @@
     <footer id="footer" class="footer">
       <div class="footer-inner"> <div class="copyright" >
   
-  &copy; &nbsp; 
+  &copy; &nbsp;  2014 - 
   <span itemprop="copyrightYear">2015</span>
   <span class="with-love">
     <i class="icon-next-heart"></i>
@@ -353,7 +381,7 @@
 <div class="theme-info">
   主题 -
   <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
-    NexT
+    NexT.Mist
   </a>
 </div>
 
@@ -370,11 +398,26 @@
   
   
     
-    
 
   
+    
+  
 
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"lanjingling"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+    
+     
 
+    
   
   
   <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
