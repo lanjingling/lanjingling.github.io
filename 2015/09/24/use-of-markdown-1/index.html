@@ -30,7 +30,7 @@
 
 
 
-  <meta name="keywords" content="Hexo,next" />
+  <meta name="keywords" content="markdown," />
 
 
 
@@ -39,15 +39,16 @@
   <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.1" />
 
 
-<meta name="description" content="java程序员、爱开源、喜欢nodejs、前端js、oracle数据库、分布式技术...改变世界的是这么一群人,他们寻找梦想中的乐园,当他们找不到时,就亲手创造了她...">
-<meta property="og:type" content="website">
-<meta property="og:title" content="晓的技术博客">
-<meta property="og:url" content="http://yoursite.com/index.html">
+<meta name="description" content="上文介绍了一些关于markdown的简单教程，本节主要针对hexo上代码高亮的一些配置...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="markdown 高亮代码">
+<meta property="og:url" content="http://yoursite.com/2015/09/24/use-of-markdown-1/index.html">
 <meta property="og:site_name" content="晓的技术博客">
-<meta property="og:description" content="java程序员、爱开源、喜欢nodejs、前端js、oracle数据库、分布式技术...改变世界的是这么一群人,他们寻找梦想中的乐园,当他们找不到时,就亲手创造了她...">
+<meta property="og:description" content="上文介绍了一些关于markdown的简单教程，本节主要针对hexo上代码高亮的一些配置...">
+<meta property="og:updated_time" content="2015-09-24T09:27:46.927Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="晓的技术博客">
-<meta name="twitter:description" content="java程序员、爱开源、喜欢nodejs、前端js、oracle数据库、分布式技术...改变世界的是这么一群人,他们寻找梦想中的乐园,当他们找不到时,就亲手创造了她...">
+<meta name="twitter:title" content="markdown 高亮代码">
+<meta name="twitter:description" content="上文介绍了一些关于markdown的简单教程，本节主要针对hexo上代码高亮的一些配置...">
 
 
 <script type="text/javascript" id="hexo.configuration">
@@ -57,7 +58,7 @@
   };
 </script>
 
-  <title> 晓的技术博客 </title>
+  <title> markdown 高亮代码 | 晓的技术博客 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -85,9 +86,7 @@
 
 
 
-  <div class="container one-column 
-   page-home 
-">
+  <div class="container one-column page-post-detail">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -192,9 +191,9 @@
     <main id="main" class="main">
       <div class="main-inner">
         <div id="content" class="content"> 
-  <section id="posts" class="posts-expand">
+
+  <div id="posts" class="posts-expand">
     
-      
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <header class="post-header">
@@ -205,9 +204,7 @@
           
           
             
-              <a class="post-title-link" href="/2015/09/24/use-of-markdown-1/" itemprop="url">
-                markdown 高亮代码
-              </a>
+              markdown 高亮代码
             
           
         </h1>
@@ -257,302 +254,98 @@
       
 
       
-        
-          <span itemprop="description">上文介绍了一些关于markdown的简单教程，本节主要针对hexo上代码高亮的一些配置...</span>
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2015/09/24/use-of-markdown-1/">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
+        <span itemprop="articleBody"><p>在hexo上写了几篇文章后，发现使用markdown的“`”语法插入代码后， 代码区域没有高亮、而且没有行号。。。郁闷，google了一下发现<a href="http://heckaitor.github.io/2014/04/10/hexo-markdown-code-highlight/" target="_blank" rel="external">这篇文章</a>里有解决方法，现在记录一下。</p>
+<p>常用的“`”来框起一个单词或短句，Markdown最终会转化成<code>&lt;pre&gt;&lt;/pre&gt;</code>或<code>&lt;code&gt;&lt;/code&gt;</code>对于成段的代码块，使用这种方式后代码区域显示出来的没有语法高亮，也没有行号，一点美感都没有，查询<a href="http://octopress.org/docs/plugins/codeblock/" target="_blank" rel="external">Markdown</a>语法，发现了另外一种格式：</p>
+<blockquote>
+
+{% codeblock [lang:language] [title] [url] [link text] %}<br>
+code snippet<br>
+{% endcodeblock %}
+</blockquote>
+<p>其中</p>
+<ul>
+<li>lang 语言</li>
+<li>title 代码块上方的标题</li>
+<li>url 为本段代码指定一个url，用于下载或引用</li>
+<li>link text url显示的文字</li>
+</ul>
+<p>以下三个用于控制行号显示</p>
+<ul>
+<li>start:# 从第#行开始显示行号</li>
+<li>mark:#,#-# 在第#行，以及第#-#行显示行号</li>
+<li>linenos:false true 所有行都显示行号，false所有行都不显示行号<br>对于lang，这里列出了支持的语言以及对应的字段名，如java，cpp等，以上字段均为可选字段，可以使用默认值，如:<figure class="highlight java"><figcaption><span>java代码实例</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">hashMap</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		Map map1  = <span class="keyword">new</span> LinkedHashMap();</span><br><span class="line">		map1.put(<span class="string">"a3"</span>, <span class="string">"aa"</span>);       </span><br><span class="line">	    map1.put(<span class="string">"a2"</span>, <span class="string">"bb"</span>); </span><br><span class="line">	    map1.put(<span class="string">"b1"</span>, <span class="string">"cc"</span>);</span><br><span class="line">		Iterator keysIterator = map1.values().iterator();</span><br><span class="line">		<span class="keyword">while</span> (keysIterator.hasNext()) &#123;</span><br><span class="line">			System.out.println(keysIterator.next());</span><br><span class="line">		&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</span>
       
     </div>
 
     <footer class="post-footer">
       
-
+        <div class="post-tags">
+          
+            <a href="/tags/markdown/" rel="tag">#markdown</a>
+          
+        </div>
       
 
       
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/09/24/use-of-hexo-2/" rel="next">hexo使用心得（二）</a>
+            
+          </div>
+        </div>
       
-        <div class="post-eof"></div>
+
+      
       
     </footer>
   </article>
 
 
-    
+
+    <div class="post-spread">
       
+        <div class="ds-share flat" data-thread-key="2015/09/24/use-of-markdown-1/"
+     data-title="markdown 高亮代码"
+     data-content=""
+     data-url="http://yoursite.com/2015/09/24/use-of-markdown-1/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
 
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
 
-      
-      
-        <h1 class="post-title" itemprop="name headline">
-          
-          
-            
-              <a class="post-title-link" href="/2015/09/24/use-of-hexo-2/" itemprop="url">
-                hexo使用心得（二）
-              </a>
-            
-          
-        </h1>
-      
-
-      <div class="post-meta">
-        <span class="post-time">
-          发表于
-          <time itemprop="dateCreated" datetime="2015-09-24T15:26:59+08:00" content="2015-09-24">
-            2015-09-24
-          </time>
-        </span>
-
-        
-          <span class="post-category" >
-            &nbsp; | &nbsp; 分类于
-            
-              <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                <a href="/categories/hexo/" itemprop="url" rel="index">
-                  <span itemprop="name">hexo</span>
-                </a>
-              </span>
-
-              
-              
-
-            
-          </span>
-        
-
-        
-          
-            <span class="post-comments-count">
-              &nbsp; | &nbsp;
-              <a href="/2015/09/24/use-of-hexo-2/#comments" itemprop="discussionUrl">
-                <span class="post-comments-count ds-thread-count" data-thread-key="2015/09/24/use-of-hexo-2/" itemprop="commentsCount"></span>
-              </a>
-            </span>
-          
-        
-      </div>
-    </header>
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <span itemprop="description">上文介绍了如何配置个性化的hexo、以及配置next主题，本节主要介绍如何使用hexo发布新文章，以及一些常用的使用技巧（不错的markdown在线编辑器、图床等）...</span>
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2015/09/24/use-of-hexo-2/">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
       
     </div>
+  </div>
 
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      
-      
-        <h1 class="post-title" itemprop="name headline">
-          
-          
-            
-              <a class="post-title-link" href="/2015/09/24/ues-of-hexo-1/" itemprop="url">
-                hexo使用心得（一）
-              </a>
-            
-          
-        </h1>
-      
-
-      <div class="post-meta">
-        <span class="post-time">
-          发表于
-          <time itemprop="dateCreated" datetime="2015-09-24T13:20:14+08:00" content="2015-09-24">
-            2015-09-24
-          </time>
-        </span>
-
-        
-          <span class="post-category" >
-            &nbsp; | &nbsp; 分类于
-            
-              <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                <a href="/categories/hexo/" itemprop="url" rel="index">
-                  <span itemprop="name">hexo</span>
-                </a>
-              </span>
-
-              
-              
-
-            
-          </span>
-        
-
-        
-          
-            <span class="post-comments-count">
-              &nbsp; | &nbsp;
-              <a href="/2015/09/24/ues-of-hexo-1/#comments" itemprop="discussionUrl">
-                <span class="post-comments-count ds-thread-count" data-thread-key="2015/09/24/ues-of-hexo-1/" itemprop="commentsCount"></span>
-              </a>
-            </span>
-          
-        
-      </div>
-    </header>
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <span itemprop="description">上文介绍了hexo的安装、部署，从这节开始主要介绍如何使用hexo。hexo安装目录介绍、hexo主要命令、配置next主题...</span>
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2015/09/24/ues-of-hexo-1/">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      
-      
-        <h1 class="post-title" itemprop="name headline">
-          
-          
-            
-              <a class="post-title-link" href="/2015/09/23/hexo简介/" itemprop="url">
-                hexo简介、安装、部署
-              </a>
-            
-          
-        </h1>
-      
-
-      <div class="post-meta">
-        <span class="post-time">
-          发表于
-          <time itemprop="dateCreated" datetime="2015-09-23T15:00:41+08:00" content="2015-09-23">
-            2015-09-23
-          </time>
-        </span>
-
-        
-          <span class="post-category" >
-            &nbsp; | &nbsp; 分类于
-            
-              <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                <a href="/categories/hexo/" itemprop="url" rel="index">
-                  <span itemprop="name">hexo</span>
-                </a>
-              </span>
-
-              
-              
-
-            
-          </span>
-        
-
-        
-          
-            <span class="post-comments-count">
-              &nbsp; | &nbsp;
-              <a href="/2015/09/23/hexo简介/#comments" itemprop="discussionUrl">
-                <span class="post-comments-count ds-thread-count" data-thread-key="2015/09/23/hexo简介/" itemprop="commentsCount"></span>
-              </a>
-            </span>
-          
-        
-      </div>
-    </header>
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <span itemprop="description">hexo是使用nodejs开发的一个快速、简洁、高效、开源的静态博客生成器。本文介绍了如何安装hexo、把hexo部署到github上。</span>
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2015/09/23/hexo简介/">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-  </section>
-
-  
  </div>
 
         
 
+        
+          <div class="comments" id="comments">
+            
+              <div class="ds-thread" data-thread-key="2015/09/24/use-of-markdown-1/"
+                   data-title="markdown 高亮代码" data-url="http://yoursite.com/2015/09/24/use-of-markdown-1/">
+              </div>
+            
+          </div>
         
       </div>
 
@@ -569,6 +362,15 @@
   <aside id="sidebar" class="sidebar">
     <div class="sidebar-inner">
 
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
       
 
       <section class="site-overview">
@@ -645,6 +447,17 @@
 
       </section>
 
+      
+        <section class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <p class="post-toc-empty">此文章未包含目录</p>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </section>
       
 
     </div>
@@ -729,6 +542,165 @@
   <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
 
   
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.1" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 0.4 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    var $tocContent = $('.post-toc-content');
+    if (isDesktop() && CONFIG.sidebar === 'post') {
+      if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+        displaySidebar();
+      }
+    }
+  });
+</script>
+
+
 
   <script type="text/javascript">
     $(document).ready(function () {
