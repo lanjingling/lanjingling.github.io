@@ -41,12 +41,12 @@
 
 <meta name="description" content="java程序员、爱开源、喜欢nodejs、前端js、oracle数据库、分布式技术...改变世界的是这么一群人,他们寻找梦想中的乐园,当他们找不到时,就亲手创造了她...">
 <meta property="og:type" content="website">
-<meta property="og:title" content="蓝精灵儿的技术博客">
+<meta property="og:title" content="晓的技术博客">
 <meta property="og:url" content="http://yoursite.com/index.html">
-<meta property="og:site_name" content="蓝精灵儿的技术博客">
+<meta property="og:site_name" content="晓的技术博客">
 <meta property="og:description" content="java程序员、爱开源、喜欢nodejs、前端js、oracle数据库、分布式技术...改变世界的是这么一群人,他们寻找梦想中的乐园,当他们找不到时,就亲手创造了她...">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="蓝精灵儿的技术博客">
+<meta name="twitter:title" content="晓的技术博客">
 <meta name="twitter:description" content="java程序员、爱开源、喜欢nodejs、前端js、oracle数据库、分布式技术...改变世界的是这么一群人,他们寻找梦想中的乐园,当他们找不到时,就亲手创造了她...">
 
 
@@ -57,7 +57,7 @@
   };
 </script>
 
-  <title> 蓝精灵儿的技术博客 </title>
+  <title> 晓的技术博客 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -97,7 +97,7 @@
       <span class="logo">
         <i class="icon-next-logo"></i>
       </span>
-      <span class="site-title">蓝精灵儿的技术博客</span>
+      <span class="site-title">晓的技术博客</span>
   </a>
   <span class="logo-line-after"><i></i></span>
 </h1>
@@ -205,8 +205,8 @@
           
           
             
-              <a class="post-title-link" href="/2015/09/22/hello-world/" itemprop="url">
-                Hello World
+              <a class="post-title-link" href="/2015/09/24/use-of-hexo-2/" itemprop="url">
+                hexo使用心得（二）
               </a>
             
           
@@ -216,19 +216,34 @@
       <div class="post-meta">
         <span class="post-time">
           发表于
-          <time itemprop="dateCreated" datetime="2015-09-22T11:05:13+08:00" content="2015-09-22">
-            2015-09-22
+          <time itemprop="dateCreated" datetime="2015-09-24T15:26:59+08:00" content="2015-09-24">
+            2015-09-24
           </time>
         </span>
 
+        
+          <span class="post-category" >
+            &nbsp; | &nbsp; 分类于
+            
+              <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                <a href="/categories/hexo/" itemprop="url" rel="index">
+                  <span itemprop="name">hexo</span>
+                </a>
+              </span>
+
+              
+              
+
+            
+          </span>
         
 
         
           
             <span class="post-comments-count">
               &nbsp; | &nbsp;
-              <a href="/2015/09/22/hello-world/#comments" itemprop="discussionUrl">
-                <span class="post-comments-count ds-thread-count" data-thread-key="2015/09/22/hello-world/" itemprop="commentsCount"></span>
+              <a href="/2015/09/24/use-of-hexo-2/#comments" itemprop="discussionUrl">
+                <span class="post-comments-count ds-thread-count" data-thread-key="2015/09/24/use-of-hexo-2/" itemprop="commentsCount"></span>
               </a>
             </span>
           
@@ -243,16 +258,188 @@
 
       
         
-          <span itemprop="articleBody"><p>Welcome to <a href="http://hexo.io/" target="_blank" rel="external">Hexo</a>! This is your very first post. Check <a href="http://hexo.io/docs/" target="_blank" rel="external">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="http://hexo.io/docs/troubleshooting.html" target="_blank" rel="external">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="external">GitHub</a>.</p>
-<h2 id="Quick_Start">Quick Start</h2><h3 id="Create_a_new_post">Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
-<p>More info: <a href="http://hexo.io/docs/writing.html" target="_blank" rel="external">Writing</a></p>
-<h3 id="Run_server">Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="http://hexo.io/docs/server.html" target="_blank" rel="external">Server</a></p>
-<h3 id="Generate_static_files">Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="http://hexo.io/docs/generating.html" target="_blank" rel="external">Generating</a></p>
-<h3 id="Deploy_to_remote_sites">Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="http://hexo.io/docs/deployment.html" target="_blank" rel="external">Deployment</a></p>
-</span>
+          <span itemprop="description">上文介绍了如何配置个性化的hexo、以及配置next主题，本节主要介绍如何使用hexo发布新文章，以及一些常用的使用技巧（不错的markdown在线编辑器、图床等）...</span>
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2015/09/24/use-of-hexo-2/">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+
+      
+      
+        <h1 class="post-title" itemprop="name headline">
+          
+          
+            
+              <a class="post-title-link" href="/2015/09/24/ues-of-hexo-1/" itemprop="url">
+                hexo使用心得（一）
+              </a>
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于
+          <time itemprop="dateCreated" datetime="2015-09-24T13:20:14+08:00" content="2015-09-24">
+            2015-09-24
+          </time>
+        </span>
+
+        
+          <span class="post-category" >
+            &nbsp; | &nbsp; 分类于
+            
+              <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                <a href="/categories/hexo/" itemprop="url" rel="index">
+                  <span itemprop="name">hexo</span>
+                </a>
+              </span>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+            <span class="post-comments-count">
+              &nbsp; | &nbsp;
+              <a href="/2015/09/24/ues-of-hexo-1/#comments" itemprop="discussionUrl">
+                <span class="post-comments-count ds-thread-count" data-thread-key="2015/09/24/ues-of-hexo-1/" itemprop="commentsCount"></span>
+              </a>
+            </span>
+          
+        
+      </div>
+    </header>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="description">上文介绍了hexo的安装、部署，从这节开始主要介绍如何使用hexo。hexo安装目录介绍、hexo主要命令、配置next主题...</span>
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2015/09/24/ues-of-hexo-1/">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+
+      
+      
+        <h1 class="post-title" itemprop="name headline">
+          
+          
+            
+              <a class="post-title-link" href="/2015/09/23/hexo简介/" itemprop="url">
+                hexo简介
+              </a>
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于
+          <time itemprop="dateCreated" datetime="2015-09-23T15:00:41+08:00" content="2015-09-23">
+            2015-09-23
+          </time>
+        </span>
+
+        
+          <span class="post-category" >
+            &nbsp; | &nbsp; 分类于
+            
+              <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                <a href="/categories/hexo/" itemprop="url" rel="index">
+                  <span itemprop="name">hexo</span>
+                </a>
+              </span>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+            <span class="post-comments-count">
+              &nbsp; | &nbsp;
+              <a href="/2015/09/23/hexo简介/#comments" itemprop="discussionUrl">
+                <span class="post-comments-count ds-thread-count" data-thread-key="2015/09/23/hexo简介/" itemprop="commentsCount"></span>
+              </a>
+            </span>
+          
+        
+      </div>
+    </header>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="description">hexo是使用nodejs开发的一个快速、简洁、高效、开源的静态博客生成器。本文介绍了如何安装hexo、把hexo部署到github上。</span>
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2015/09/23/hexo简介/">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
       
     </div>
@@ -298,28 +485,28 @@
 
       <section class="site-overview">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-          <img class="site-author-image" src="/images/lanjingling.jpg" alt="lanjingling" itemprop="image"/>
-          <p class="site-author-name" itemprop="name">lanjingling</p>
+          <img class="site-author-image" src="/images/lanjingling.jpg" alt="蓝精灵" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">蓝精灵</p>
         </div>
         <p class="site-description motion-element" itemprop="description">java程序员、爱开源、喜欢nodejs、前端js、oracle数据库、分布式技术...<br/>改变世界的是这么一群人,他们寻找梦想中的乐园,当他们找不到时,就亲手创造了她...</p>
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">1</span>
+              <span class="site-state-item-count">3</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
 
           <div class="site-state-item site-state-categories">
             <a href="/categories">
-              <span class="site-state-item-count">0</span>
+              <span class="site-state-item-count">1</span>
               <span class="site-state-item-name">分类</span>
               </a>
           </div>
 
           <div class="site-state-item site-state-tags">
             <a href="/tags">
-              <span class="site-state-item-count">0</span>
+              <span class="site-state-item-count">2</span>
               <span class="site-state-item-name">标签</span>
               </a>
           </div>
@@ -351,6 +538,21 @@
 
         <div class="links-of-author motion-element">
           
+            <p class="site-author-name">Links</p>
+            
+              <span class="links-of-author-item">
+              <a href="http://zipperary.com/" target="_blank">Zippera's Blog</a>
+              </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://wuchong.me/" target="_blank">Jark's Blog</a>
+              </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://www.ruanyifeng.com/blog/" target="_blank">阮一峰</a>
+              </span>
+            
+          
         </div>
 
       </section>
@@ -371,7 +573,7 @@
   <span class="with-love">
     <i class="icon-next-heart"></i>
   </span>
-  <span class="author" itemprop="copyrightHolder">lanjingling</span>
+  <span class="author" itemprop="copyrightHolder">蓝精灵</span>
 </div>
 
 <div class="powered-by">

@@ -30,7 +30,7 @@
 
 
 
-  <meta name="keywords" content="Hexo,next" />
+  <meta name="keywords" content="hexo,markdown," />
 
 
 
@@ -39,19 +39,16 @@
   <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.1" />
 
 
-<meta name="description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub.
-Quick">
+<meta name="description" content="上文介绍了如何配置个性化的hexo、以及配置next主题，本节主要介绍如何使用hexo发布新文章，以及一些常用的使用技巧（不错的markdown在线编辑器、图床等）...">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Hello World">
-<meta property="og:url" content="http://yoursite.com/2015/09/22/hello-world/index.html">
-<meta property="og:site_name" content="蓝精灵儿的技术博客">
-<meta property="og:description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub.
-Quick">
-<meta property="og:updated_time" content="2015-09-22T03:05:13.445Z">
+<meta property="og:title" content="hexo使用心得（二）">
+<meta property="og:url" content="http://yoursite.com/2015/09/24/use-of-hexo-2/index.html">
+<meta property="og:site_name" content="晓的技术博客">
+<meta property="og:description" content="上文介绍了如何配置个性化的hexo、以及配置next主题，本节主要介绍如何使用hexo发布新文章，以及一些常用的使用技巧（不错的markdown在线编辑器、图床等）...">
+<meta property="og:updated_time" content="2015-09-24T08:58:57.134Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Hello World">
-<meta name="twitter:description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub.
-Quick">
+<meta name="twitter:title" content="hexo使用心得（二）">
+<meta name="twitter:description" content="上文介绍了如何配置个性化的hexo、以及配置next主题，本节主要介绍如何使用hexo发布新文章，以及一些常用的使用技巧（不错的markdown在线编辑器、图床等）...">
 
 
 <script type="text/javascript" id="hexo.configuration">
@@ -61,7 +58,7 @@ Quick">
   };
 </script>
 
-  <title> Hello World | 蓝精灵儿的技术博客 </title>
+  <title> hexo使用心得（二） | 晓的技术博客 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -99,7 +96,7 @@ Quick">
       <span class="logo">
         <i class="icon-next-logo"></i>
       </span>
-      <span class="site-title">蓝精灵儿的技术博客</span>
+      <span class="site-title">晓的技术博客</span>
   </a>
   <span class="logo-line-after"><i></i></span>
 </h1>
@@ -207,7 +204,7 @@ Quick">
           
           
             
-              Hello World
+              hexo使用心得（二）
             
           
         </h1>
@@ -216,19 +213,34 @@ Quick">
       <div class="post-meta">
         <span class="post-time">
           发表于
-          <time itemprop="dateCreated" datetime="2015-09-22T11:05:13+08:00" content="2015-09-22">
-            2015-09-22
+          <time itemprop="dateCreated" datetime="2015-09-24T15:26:59+08:00" content="2015-09-24">
+            2015-09-24
           </time>
         </span>
 
+        
+          <span class="post-category" >
+            &nbsp; | &nbsp; 分类于
+            
+              <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                <a href="/categories/hexo/" itemprop="url" rel="index">
+                  <span itemprop="name">hexo</span>
+                </a>
+              </span>
+
+              
+              
+
+            
+          </span>
         
 
         
           
             <span class="post-comments-count">
               &nbsp; | &nbsp;
-              <a href="/2015/09/22/hello-world/#comments" itemprop="discussionUrl">
-                <span class="post-comments-count ds-thread-count" data-thread-key="2015/09/22/hello-world/" itemprop="commentsCount"></span>
+              <a href="/2015/09/24/use-of-hexo-2/#comments" itemprop="discussionUrl">
+                <span class="post-comments-count ds-thread-count" data-thread-key="2015/09/24/use-of-hexo-2/" itemprop="commentsCount"></span>
               </a>
             </span>
           
@@ -242,22 +254,88 @@ Quick">
       
 
       
-        <span itemprop="articleBody"><p>Welcome to <a href="http://hexo.io/" target="_blank" rel="external">Hexo</a>! This is your very first post. Check <a href="http://hexo.io/docs/" target="_blank" rel="external">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="http://hexo.io/docs/troubleshooting.html" target="_blank" rel="external">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="external">GitHub</a>.</p>
-<h2 id="Quick_Start">Quick Start</h2><h3 id="Create_a_new_post">Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
-<p>More info: <a href="http://hexo.io/docs/writing.html" target="_blank" rel="external">Writing</a></p>
-<h3 id="Run_server">Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="http://hexo.io/docs/server.html" target="_blank" rel="external">Server</a></p>
-<h3 id="Generate_static_files">Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="http://hexo.io/docs/generating.html" target="_blank" rel="external">Generating</a></p>
-<h3 id="Deploy_to_remote_sites">Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="http://hexo.io/docs/deployment.html" target="_blank" rel="external">Deployment</a></p>
+        <span itemprop="articleBody"><p>上文介绍了如何配置个性化的hexo、以及配置next主题，本节主要介绍如何使用hexo发布新文章，以及一些常用的使用技巧（不错的markdown在线编辑器、图床等）…</p>
+<h2 id="发布新文章">发布新文章</h2><p>执行new命令，生成指定名称的文章至hexo\source_posts\postName.md。<br><code>hexo new [layout] &quot;postName&quot; #新建文章</code></p>
+<p>其中layout是可选参数，默认值为post。有哪些layout呢，请到scaffolds目录下查看，这些文件名称就是layout名称。当然你可以添加自己的layout，方法就是添加一个文件即可，同时你也可以编辑现有的layout，比如post的layout默认是hexo\scaffolds\post.md</p>
+<p>然后，使用文本编辑器打来postName.md，文件的开头是属性，采用统一的yaml格式，用三条短横线分隔。下面是文章正文。<br>可以直接修改title（标题名字）、date（时间）等。description是文章概要，该项为空时hexo默认在首页会显示全部文章内容，如果文章比较长就会显的内容很乱；写让该项后hexo会显示摘要和“阅读全文”连接。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">title: postName #文章页面上的显示名称，可以任意修改，不会出现在URL中</span><br><span class="line">date: 2013-12-02 15:30:16 #文章生成时间，一般不改，当然也可以任意修改</span><br><span class="line">categories: #文章分类目录，可以为空，注意:后面有个空格</span><br><span class="line">tags: #文章标签，可空，多标签请用格式[tag1,tag2,tag3]，注意:后面有个空格</span><br><span class="line">description: #概要信息</span><br><span class="line">---</span><br><span class="line">这里开始使用markdown格式输入你的正文。</span><br></pre></td></tr></table></figure>
+<p><strong><font color="red">注意:</font></strong> 所有文件：后面都必须有个空格，不然会报错。</p>
+<p>接下来，你就可以选择一款自己熟练的markdown编辑器写文章，然后把内容粘贴到paostName.md中。这里推荐一个不错的在线markdown编辑器<a href="https://www.zybuluo.com" target="_blank" rel="external">Cmd Markdown</a>,作业部落产品的。</p>
+<p><a href="http://ibruce.info/2013/11/22/hexo-your-blog/" target="_blank" rel="external">这里</a>是一个不错的hexo使用教程文章。</p>
+<h2 id="其他方面">其他方面</h2><h3 id="草稿">草稿</h3><p>草稿相当于很多博客都有的“私密文章”功能。使用如下命令创建：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new draft "new draft"</span><br></pre></td></tr></table></figure></p>
+<p>会在source/_drafts目录下生成一个new-draft.md文件。但是这个文件不被显示在页面上，链接也访问不到。也就是说如果你想把某一篇文章移除显示，又不舍得删除，可以把它移动到_drafts目录之中。</p>
+<p>如果你希望强行预览草稿，更改配置文件（_config.yml）：<br><code>render_drafts: true</code><br>或者如下方式启动server：<br><code>$ hexo server --drafts</code></p>
+<p>下面这条命令可以把草稿变成文章，或者页面：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo publish [layout] <span class="tag">&lt;<span class="title">filename</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="图床">图床</h3><p>如果想在文章中显示一副图片，再考虑到博客的速度，同时也为了便于博客的迁移，那么图床是必须的。（所谓图床，就是可以保存图片，同时允许使用图片外链）现在有很多免费的图床服务器，例如：七牛、新浪微博。我的博客使用的是新浪微博作为图床，这里简单介绍一下：</p>
+<ul>
+<li>进入新浪微博的微相册 ：<a href="http://photo.weibo.com" target="_blank" rel="external">http://photo.weibo.com</a></li>
+<li>上传图片，然后把图片拖到浏览器地址栏查看连接。新浪微博的图片会上传到ww1-ww4几台服务器上，同时会生成几张不同尺寸的图片，常用的有以下几种形式：<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">http://ww1.sinaimg.cn/thumbnail/6ee58152gw1dxmhny2ga3j.jpg （缩略图）</span><br><span class="line">http://ww1.sinaimg.cn/small/6ee58152gw1dxmhny2ga3j.jpg （稍微大点的图）</span><br><span class="line">http://ww1.sinaimg.cn/bmiddle/6ee58152gw1dxmhny2ga3j.jpg （再大点的图）</span><br><span class="line">http://ww1.sinaimg.cn/large/6ee58152gw1dxmhny2ga3j.jpg（最大的）</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="markdown语法">markdown语法</h3><p>下面介绍你种常用的语法，详细使用请参照后面的几个连接。</p>
+<p><strong>1、标题：</strong></p>
+<blockquote>
+<p># 一级标题<br>## 二级标题<br>### 三级标题<br>#### 四级标题<br>##### 五级标题<br>###### 六级标题</p>
+</blockquote>
+<p><strong>2、列表：</strong><br>无语列表：</p>
+<blockquote>
+<p>- 文本1<br>- 文本2<br>- 文本3</p>
+</blockquote>
+<p>有序列表：</p>
+<blockquote>
+<ol>
+<li>文本1</li>
+<li>文本2</li>
+<li>文本3</li>
+</ol>
+</blockquote>
+<p><strong>3、超链接：</strong></p>
+<blockquote>
+<p><code>[晓的技术博客](http://lanjingling.github.io/)</code></p>
+</blockquote>
+<p><strong>4、图片：</strong></p>
+<blockquote>
+<p><code>![](http://ww4.sinaimg.cn/bmiddle/aa397b7fjw1dzplsgpdw5j.jpg)</code></p>
+</blockquote>
+<p><strong>5、引用：</strong><br>Markdown 中，你只需要在你希望引用的文字前面加上 &gt; 就好了</p>
+<p><strong>6、转义：</strong><br>Markdown中的转义字符为\，可以转义的有：</p>
+<blockquote>
+<p>\\ 反斜杠<br>\` 反引号<br>\* 星号<br>\_ 下划线<br>\{} 大括号<br>\[] 中括号<br>\() 小括号<br>\# 井号<br>\+ 加号<br>\- 减号<br>\. 英文句号<br>\! 感叹号</p>
+</blockquote>
+<p>此外，对于一些markdown中有意义的语法（如图片语法），要转移的化需要使用反引号括起来。例如（`<code>[晓的技术博客](http://lanjingling.github.io/)</code>`）</p>
+<p><strong>7、图表、流程图</strong><br>见<a href="https://www.zybuluo.com/mdeditor#180745" target="_blank" rel="external">这里</a></p>
+<p><strong>8、其他语法见如下连接：</strong></p>
+<ol>
+<li><a href="http://www.jianshu.com/p/q81RER" target="_blank" rel="external">简书：献给写作者的 Markdown 新手指南</a></li>
+<li><a href="http://wowubuntu.com/markdown/#p" target="_blank" rel="external">官方文档(中文版)：Markdown 语法说明</a></li>
+</ol>
 </span>
       
     </div>
 
     <footer class="post-footer">
       
+        <div class="post-tags">
+          
+            <a href="/tags/hexo/" rel="tag">#hexo</a>
+          
+            <a href="/tags/markdown/" rel="tag">#markdown</a>
+          
+        </div>
+      
 
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/09/24/ues-of-hexo-1/" rel="next">hexo使用心得（一）</a>
+            
+          </div>
+        </div>
       
 
       
@@ -269,10 +347,10 @@ Quick">
 
     <div class="post-spread">
       
-        <div class="ds-share flat" data-thread-key="2015/09/22/hello-world/"
-     data-title="Hello World"
+        <div class="ds-share flat" data-thread-key="2015/09/24/use-of-hexo-2/"
+     data-title="hexo使用心得（二）"
      data-content=""
-     data-url="http://yoursite.com/2015/09/22/hello-world/">
+     data-url="http://yoursite.com/2015/09/24/use-of-hexo-2/">
   <div class="ds-share-inline">
     <ul  class="ds-share-icons-16">
 
@@ -298,8 +376,8 @@ Quick">
         
           <div class="comments" id="comments">
             
-              <div class="ds-thread" data-thread-key="2015/09/22/hello-world/"
-                   data-title="Hello World" data-url="http://yoursite.com/2015/09/22/hello-world/">
+              <div class="ds-thread" data-thread-key="2015/09/24/use-of-hexo-2/"
+                   data-title="hexo使用心得（二）" data-url="http://yoursite.com/2015/09/24/use-of-hexo-2/">
               </div>
             
           </div>
@@ -332,28 +410,28 @@ Quick">
 
       <section class="site-overview">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-          <img class="site-author-image" src="/images/lanjingling.jpg" alt="lanjingling" itemprop="image"/>
-          <p class="site-author-name" itemprop="name">lanjingling</p>
+          <img class="site-author-image" src="/images/lanjingling.jpg" alt="蓝精灵" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">蓝精灵</p>
         </div>
         <p class="site-description motion-element" itemprop="description">java程序员、爱开源、喜欢nodejs、前端js、oracle数据库、分布式技术...<br/>改变世界的是这么一群人,他们寻找梦想中的乐园,当他们找不到时,就亲手创造了她...</p>
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">1</span>
+              <span class="site-state-item-count">3</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
 
           <div class="site-state-item site-state-categories">
             <a href="/categories">
-              <span class="site-state-item-count">0</span>
+              <span class="site-state-item-count">1</span>
               <span class="site-state-item-name">分类</span>
               </a>
           </div>
 
           <div class="site-state-item site-state-tags">
             <a href="/tags">
-              <span class="site-state-item-count">0</span>
+              <span class="site-state-item-count">2</span>
               <span class="site-state-item-name">标签</span>
               </a>
           </div>
@@ -385,6 +463,21 @@ Quick">
 
         <div class="links-of-author motion-element">
           
+            <p class="site-author-name">Links</p>
+            
+              <span class="links-of-author-item">
+              <a href="http://zipperary.com/" target="_blank">Zippera's Blog</a>
+              </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://wuchong.me/" target="_blank">Jark's Blog</a>
+              </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://www.ruanyifeng.com/blog/" target="_blank">阮一峰</a>
+              </span>
+            
+          
         </div>
 
       </section>
@@ -395,7 +488,7 @@ Quick">
           <div class="post-toc">
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Quick_Start"><span class="nav-number">1.</span> <span class="nav-text">Quick Start</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Create_a_new_post"><span class="nav-number">1.1.</span> <span class="nav-text">Create a new post</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Run_server"><span class="nav-number">1.2.</span> <span class="nav-text">Run server</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Generate_static_files"><span class="nav-number">1.3.</span> <span class="nav-text">Generate static files</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Deploy_to_remote_sites"><span class="nav-number">1.4.</span> <span class="nav-text">Deploy to remote sites</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#发布新文章"><span class="nav-number">1.</span> <span class="nav-text">发布新文章</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其他方面"><span class="nav-number">2.</span> <span class="nav-text">其他方面</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#草稿"><span class="nav-number">2.1.</span> <span class="nav-text">草稿</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#图床"><span class="nav-number">2.2.</span> <span class="nav-text">图床</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#markdown语法"><span class="nav-number">2.3.</span> <span class="nav-text">markdown语法</span></a></li></ol></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator"></div>
@@ -416,7 +509,7 @@ Quick">
   <span class="with-love">
     <i class="icon-next-heart"></i>
   </span>
-  <span class="author" itemprop="copyrightHolder">lanjingling</span>
+  <span class="author" itemprop="copyrightHolder">蓝精灵</span>
 </div>
 
 <div class="powered-by">
