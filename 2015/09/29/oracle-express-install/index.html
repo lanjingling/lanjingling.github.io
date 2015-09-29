@@ -30,7 +30,7 @@
 
 
 
-  <meta name="keywords" content="hexo," />
+  <meta name="keywords" content="oracle," />
 
 
 
@@ -39,17 +39,16 @@
   <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.1" />
 
 
-<meta name="description" content="hexo是使用nodejs开发的一个快速、简洁、高效、开源的静态博客生成器。本文介绍了如何安装hexo、把hexo部署到github上。">
+<meta name="description" content="Oracle XE是 Oracle 数据库的免费版本，支持标准版的大部分功能，11g XE 提供 Windows 和 Linux 版本(有32位和64位之分)。 Oracle XE版本也称”快捷版本“，是给个人学习、熟悉Oracle的简化版，可能是由于标准版oracle的安装（在linux、unix下）非常复杂，所以，oracle公司在最近才发布了这个快捷版本。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="hexo简介、安装、部署">
-<meta property="og:url" content="http://yoursite.com/2015/09/23/hexo简介/index.html">
+<meta property="og:title" content="Oracle Express Edition安装">
+<meta property="og:url" content="http://yoursite.com/2015/09/29/oracle-express-install/index.html">
 <meta property="og:site_name" content="晓的技术博客">
-<meta property="og:description" content="hexo是使用nodejs开发的一个快速、简洁、高效、开源的静态博客生成器。本文介绍了如何安装hexo、把hexo部署到github上。">
-<meta property="og:image" content="http://ww1.sinaimg.cn/large/72c913fbgw1ewdleicrt6j20kg0d1mzd.jpg">
-<meta property="og:updated_time" content="2015-09-24T09:04:56.262Z">
+<meta property="og:description" content="Oracle XE是 Oracle 数据库的免费版本，支持标准版的大部分功能，11g XE 提供 Windows 和 Linux 版本(有32位和64位之分)。 Oracle XE版本也称”快捷版本“，是给个人学习、熟悉Oracle的简化版，可能是由于标准版oracle的安装（在linux、unix下）非常复杂，所以，oracle公司在最近才发布了这个快捷版本。">
+<meta property="og:updated_time" content="2015-09-29T10:31:02.353Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="hexo简介、安装、部署">
-<meta name="twitter:description" content="hexo是使用nodejs开发的一个快速、简洁、高效、开源的静态博客生成器。本文介绍了如何安装hexo、把hexo部署到github上。">
+<meta name="twitter:title" content="Oracle Express Edition安装">
+<meta name="twitter:description" content="Oracle XE是 Oracle 数据库的免费版本，支持标准版的大部分功能，11g XE 提供 Windows 和 Linux 版本(有32位和64位之分)。 Oracle XE版本也称”快捷版本“，是给个人学习、熟悉Oracle的简化版，可能是由于标准版oracle的安装（在linux、unix下）非常复杂，所以，oracle公司在最近才发布了这个快捷版本。">
 
 
 <script type="text/javascript" id="hexo.configuration">
@@ -59,7 +58,7 @@
   };
 </script>
 
-  <title> hexo简介、安装、部署 | 晓的技术博客 </title>
+  <title> Oracle Express Edition安装 | 晓的技术博客 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -205,7 +204,7 @@
           
           
             
-              hexo简介、安装、部署
+              Oracle Express Edition安装
             
           
         </h1>
@@ -214,8 +213,8 @@
       <div class="post-meta">
         <span class="post-time">
           发表于
-          <time itemprop="dateCreated" datetime="2015-09-23T15:00:41+08:00" content="2015-09-23">
-            2015-09-23
+          <time itemprop="dateCreated" datetime="2015-09-29T17:59:37+08:00" content="2015-09-29">
+            2015-09-29
           </time>
         </span>
 
@@ -240,8 +239,8 @@
           
             <span class="post-comments-count">
               &nbsp; | &nbsp;
-              <a href="/2015/09/23/hexo简介/#comments" itemprop="discussionUrl">
-                <span class="post-comments-count ds-thread-count" data-thread-key="2015/09/23/hexo简介/" itemprop="commentsCount"></span>
+              <a href="/2015/09/29/oracle-express-install/#comments" itemprop="discussionUrl">
+                <span class="post-comments-count ds-thread-count" data-thread-key="2015/09/29/oracle-express-install/" itemprop="commentsCount"></span>
               </a>
             </span>
           
@@ -255,47 +254,62 @@
       
 
       
-        <span itemprop="articleBody"><h2 id="hexo简介">hexo简介</h2><p><a href="https://hexo.io/zh-cn/" target="_blank" rel="external">hexo</a>是使用nodejs开发的一个快速、简洁、高效、开源的静态博客生成器，作者是来自台湾的大学生<a href="https://github.com/tommy351/hexo" target="_blank" rel="external">@tommy351</a>。</p>
-<p>Hexo 使用 <a href="https://www.zybuluo.com" target="_blank" rel="external">Markdown</a>（或其他渲染引擎）解析文章，在几秒内，即可利用靓丽的主题生成静态网页。类似于jekyll、Octopress、Wordpress，我们可以用hexo创建自己的博客，托管到github或<a href="https://gitcafe.com" target="_blank" rel="external">gitcafe</a>上，绑定自己的域名。</p>
-<h3 id="为什么选择hexo？">为什么选择hexo？</h3><ul>
-<li>因为hexo非常小巧，使用nodejs开发，下载安装时只需要几个简答的npm命令即可。</li>
-<li>纯静态博客，<strong>不需要什么额外的mysql数据库、php环境…</strong>仅仅需要一个nodejs环境即可。</li>
-<li>由于是静态博客，所以，可以非常方便部署到github、gitcafe上(后者是国内的，速度可能更有保证)</li>
-<li>支持markdown语法、兼容windows linux mac，高可扩展性和自定义，而且有非常多的<a href="https://github.com/hexojs/hexo/wiki/themes" target="_blank" rel="external">hexo主题</a>…</li>
-</ul>
-<hr>
-<h2 id="搭建hexo">搭建hexo</h2><p>本文针对windows环境进行演示说明，其实linux下也大体一样。大致步骤如下：</p>
-<ol>
-<li>下载安装git：windows下需要安装<a href="https://git-for-windows.github.io/" target="_blank" rel="external">msysgit</a>（需要翻墙），安装起来非常简单，直接下一步；</li>
-<li>下载安装<a href="https://nodejs.org/en/" target="_blank" rel="external">nodejs</a>环境，直接下一步…安装即可；</li>
-<li>安装hexo：</li>
-</ol>
+        <span itemprop="articleBody"><p><a href="http://www.oracle.com/technetwork/cn/database/database-technologies/express-edition/downloads/index.html" target="_blank" rel="external">Oracle 11g XE</a> 是 Oracle 数据库的免费版本，支持标准版的大部分功能，11g XE 提供 Windows 和 Linux 版本(有32位和64位之分)。 Oracle XE版本也称”快捷版本“，是给个人学习、熟悉Oracle的简化版，可能是由于标准版oracle的安装（在linux、unix下）非常复杂，所以，oracle公司在最近才发布了这个快捷版本。</p>
+<p>Oracle XE做为免费的 Oracle 数据库版本， 主要的限制是： </p>
 <ul>
-<li>使用npm下载hexo：在命令行上（任意目录）使用npm install -g hexo 全局安装hexo；</li>
-<li><p>安装完成后，在你喜爱的文件夹下（如H:\hexo），执行以下指令(在H:\hexo内点击鼠标右键，选择Git bash)，Hexo 即会自动在目标文件夹建立网站所需要的所有文件；</p>
-<blockquote>
-<p>hexo init</p>
-</blockquote>
-</li>
-<li><p>安装依赖包：npm install<br>至此，hexo博客环境已经搭建完成，执行以下命令(在H:\hexo)，然后到浏览器输入localhost:4000即可查看效果：</p>
-<blockquote>
-<p>hexo g<br>hexo s</p>
-</blockquote>
-</li>
+<li>最大数据库大小为 11 GB；</li>
+<li>可使用的最大内存是 1G；</li>
+<li>一台机器上只能安装一个 XE 实例 ；</li>
+<li>XE 只能使用单 CPU</li>
 </ul>
-<hr>
-<h2 id="将hexo部署到github上">将hexo部署到github上</h2><p>上文已经在本地部署好了hexo博客系统，但仅仅本地能够访问。如果想让别人访问到你的博客，你可以租一台云主机，然后把hexo系统部署到云主机上，好处是带宽、容量可以得到保证，缺点是需要花费一笔租金。还有另一种免费的方法，就是把hexo部署到githu pages或者gitcafe pages上，本文一github为例。</p>
-<h3 id="1-注册github帐号">1.注册github帐号</h3><p>点击<a href="https://github.com/" target="_blank" rel="external">此处</a>可以免费注册github。默认github会免费给用户350M的public空间。</p>
-<h3 id="2-为github设置ssh">2.为github设置ssh</h3><p>每次使用git命令从github上同步代码时，需要SSH连接认证。这时就需要你在本地先生成SSH KEY(命令如下)，然后把其拷贝到github上。<br><code>ssh-keygen</code></p>
-<h3 id="3-创建repository">3.创建repository</h3><p>如下图所示，这里要注意，repository名称一定是github的用户名+.github.io,否则github pages无法访问。<br><img src="http://ww1.sinaimg.cn/large/72c913fbgw1ewdleicrt6j20kg0d1mzd.jpg" alt=""></p>
-<h3 id="4-部署hexo">4.部署hexo</h3><p>1）编辑_config.yml(在H:\hexo下)，repository是上部gitbug中申请的地址。如下：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">deploy:</span><br><span class="line">type: git</span><br><span class="line">repository: https://github.com/lanjingling/lanjingling.github.io.git #你的GitHub Pages仓库</span><br><span class="line">branch: master</span><br></pre></td></tr></table></figure></p>
-<p> 2）执行下面命令 生成、部署hexo博客到github上<br> <figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">hexo g</span><br><span class="line">hexo d</span><br></pre></td></tr></table></figure><br> 这样，你就可以在<a href="http://lanjingling.github.io/" target="_blank" rel="external">lanjingling.github.io</a>来访问你的博客了。</p>
-<p><strong>注意</strong> 在执行<code>hexo d</code>命令时，有可能会显示如下错误信息：ERROR Deployer not found : github 解决方法如下：</p>
+<p>接下来，介绍在centos6（64位）上如何安装Oracle XE。</p>
+<h2 id="一下载Oracle_XE">一下载Oracle XE</h2><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget http://download.oracle.com/otn/linux/oracle11g/xe/oracle-xe-11.2.0-1.0.x86_64.rpm.zip</span><br></pre></td></tr></table></figure>
+<h2 id="二安装依赖">二安装依赖</h2><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install libaio libaio-devel bc -y</span><br></pre></td></tr></table></figure>
+<h2 id="三安装">三安装</h2><p><font color="red">以下操作，都是用root</font></p>
+<h3 id="解压、检测">解压、检测</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">unzip oracle-xe-11.2.0-1.0.x86_64.rpm.zip  </span><br><span class="line">cd Disk1  </span><br><span class="line">rpm -ivh oracle-xe-11.2.0-1.0.x86_64.rpm</span><br></pre></td></tr></table></figure>
+<p>安装时会对系统进行检测，最好内存有1G，SWAP要求是内存的2倍。检测结果如下：</p>
+<blockquote>
+<p>[root@server01 Disk1]# rpm -ivh oracle-xe-11.2.0-1.0.x86_64.rpm<br>Preparing…                ########################################### [100%]<br>   1:oracle-xe              ########################################### [100%]<br>Executing post-install steps…</p>
+</blockquote>
+<p>You must run ‘/etc/init.d/oracle-xe configure’ as the root user to configure the database.</p>
+<h3 id="根据提示安装，但如果tmpfs小于2G，会报错：">根据提示安装，但如果tmpfs小于2G，会报错：</h3><blockquote>
+<p>Database Configuration failed. Look into /u01/app/oracle/product/11.2.0/xe/config/log for details</p>
+</blockquote>
+<p>1、修改/etc/fstab文件<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/fstab</span><br><span class="line">将：</span><br><span class="line">tmpfs        /dev/shm        tmpfs   defaults      0 0</span><br><span class="line">改为：</span><br><span class="line">tmpfs        /dev/shm        tmpfs   defaults,size=2048M      0 0</span><br></pre></td></tr></table></figure></p>
+<p>2、重新加载tmpfs<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">umount /dev/shm</span><br><span class="line">mount /dev/shm</span><br></pre></td></tr></table></figure></p>
+<p>3、检查<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">df -h /dev/shm</span><br><span class="line">Filesystem      Size  Used Avail Use% Mounted on</span><br><span class="line">none            2.0G  243M  1.8G  12% /dev/shm</span><br></pre></td></tr></table></figure></p>
+<h3 id="根据提示安装XE">根据提示安装XE</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@server01 Disk1]# /etc/init.d/oracle-xe configure</span><br></pre></td></tr></table></figure>
+<p>之后，会引导用户进行简单的几项设置：</p>
+<blockquote>
+<p>Oracle Database 11g Express Edition Configuration<br>-————————————————<br>This will configure on-boot properties of Oracle Database 11g Express<br>Edition.  The following questions will determine whether the database should<br>be starting upon system boot, the ports it will use, and the passwords that<br>will be used for database accounts.  Press  to accept the defaults.<br>Ctrl-C will abort.</p>
+<p>Specify the HTTP port that will be used for Oracle Application Express [8080]:8081</p>
+<p>Specify a port that will be used for the database listener [1521]:1521</p>
+<p>Specify a password to be used for database accounts.  Note that the same<br>password will be used for SYS and SYSTEM.  Oracle recommends the use of<br>different passwords for each database account.  This can be done after<br>initial configuration:<br>Confirm the password:</p>
+<p>Do you want Oracle Database 11g Express Edition to be started on boot (y/n) [y]:y</p>
+<p>Starting Oracle Net Listener…Done<br>Configuring database…Done<br>Starting Oracle Database 11g Express Edition instance…Done<br>Installation completed successfully.</p>
+</blockquote>
+<p>输入的四项内容是：</p>
 <ul>
-<li>在hexo的配置文件中，把deploy的type改成git</li>
-<li>运行如下命令：<code>npm install hexo-deployer-git --save</code></li>
+<li>http访问时的端口</li>
+<li>数据库的监听端口</li>
+<li>SYS和SYSTEM用户的密码</li>
+<li>是否开机启动（并没有开机启动，可能还有地方要设置）。</li>
 </ul>
-<p>另外，这里有一篇<a href="http://www.cnblogs.com/purediy/archive/2013/03/07/2948892.html" target="_blank" rel="external">github+jekyll</a>的文章</p>
+<p>安装完成后：</p>
+<ul>
+<li>会自动建立一个名为oracle的用户，家目录/u01/app/oracle。</li>
+<li>会建立dba组，oracle用户属于这个组。</li>
+<li>会自动生成一个数据库实例，名为XE。/u01/app/oracle/product/11.2.0/xe/dbs/spfileXE.ora</li>
+</ul>
+<h3 id="设置oracle的环境变量">设置oracle的环境变量</h3><p><font color="red">使用oracle用户</font></p>
+<blockquote>
+<p>vim /etc/profile</p>
+</blockquote>
+<p>加入：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">export ORACLE_BASE=/u01/app/oracle</span><br><span class="line">export ORACLE_HOME=/u01/app/oracle/product/11.2.0/xe</span><br><span class="line">export PATH=$PATH:$ORACLE_HOME/bin</span><br><span class="line">export ORACLE_SID=XE</span><br><span class="line">export NLS_LANG=`$ORACLE_HOME/bin/nls_lang.sh`</span><br></pre></td></tr></table></figure></p>
+<p>之后，注销用户，使用oracle用户重新登录，就可以用sqlplus登录oracle，进而操作。</p>
+<blockquote>
+<p>sqlplus / as sysdba</p>
+</blockquote>
 </span>
       
     </div>
@@ -304,7 +318,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/hexo/" rel="tag">#hexo</a>
+            <a href="/tags/oracle/" rel="tag">#oracle</a>
           
         </div>
       
@@ -313,11 +327,11 @@
         <div class="post-nav">
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2015/09/24/ues-of-hexo-1/" rel="prev">hexo使用心得（一）</a>
-            
           </div>
 
           <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/09/24/use-of-markdown-1/" rel="next">markdown 高亮代码</a>
             
           </div>
         </div>
@@ -332,10 +346,10 @@
 
     <div class="post-spread">
       
-        <div class="ds-share flat" data-thread-key="2015/09/23/hexo简介/"
-     data-title="hexo简介、安装、部署"
+        <div class="ds-share flat" data-thread-key="2015/09/29/oracle-express-install/"
+     data-title="Oracle Express Edition安装"
      data-content=""
-     data-url="http://yoursite.com/2015/09/23/hexo简介/">
+     data-url="http://yoursite.com/2015/09/29/oracle-express-install/">
   <div class="ds-share-inline">
     <ul  class="ds-share-icons-16">
 
@@ -361,8 +375,8 @@
         
           <div class="comments" id="comments">
             
-              <div class="ds-thread" data-thread-key="2015/09/23/hexo简介/"
-                   data-title="hexo简介、安装、部署" data-url="http://yoursite.com/2015/09/23/hexo简介/">
+              <div class="ds-thread" data-thread-key="2015/09/29/oracle-express-install/"
+                   data-title="Oracle Express Edition安装" data-url="http://yoursite.com/2015/09/29/oracle-express-install/">
               </div>
             
           </div>
@@ -473,7 +487,7 @@
           <div class="post-toc">
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#hexo简介"><span class="nav-number">1.</span> <span class="nav-text">hexo简介</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#为什么选择hexo？"><span class="nav-number">1.1.</span> <span class="nav-text">为什么选择hexo？</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#搭建hexo"><span class="nav-number">2.</span> <span class="nav-text">搭建hexo</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#将hexo部署到github上"><span class="nav-number">3.</span> <span class="nav-text">将hexo部署到github上</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-注册github帐号"><span class="nav-number">3.1.</span> <span class="nav-text">1.注册github帐号</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-为github设置ssh"><span class="nav-number">3.2.</span> <span class="nav-text">2.为github设置ssh</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-创建repository"><span class="nav-number">3.3.</span> <span class="nav-text">3.创建repository</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-部署hexo"><span class="nav-number">3.4.</span> <span class="nav-text">4.部署hexo</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#一下载Oracle_XE"><span class="nav-number">1.</span> <span class="nav-text">一下载Oracle XE</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二安装依赖"><span class="nav-number">2.</span> <span class="nav-text">二安装依赖</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三安装"><span class="nav-number">3.</span> <span class="nav-text">三安装</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#解压、检测"><span class="nav-number">3.1.</span> <span class="nav-text">解压、检测</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#根据提示安装，但如果tmpfs小于2G，会报错："><span class="nav-number">3.2.</span> <span class="nav-text">根据提示安装，但如果tmpfs小于2G，会报错：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#根据提示安装XE"><span class="nav-number">3.3.</span> <span class="nav-text">根据提示安装XE</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#设置oracle的环境变量"><span class="nav-number">3.4.</span> <span class="nav-text">设置oracle的环境变量</span></a></li></ol></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator"></div>
