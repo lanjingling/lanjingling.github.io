@@ -39,16 +39,16 @@
   <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.1" />
 
 
-<meta name="description" content="Oracle XE是 Oracle 数据库的免费版本，支持标准版的大部分功能，11g XE 提供 Wi">
+<meta name="description" content="rollup 通常和group by语句一起使用，是根据维度在分组的结果集中进行聚合操作（通常为汇总，这取决于SELECT后的聚合函数）。最常用的场景是：为每个分组返回一个小计，同时为所有分组返回总计。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="oracle 分析函数1——rollup、cube">
+<meta property="og:title" content="oracle分析函数(一)——rollup、cube">
 <meta property="og:url" content="http://yoursite.com/2015/10/09/oracle-fenxihanshu-1/index.html">
 <meta property="og:site_name" content="晓的技术博客">
-<meta property="og:description" content="Oracle XE是 Oracle 数据库的免费版本，支持标准版的大部分功能，11g XE 提供 Wi">
-<meta property="og:updated_time" content="2015-10-09T03:50:47.599Z">
+<meta property="og:description" content="rollup 通常和group by语句一起使用，是根据维度在分组的结果集中进行聚合操作（通常为汇总，这取决于SELECT后的聚合函数）。最常用的场景是：为每个分组返回一个小计，同时为所有分组返回总计。">
+<meta property="og:updated_time" content="2015-10-09T04:55:06.197Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="oracle 分析函数1——rollup、cube">
-<meta name="twitter:description" content="Oracle XE是 Oracle 数据库的免费版本，支持标准版的大部分功能，11g XE 提供 Wi">
+<meta name="twitter:title" content="oracle分析函数(一)——rollup、cube">
+<meta name="twitter:description" content="rollup 通常和group by语句一起使用，是根据维度在分组的结果集中进行聚合操作（通常为汇总，这取决于SELECT后的聚合函数）。最常用的场景是：为每个分组返回一个小计，同时为所有分组返回总计。">
 
 
 <script type="text/javascript" id="hexo.configuration">
@@ -58,7 +58,7 @@
   };
 </script>
 
-  <title> oracle 分析函数1——rollup、cube | 晓的技术博客 </title>
+  <title> oracle分析函数(一)——rollup、cube | 晓的技术博客 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -204,7 +204,7 @@
           
           
             
-              oracle 分析函数1——rollup、cube
+              oracle分析函数(一)——rollup、cube
             
           
         </h1>
@@ -254,7 +254,7 @@
       
 
       
-        <span itemprop="articleBody"><h2 id="rollup介绍">rollup介绍</h2><p>rollup 通常和group by语句一起使用，是根据维度在分组的结果集中进行聚合操作（通常为汇总，这取决于SELECT后的聚合函数）。最常用的场景是：为每个分组返回一个小计，同时为所有分组返回总计。</p>
+        <span itemprop="articleBody"><h2 id="一、rollup介绍">一、rollup介绍</h2><p>rollup 通常和group by语句一起使用，是根据维度在分组的结果集中进行聚合操作（通常为汇总，这取决于SELECT后的聚合函数）。最常用的场景是：为每个分组返回一个小计，同时为所有分组返回总计。</p>
 <h3 id="在oracle中，rollup有一下使用方式：">在oracle中，rollup有一下使用方式：</h3><p><strong>1、不带rollup的goup by ：</strong><br>Group by A ,B产生的分组种数：1种； </p>
 <ul>
 <li>group by A,B </li>
@@ -313,7 +313,7 @@
 </ol>
 <h3 id="实例：">实例：</h3><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">SQL&gt; select ename,deptno,sum(sal) from emp group by rollup(deptno,ename);</span><br><span class="line"></span><br><span class="line">ENAME	       DEPTNO	SUM(SAL)</span><br><span class="line">---------- ---------- ----------</span><br><span class="line">KING		   10	    5000</span><br><span class="line">CLARK		   10	    2450</span><br><span class="line">MILLER		   10	    1300</span><br><span class="line">		       10	    8750</span><br><span class="line">FORD		   20	    3000</span><br><span class="line">ADAMS		   20	    1100</span><br><span class="line">JONES		   20	    2975</span><br><span class="line">SCOTT		   20	    3000</span><br><span class="line">SMITH		   20	     800</span><br><span class="line">		       20	   10875</span><br><span class="line">WARD		   30	    1250</span><br><span class="line"></span><br><span class="line">ENAME	       DEPTNO	SUM(SAL)</span><br><span class="line">---------- ---------- ----------</span><br><span class="line">ALLEN		   30	    1600</span><br><span class="line">BLAKE		   30	    2850</span><br><span class="line">JAMES		   30	     950</span><br><span class="line">MARTIN		   30	    1250</span><br><span class="line">TURNER		   30	    1500</span><br><span class="line">		       30	    9400</span><br><span class="line">			            29025</span><br></pre></td></tr></table></figure>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="operator"><span class="keyword">select</span> <span class="keyword">decode</span>(<span class="keyword">grouping</span>(f_line)+<span class="keyword">grouping</span>(f_workarea),<span class="number">1</span>,<span class="string">'小计'</span>,<span class="number">2</span>,<span class="string">'总计'</span>,f_workarea) f_workarea,</span><br><span class="line"><span class="keyword">decode</span>(<span class="keyword">grouping</span>(f_line),<span class="number">1</span>,<span class="keyword">count</span>(*)||<span class="string">'条'</span>,f_line) f_line,</span><br><span class="line"><span class="keyword">sum</span>(f_pagesnumber) sum_pagesnumbers  </span><br><span class="line"><span class="keyword">from</span> t_testcount </span><br><span class="line"><span class="keyword">group</span> <span class="keyword">by</span> <span class="keyword">rollup</span> (f_workarea,f_line);</span></span><br></pre></td></tr></table></figure>
-<h2 id="rollup的几个辅助函数">rollup的几个辅助函数</h2><ul>
+<h2 id="二、rollup的几个辅助函数">二、rollup的几个辅助函数</h2><ul>
 <li><p>grouping()函数：</p>
 <p>必须接受一列且只能接受一列做为其参数。参数列值为空返回1，参数列值非空返回0。（如果参数的列在rollup中，则返回1；否则返回0）</p>
 </li>
@@ -328,7 +328,7 @@
 </li>
 </ul>
 <p>注：使用以上三个函数往往是为了过滤掉一部分统计数据，而达到美化统计结果的作用。 </p>
-<h2 id="rollup和cube的区别">rollup和cube的区别</h2><p>rollup是cube的一种特殊情况，和rollup一样，cube也是根据维度在分组的结果集中进行聚合操作。但是rollup只在层次上对数据进行聚合，而cube对所有的维度进行聚合。具有N个维度的列，cube需要2的N次方次分组操作，而rollup只需要N次分组操作。</p>
+<h2 id="三、rollup和cube的区别">三、rollup和cube的区别</h2><p>rollup是cube的一种特殊情况，和rollup一样，cube也是根据维度在分组的结果集中进行聚合操作。但是rollup只在层次上对数据进行聚合，而cube对所有的维度进行聚合。具有N个维度的列，cube需要2的N次方次分组操作，而rollup只需要N次分组操作。</p>
 <p>带cube子句的group by会产生更多的分组统计数据。cube后的列有多少种组合（注意组合是与顺序无关的）就会有多少种分组。 </p>
 <ol>
 <li><p>假设有n个维度，rollup会有n个聚合：<br>rollup(a,b)   统计列包含：(a,b)、(a)、()<br>rollup(a,b,c) 统计列包含：(a,b,c)、(a,b)、(a)、()<br>……以此类推ing……</p>
@@ -336,7 +336,7 @@
 <li><p>假设有n个纬度，cube会有2的n次方个聚合：<br>cube(a,b)     统计列包含：(a,b)、(a)、(b)、()<br>cube(a,b,c)   统计列包含：(a,b,c)、(a,b)、(a,c)、(b,c)、(a)、(b)、(c)、()<br>……以此类推ing……</p>
 </li>
 </ol>
-<h2 id="grouping_sets(…)_介绍">grouping sets(…) 介绍</h2><p>oracle中，允许在group by后面使用 grouping sets(…) 语句。通过该语句可以实现rollup、cube同样的功能。</p>
+<h2 id="四、grouping_sets(…)_介绍">四、grouping sets(…) 介绍</h2><p>oracle中，允许在group by后面使用 grouping sets(…) 语句。通过该语句可以实现rollup、cube同样的功能。</p>
 <ol>
 <li>Group by grouping sets(A ,B) 产生的分组种数：2种；<ul>
 <li>第一种：group by A </li>
@@ -352,8 +352,8 @@
 </ul>
 </li>
 </ol>
-<p>返回结果集：为以上二种分组统计结果集的并集且未去掉重复数据。<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">SQL&gt; select ename,deptno,sum(sal) from emp group by grouping sets((ename,deptno),deptno);</span><br><span class="line"></span><br><span class="line">ENAME	       DEPTNO	SUM(SAL)</span><br><span class="line">---------- ---------- ----------</span><br><span class="line">KING		   10	    5000</span><br><span class="line">CLARK		   10	    2450</span><br><span class="line">MILLER		   10	    1300</span><br><span class="line">		       10	    8750</span><br><span class="line">FORD		   20	    3000</span><br><span class="line">ADAMS		   20	    1100</span><br><span class="line">JONES		   20	    2975</span><br><span class="line">SCOTT		   20	    3000</span><br><span class="line">SMITH		   20	     800</span><br><span class="line">		       20	   10875</span><br><span class="line">WARD		   30	    1250</span><br><span class="line"></span><br><span class="line">ENAME	       DEPTNO	SUM(SAL)</span><br><span class="line">---------- ---------- ----------</span><br><span class="line">ALLEN		   30	    1600</span><br><span class="line">BLAKE		   30	    2850</span><br><span class="line">JAMES		   30	     950</span><br><span class="line">MARTIN		   30	    1250</span><br><span class="line">TURNER		   30	    1500</span><br><span class="line">		       30	    9400</span><br><span class="line"></span><br><span class="line">17 rows selected.</span><br></pre></td></tr></table></figure></p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">SQL&gt; select ename,deptno,sum(sal) from emp group by grouping sets((ename,deptno),deptno,null);</span><br><span class="line"></span><br><span class="line">ENAME	       DEPTNO	SUM(SAL)</span><br><span class="line">---------- ---------- ----------</span><br><span class="line">KING		   10	    5000</span><br><span class="line">CLARK		   10	    2450</span><br><span class="line">MILLER		   10	    1300</span><br><span class="line">		       10	    8750</span><br><span class="line">FORD		   20	    3000</span><br><span class="line">ADAMS		   20	    1100</span><br><span class="line">JONES		   20	    2975</span><br><span class="line">SCOTT		   20	    3000</span><br><span class="line">SMITH		   20	     800</span><br><span class="line">		       20	   10875</span><br><span class="line">WARD		   30	    1250</span><br><span class="line"></span><br><span class="line">ENAME	       DEPTNO	SUM(SAL)</span><br><span class="line">---------- ---------- ----------</span><br><span class="line">ALLEN		   30	    1600</span><br><span class="line">BLAKE		   30	    2850</span><br><span class="line">JAMES		   30	     950</span><br><span class="line">MARTIN		   30	    1250</span><br><span class="line">TURNER		   30	    1500</span><br><span class="line">		       30	    9400</span><br><span class="line">			            29025</span><br></pre></td></tr></table></figure></span>
+<p>返回结果集：为以上二种分组统计结果集的并集且未去掉重复数据。<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">SQL&gt; select ename,deptno,sum(sal) from emp group by grouping sets((ename,deptno),deptno);</span><br><span class="line"></span><br><span class="line">ENAME	       DEPTNO	SUM(SAL)</span><br><span class="line">---------- ---------- ----------</span><br><span class="line">KING		   10	    5000</span><br><span class="line">CLARK		   10	    2450</span><br><span class="line">MILLER		   10	    1300</span><br><span class="line">		   10	    8750</span><br><span class="line">FORD		   20	    3000</span><br><span class="line">ADAMS		   20	    1100</span><br><span class="line">JONES		   20	    2975</span><br><span class="line">SCOTT		   20	    3000</span><br><span class="line">SMITH		   20	     800</span><br><span class="line">		   20	   10875</span><br><span class="line">WARD		   30	    1250</span><br><span class="line"></span><br><span class="line">ENAME	       DEPTNO	SUM(SAL)</span><br><span class="line">---------- ---------- ----------</span><br><span class="line">ALLEN		   30	    1600</span><br><span class="line">BLAKE		   30	    2850</span><br><span class="line">JAMES		   30	     950</span><br><span class="line">MARTIN		   30	    1250</span><br><span class="line">TURNER		   30	    1500</span><br><span class="line">		   30	    9400</span><br><span class="line"></span><br><span class="line">17 rows selected.</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">SQL&gt; select ename,deptno,sum(sal) from emp group by grouping sets((ename,deptno),deptno,null);</span><br><span class="line"></span><br><span class="line">ENAME	       DEPTNO	SUM(SAL)</span><br><span class="line">---------- ---------- ----------</span><br><span class="line">KING		   10	    5000</span><br><span class="line">CLARK		   10	    2450</span><br><span class="line">MILLER		   10	    1300</span><br><span class="line">		   10	    8750</span><br><span class="line">FORD		   20	    3000</span><br><span class="line">ADAMS		   20	    1100</span><br><span class="line">JONES		   20	    2975</span><br><span class="line">SCOTT		   20	    3000</span><br><span class="line">SMITH		   20	     800</span><br><span class="line">		   20	   10875</span><br><span class="line">WARD		   30	    1250</span><br><span class="line"></span><br><span class="line">ENAME	       DEPTNO	SUM(SAL)</span><br><span class="line">---------- ---------- ----------</span><br><span class="line">ALLEN		   30	    1600</span><br><span class="line">BLAKE		   30	    2850</span><br><span class="line">JAMES		   30	     950</span><br><span class="line">MARTIN		   30	    1250</span><br><span class="line">TURNER		   30	    1500</span><br><span class="line">		   30	    9400</span><br><span class="line">			   29025</span><br><span class="line"></span><br><span class="line">18 rows selected.</span><br></pre></td></tr></table></figure></span>
       
     </div>
 
@@ -372,11 +372,13 @@
         <div class="post-nav">
           <div class="post-nav-prev post-nav-item">
             
+              <a href="/2015/10/09/oracle-fenxihanshu-2/" rel="prev">oracle分析函数(二)——over函数</a>
+            
           </div>
 
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2015/10/07/shujujiegou-paixusuanfa/" rel="next">shujujiegou-paixusuanfa</a>
+              <a href="/2015/10/07/shujujiegou-paixusuanfa/" rel="next">数据结构之——经典排序算法</a>
             
           </div>
         </div>
@@ -392,7 +394,7 @@
     <div class="post-spread">
       
         <div class="ds-share flat" data-thread-key="2015/10/09/oracle-fenxihanshu-1/"
-     data-title="oracle 分析函数1——rollup、cube"
+     data-title="oracle分析函数(一)——rollup、cube"
      data-content=""
      data-url="http://yoursite.com/2015/10/09/oracle-fenxihanshu-1/">
   <div class="ds-share-inline">
@@ -421,7 +423,7 @@
           <div class="comments" id="comments">
             
               <div class="ds-thread" data-thread-key="2015/10/09/oracle-fenxihanshu-1/"
-                   data-title="oracle 分析函数1——rollup、cube" data-url="http://yoursite.com/2015/10/09/oracle-fenxihanshu-1/">
+                   data-title="oracle分析函数(一)——rollup、cube" data-url="http://yoursite.com/2015/10/09/oracle-fenxihanshu-1/">
               </div>
             
           </div>
@@ -461,21 +463,21 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">7</span>
+              <span class="site-state-item-count">9</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
 
           <div class="site-state-item site-state-categories">
             <a href="/categories">
-              <span class="site-state-item-count">2</span>
+              <span class="site-state-item-count">3</span>
               <span class="site-state-item-name">分类</span>
               </a>
           </div>
 
           <div class="site-state-item site-state-tags">
             <a href="/tags">
-              <span class="site-state-item-count">4</span>
+              <span class="site-state-item-count">6</span>
               <span class="site-state-item-name">标签</span>
               </a>
           </div>
@@ -532,7 +534,7 @@
           <div class="post-toc">
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#rollup介绍"><span class="nav-number">1.</span> <span class="nav-text">rollup介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#在oracle中，rollup有一下使用方式："><span class="nav-number">1.1.</span> <span class="nav-text">在oracle中，rollup有一下使用方式：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#其他："><span class="nav-number">1.2.</span> <span class="nav-text">其他：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实例："><span class="nav-number">1.3.</span> <span class="nav-text">实例：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#rollup的几个辅助函数"><span class="nav-number">2.</span> <span class="nav-text">rollup的几个辅助函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#rollup和cube的区别"><span class="nav-number">3.</span> <span class="nav-text">rollup和cube的区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#grouping_sets(…)_介绍"><span class="nav-number">4.</span> <span class="nav-text">grouping sets(…) 介绍</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、rollup介绍"><span class="nav-number">1.</span> <span class="nav-text">一、rollup介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#在oracle中，rollup有一下使用方式："><span class="nav-number">1.1.</span> <span class="nav-text">在oracle中，rollup有一下使用方式：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#其他："><span class="nav-number">1.2.</span> <span class="nav-text">其他：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实例："><span class="nav-number">1.3.</span> <span class="nav-text">实例：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、rollup的几个辅助函数"><span class="nav-number">2.</span> <span class="nav-text">二、rollup的几个辅助函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三、rollup和cube的区别"><span class="nav-number">3.</span> <span class="nav-text">三、rollup和cube的区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#四、grouping_sets(…)_介绍"><span class="nav-number">4.</span> <span class="nav-text">四、grouping sets(…) 介绍</span></a></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator"></div>

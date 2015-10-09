@@ -1,0 +1,777 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.5.1"/>
+
+
+    <meta name="description" content="java程序员、爱开源、喜欢nodejs、前端js、oracle数据库、分布式技术...<br/>改变世界的是这么一群人,他们寻找梦想中的乐园,当他们找不到时,就亲手创造了她..." />
+
+
+
+  <meta name="keywords" content="oracle,分析函数," />
+
+
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.1" />
+
+
+<meta name="description" content="Oracle从8.1.6开始提供分析函数，专门用于解决复杂报表统计需求的功能强大的函数，它可以在数据中进行分组然后计算基于组的某种统计值，并且每一组的每一行都可以返回一个统计值。分析函数用于计算基于组的某种聚合值。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="oracle分析函数(二)——over函数">
+<meta property="og:url" content="http://yoursite.com/2015/10/09/oracle-fenxihanshu-2/index.html">
+<meta property="og:site_name" content="晓的技术博客">
+<meta property="og:description" content="Oracle从8.1.6开始提供分析函数，专门用于解决复杂报表统计需求的功能强大的函数，它可以在数据中进行分组然后计算基于组的某种统计值，并且每一组的每一行都可以返回一个统计值。分析函数用于计算基于组的某种聚合值。">
+<meta property="og:updated_time" content="2015-10-09T05:43:38.967Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="oracle分析函数(二)——over函数">
+<meta name="twitter:description" content="Oracle从8.1.6开始提供分析函数，专门用于解决复杂报表统计需求的功能强大的函数，它可以在数据中进行分组然后计算基于组的某种统计值，并且每一组的每一行都可以返回一个统计值。分析函数用于计算基于组的某种聚合值。">
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'post'
+  };
+</script>
+
+  <title> oracle分析函数(二)——over函数 | 晓的技术博客 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?93b1a723d246349c4cace650dee4a731";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand" rel="start">
+      <span class="logo">
+        <i class="icon-next-logo"></i>
+      </span>
+      <span class="site-title">晓的技术博客</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu menu-left">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            <i class="menu-item-icon icon-next-home"></i> <br />
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            <i class="menu-item-icon icon-next-archives"></i> <br />
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            <i class="menu-item-icon icon-next-categories"></i> <br />
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            <i class="menu-item-icon icon-next-tags"></i> <br />
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            <i class="menu-item-icon icon-next-about"></i> <br />
+            关于
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <form class="site-search-form">
+    <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+  </form>
+
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'iSunJWoZvxV9mKcJc6QU','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content"> 
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+
+      
+      
+        <h1 class="post-title" itemprop="name headline">
+          
+          
+            
+              oracle分析函数(二)——over函数
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于
+          <time itemprop="dateCreated" datetime="2015-10-09T12:55:27+08:00" content="2015-10-09">
+            2015-10-09
+          </time>
+        </span>
+
+        
+          <span class="post-category" >
+            &nbsp; | &nbsp; 分类于
+            
+              <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                <a href="/categories/oracle/" itemprop="url" rel="index">
+                  <span itemprop="name">oracle</span>
+                </a>
+              </span>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+            <span class="post-comments-count">
+              &nbsp; | &nbsp;
+              <a href="/2015/10/09/oracle-fenxihanshu-2/#comments" itemprop="discussionUrl">
+                <span class="post-comments-count ds-thread-count" data-thread-key="2015/10/09/oracle-fenxihanshu-2/" itemprop="commentsCount"></span>
+              </a>
+            </span>
+          
+        
+      </div>
+    </header>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><h2 id="一、分析函数">一、分析函数</h2><p>Oracle从8.1.6开始提供分析函数，专门用于解决复杂报表统计需求的功能强大的函数，它可以在数据中进行分组然后计算基于组的某种统计值，并且每一组的每一行都可以返回一个统计值。分析函数用于计算基于组的某种聚合值。</p>
+<p>它和聚合函数的不同之处是：<font color="red">对于每个组返回多行，而聚合函数对于每个组只返回一行。</font>普通的聚合函数用group by分组，每个分组返回一个统计值；而分析函数采用partition by分组，并且每组每行都可以返回一个统计值。</p>
+<p>1、分析函数的形式：<br>     分析函数带有一个开窗函数over()，在窗口函数中包含三个分析子句:分组(partition by), 排序(order by), 窗口(rows) ，他们的使用形式如下：over(partition by xxx order by yyy rows between zzz)。<br>注：窗口子句在这里我只说rows方式的窗口,range方式和滑动窗口也不提。</p>
+<p>例如：统计函数+over()、排序函数+over()、数据分布函数+over()、统计分析函数+over()。</p>
+<p>2、开窗函数：<br>     开窗函数指定了分析函数工作的数据窗口大小，这个数据窗口大小可能会随着行的变化而变化。例如over函数</p>
+<h2 id="二、开窗函数">二、开窗函数</h2><p>窗口函数中常用的子句有：分区（partition by）、排序（order by）、范围（rows between或range between），以及她们的混合方式。形式如下：<font color="red">over(partition by xxx order by yyy rows between zzz)</font></p>
+<h3 id="1、over(order_by_col)_：">1、over(order by col) ：</h3><p>可以理解为按照col列排序进行<strong>累计</strong>，order by是个默认的开窗函数</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">SQL&gt; select * from t_over;</span><br><span class="line"></span><br><span class="line">	 A</span><br><span class="line">----------</span><br><span class="line">	 1</span><br><span class="line">	 2</span><br><span class="line">	 2</span><br><span class="line">	 2</span><br><span class="line">	 3</span><br><span class="line">	 4</span><br><span class="line">	 5</span><br><span class="line">	 6</span><br><span class="line">	 7</span><br><span class="line">	 9</span><br><span class="line"></span><br><span class="line">10 rows selected.</span><br><span class="line"></span><br><span class="line">SQL&gt; select a,avg(a)over(order by a),sum(a)over(order by a) from t_over;</span><br><span class="line"></span><br><span class="line">	 A AVG(A)OVER(ORDERBYA) SUM(A)OVER(ORDERBYA)</span><br><span class="line">---------- -------------------- --------------------</span><br><span class="line">	 1		      1 		   1</span><br><span class="line">	 2		   1.75 		   7</span><br><span class="line">	 2		   1.75 		   7</span><br><span class="line">	 2		   1.75 		   7</span><br><span class="line">	 3		      2 		  10</span><br><span class="line">	 4	     2.33333333 		  14</span><br><span class="line">	 5	     2.71428571 		  19</span><br><span class="line">	 6		  3.125 		  25</span><br><span class="line">	 7	     3.55555556 		  32</span><br><span class="line">	 9		    4.1 		  41</span><br><span class="line"></span><br><span class="line">10 rows selected.</span><br></pre></td></tr></table></figure>
+<h3 id="2、分区（partition_by_col）：">2、分区（partition by col）：</h3><p>按照col进行分区统计<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">SQL&gt; select a,sum(a)over(partition by a) from t_over;</span><br><span class="line"></span><br><span class="line">	 A SUM(A)OVER(PARTITIONBYA)</span><br><span class="line">---------- ------------------------</span><br><span class="line">	 1			  1</span><br><span class="line">	 2			  6</span><br><span class="line">	 2			  6</span><br><span class="line">	 2			  6</span><br><span class="line">	 3			  3</span><br><span class="line">	 4			  4</span><br><span class="line">	 5			  5</span><br><span class="line">	 6			  6</span><br><span class="line">	 7			  7</span><br><span class="line">	 9			  9</span><br><span class="line"></span><br><span class="line">10 rows selected.</span><br></pre></td></tr></table></figure></p>
+<h3 id="3、范围over（order_by_salary_range_between_5_preceding_and_5_following）：">3、范围over（order by salary range between 5 preceding and 5 following）：</h3><p>窗口范围为当前行数据幅度减5加5后的范围内的。<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">SQL&gt; select a,sum(a)over(order by a range between 2 preceding and 2 following) from t_over;</span><br><span class="line"></span><br><span class="line">	 A SUM(A)OVER(ORDERBYARANGEBETWEEN2PRECEDINGAND2FOLLOWING)</span><br><span class="line">---------- -------------------------------------------------------</span><br><span class="line">	 1							10          --  1减2加2范围是-1到3，a在这个范围内有1、2、2、2、3，所以是10</span><br><span class="line">	 2							14</span><br><span class="line">	 2							14</span><br><span class="line">	 2							14</span><br><span class="line">	 3							19</span><br><span class="line">	 4							24</span><br><span class="line">	 5							25        --  5减2加2范围是3到7，a在这个范围内有3、4、5、6、7，所以是25</span><br><span class="line">	 6							22</span><br><span class="line">	 7							27</span><br><span class="line">	 9							16        --  9减2加2范围是7到11，a在这个范围内有7、9，所以是16</span><br><span class="line"></span><br><span class="line">10 rows selected.</span><br></pre></td></tr></table></figure></p>
+<h3 id="4、范围over（order_by_salary_rows_between_5_preceding_and_5_following）：">4、范围over（order by salary rows between 5 preceding and 5 following）：</h3><p>窗口范围为当前行前后各移动5行。<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">SQL&gt; select a,sum(a)over(order by a rows between 2 preceding and 2 following) from t_over;</span><br><span class="line"></span><br><span class="line">	 A SUM(A)OVER(ORDERBYAROWSBETWEEN2PRECEDINGAND2FOLLOWING)</span><br><span class="line">---------- ------------------------------------------------------</span><br><span class="line">	 1							5</span><br><span class="line">	 2							7</span><br><span class="line">	 2						       10</span><br><span class="line">	 2						       13</span><br><span class="line">	 3						       16</span><br><span class="line">	 4						       20</span><br><span class="line">	 5						       25</span><br><span class="line">	 6						       31</span><br><span class="line">	 7						       27</span><br><span class="line">	 9						       22</span><br><span class="line"></span><br><span class="line">10 rows selected.</span><br></pre></td></tr></table></figure></p>
+<h3 id="5、可以混合使用：">5、可以混合使用：</h3><p>以上几中可以混合使用，如下<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="operator"><span class="keyword">SELECT</span> <span class="keyword">E</span>.DEPTNO,</span><br><span class="line">       <span class="keyword">E</span>.EMPNO,</span><br><span class="line">       <span class="keyword">E</span>.ENAME,</span><br><span class="line">       <span class="keyword">E</span>.SAL,</span><br><span class="line">       <span class="keyword">LAST_VALUE</span>(<span class="keyword">E</span>.SAL) </span><br><span class="line">       <span class="keyword">OVER</span>(<span class="keyword">PARTITION</span> <span class="keyword">BY</span> <span class="keyword">E</span>.DEPTNO </span><br><span class="line">            <span class="keyword">ORDER</span> <span class="keyword">BY</span> <span class="keyword">E</span>.SAL </span><br><span class="line">	               <span class="keyword">ROWS</span> </span><br><span class="line">            <span class="comment">--unbounded preceding and unbouned following针对当前所有记录的前一条、后一条记录，也就是表中的所有记录</span></span><br><span class="line">            <span class="comment">--unbounded：不受控制的，无限的</span></span><br><span class="line">            <span class="comment">--preceding：在...之前</span></span><br><span class="line">            <span class="comment">--following：在...之后</span></span><br><span class="line">            <span class="keyword">BETWEEN</span> <span class="keyword">UNBOUNDED</span> <span class="keyword">PRECEDING</span> <span class="keyword">AND</span> <span class="keyword">UNBOUNDED</span> <span class="keyword">FOLLOWING</span>) MAX_SAL</span><br><span class="line">  <span class="keyword">FROM</span> EMP <span class="keyword">E</span>;</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="6、下面三条语句等效：">6、下面三条语句等效：</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">over（order by salary rows between unbounded preceding and unbounded following）</span><br><span class="line">每行对应的数据窗口是从第一行到最后一行，等效：</span><br><span class="line">over（order by salary range between unbounded preceding and unbounded following）</span><br><span class="line">等效</span><br><span class="line">over(partition by null)</span><br></pre></td></tr></table></figure>
+<h2 id="三、常见的分析函数">三、常见的分析函数</h2><p>常见的分析函数如下：</p>
+<ul>
+<li>row_number() over(partition by … order by …)</li>
+<li>rank() over(partition by … order by …)</li>
+<li>dense_rank() over(partition by … order by …)</li>
+<li>count() over(partition by … order by …)</li>
+<li>max() over(partition by … order by …)</li>
+<li>min() over(partition by … order by …)</li>
+<li>sum() over(partition by … order by …)</li>
+<li>avg() over(partition by … order by …)</li>
+<li>first_value() over(partition by … order by …)</li>
+<li>last_value() over(partition by … order by …)</li>
+<li>lag() over(partition by … order by …)</li>
+<li>lead() over(partition by … order by …)</li>
+</ul>
+<h3 id="1、row_number()、rank()、dense_rank()：">1、row_number()、rank()、dense_rank()：</h3><p>举一个销售的例子：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">SQL&gt; select * from user_order order by customer_sales;</span><br><span class="line"></span><br><span class="line"> REGION_ID CUSTOMER_ID CUSTOMER_SALES</span><br><span class="line">---------- ----------- --------------</span><br><span class="line">         5           1              151162</span><br><span class="line">        10          29             903383</span><br><span class="line">         6           7              971585</span><br><span class="line">        10          28            986964</span><br><span class="line">         9          21           1020541</span><br><span class="line">         9          22           1036146</span><br><span class="line">         8          16           1068467</span><br><span class="line">         6           8            1141638</span><br><span class="line">         5           3            1161286</span><br><span class="line">         5           5            1169926</span><br><span class="line">         8          19           1174421</span><br><span class="line">         7          12           1182275</span><br><span class="line">         7          11           1190421</span><br><span class="line">         6          10           1196748</span><br><span class="line">         6           9            1208959</span><br><span class="line">        10          30          1216858</span><br><span class="line">         5             2                1224992</span><br><span class="line">           9             24              1224992</span><br><span class="line">           9             23              1224992</span><br><span class="line">           8          18           1253840</span><br><span class="line">         7          15           1255591</span><br><span class="line">         7          13           1310434</span><br><span class="line">        10          27          1322747</span><br><span class="line">         8          20           1413722</span><br><span class="line">         6           6            1788836</span><br><span class="line">        10          26          1808949</span><br><span class="line">         5           4            1878275</span><br><span class="line">         7          14           1929774</span><br><span class="line">         8          17           1944281</span><br><span class="line">         9          25           2232703</span><br><span class="line"></span><br><span class="line">30 rows selected.</span><br></pre></td></tr></table></figure><br>注意这里有3条记录的订单总额是一样的。假如我们现在需要筛选排名前12位的客户，如果使用rownum会有什么样的后果呢？</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">SQL&gt; select rownum, t.*</span><br><span class="line">  2    from (select * </span><br><span class="line">  3            from user_order</span><br><span class="line">  4           order by customer_sales desc) t</span><br><span class="line">  5   where rownum &lt;= 12</span><br><span class="line">  6   order by customer_sales desc;</span><br><span class="line"></span><br><span class="line">    ROWNUM  REGION_ID CUSTOMER_ID CUSTOMER_SALES</span><br><span class="line">---------- ---------- ----------- --------------</span><br><span class="line">         1          9                 25        2232703</span><br><span class="line">         2          8                 17        1944281</span><br><span class="line">         3          7                 14        1929774</span><br><span class="line">         4          5                 4        1878275</span><br><span class="line">         5         10                26        1808949</span><br><span class="line">         6          6                 6        1788836</span><br><span class="line">         7          8                 20        1413722</span><br><span class="line">         8         10                27        1322747</span><br><span class="line">         9          7                13        1310434</span><br><span class="line">        10          7               15        1255591</span><br><span class="line">        11          8               18        1253840</span><br><span class="line">        12          5                2          1224992</span><br><span class="line"></span><br><span class="line">12 rows selected.</span><br></pre></td></tr></table></figure>
+<font color="red">很明显假如只是简单地按rownum进行排序的话，我们漏掉了另外两条记录(参考上面的结果)。</font>
+
+<p>针对上面的情况，Oracle从8i开始就提供了3个分析函数：rand，dense_rank，row_number来解决诸如此类的问题，下面我们来看看这3个分析函数的作用以及彼此之间的区别：</p>
+<ul>
+<li><p><em>Row_number</em> 函数返回一个唯一的值，当碰到相同数据时，排名按照记录集中记录的顺序依次递增。 例如：row_number()over(partition by col1 order by col2)表示根据col1分组，在分组内部根据col2排序，而此函数计算的值就表示每组内部排序后的顺序编号（组内连续的唯一的）。 </p>
+<p>与rownum的区别在于：使用rownum进行排序的时候是先对结果集加入伪列rownum然后再进行排序，而此函数在包含排序从句后是先排序再计算行号码。 row_number()和rownum差不多，功能更强一点（可以在各个分组内从1开始排序）。 </p>
+</li>
+<li><p><em>Dense_rank</em> 函数返回一个唯一的值，除非当碰到相同数据时，此时所有相同数据的排名都是一样的。</p>
+</li>
+<li><p><em>Rank</em> 函数返回一个唯一的值，除非遇到相同的数据时，此时所有相同数据的排名是一样的，同时会在最后一条相同记录和下一条不同记录的排名之间空出排名。</p>
+</li>
+</ul>
+<p>举一个例子：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">SQL&gt; select region_id, customer_id, sum(customer_sales) total,</span><br><span class="line">  2         rank() over(order by sum(customer_sales) desc) rank,</span><br><span class="line">  3         dense_rank() over(order by sum(customer_sales) desc) dense_rank,</span><br><span class="line">  4         row_number() over(order by sum(customer_sales) desc) row_number</span><br><span class="line">  5    from user_order</span><br><span class="line">  6   group by region_id, customer_id;</span><br><span class="line"></span><br><span class="line"> REGION_ID CUSTOMER_ID      TOTAL       RANK DENSE_RANK ROW_NUMBER</span><br><span class="line">---------- ----------- ---------- ---------- ---------- ----------</span><br><span class="line">            </span><br><span class="line">         8          18                1253840         11         11         11</span><br><span class="line">         5           2                 1224992         12         12         12</span><br><span class="line">         9          23                1224992         12         12         13</span><br><span class="line">         9          24                1224992         12         12         14</span><br><span class="line">        10          30               1216858         15           13            15</span><br><span class="line">    </span><br><span class="line">30 rows selected.</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>当出现第二条相同的记录时，Rank和Dense_rank依然给出同样的排名12；而row_number则顺延递增为13，依次类推至第三条相同的记录；</li>
+<li>当排名进行到下一条不同的记录时，可以看到Rank函数在12和15之间空出了13,14的排名，因为这2个排名实际上已经被第二、三条相同的记录占了。而Dense_rank则顺序递增。row_number函数也是顺序递增。</li>
+</ul>
+<h3 id="2、first_value()_和last_value()：">2、first_value() 和last_value()：</h3><ul>
+<li>FIRST_VALUE 返回组中数据窗口的第一个值 ；</li>
+<li>LAST_VALUE   返回组中数据窗口的最后一个值。</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="operator"><span class="keyword">select</span> deptno,sal,ename,</span><br><span class="line"><span class="keyword">first_value</span>(ename) <span class="keyword">over</span>(<span class="keyword">partition</span> <span class="keyword">by</span> deptno <span class="keyword">order</span> <span class="keyword">by</span> sal) first_ename,</span><br><span class="line"><span class="keyword">last_value</span>(ename) <span class="keyword">over</span>(<span class="keyword">partition</span> <span class="keyword">by</span> deptno <span class="keyword">order</span> <span class="keyword">by</span> sal) last_ename1,</span><br><span class="line"><span class="keyword">last_value</span>(ename) <span class="keyword">over</span>(<span class="keyword">partition</span> <span class="keyword">by</span> deptno) last_ename2 </span><br><span class="line">  <span class="number">5</span>  <span class="keyword">from</span> emp;</span></span><br><span class="line"></span><br><span class="line">    DEPTNO	  SAL ENAME	 FIRST_ENAM LAST_ENAME LAST_ENAME</span><br><span class="line"><span class="comment">---------- ---------- ---------- ---------- ---------- ----------</span></span><br><span class="line">	10	 1300 MILLER	 MILLER     MILLER     KING</span><br><span class="line">	10	 2450 CLARK	 MILLER     CLARK      KING</span><br><span class="line">	10	 5000 KING	 MILLER     KING       KING</span><br><span class="line">	20	  800 SMITH	 SMITH	    SMITH      SCOTT</span><br><span class="line">	20	 1100 ADAMS	 SMITH	    ADAMS      SCOTT</span><br><span class="line">	20	 2975 JONES	 SMITH	    JONES      SCOTT</span><br><span class="line">	20	 3000 FORD	 SMITH	    SCOTT      SCOTT</span><br><span class="line">	20	 3000 SCOTT	 SMITH	    SCOTT      SCOTT</span><br><span class="line">	30	  950 JAMES	 JAMES	    JAMES      BLAKE</span><br><span class="line">	30	 1250 MARTIN	 JAMES	    WARD       BLAKE</span><br><span class="line">	30	 1250 WARD	 JAMES	    WARD       BLAKE</span><br><span class="line">	30	 1500 TURNER	 JAMES	    TURNER     BLAKE</span><br><span class="line">	30	 1600 ALLEN	 JAMES	    ALLEN      BLAKE</span><br><span class="line">	30	 2850 BLAKE	 JAMES	    BLAKE      BLAKE</span><br><span class="line"></span><br><span class="line">14 rows selected.</span><br></pre></td></tr></table></figure>
+<h3 id="3、lag()和lead（）：">3、lag()和lead（）：</h3><p>Lag和Lead函数可以在一次查询中取出同一字段的前N行的数据和后N行的值。语法：lag(exp_str,offset,defval) over()</p>
+<ul>
+<li>exp_str 是要做对比的字段；</li>
+<li>offset 是exp_str字段的偏移量 比如说 offset 为2 则 拿exp_str的第一行和第三行对比，第二行和第四行，依次类推，offset的默认值为1！</li>
+<li>defval是当该函数无值可用的情况下返回的值。Lead函数的用法类似。</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">SQL&gt; select ename,job,sal ,lag(sal) over(order by sal) last_sal from emp;</span><br><span class="line"></span><br><span class="line">ENAME	   JOB		    SAL   LAST_SAL</span><br><span class="line">---------- --------- ---------- ----------</span><br><span class="line">SMITH	   CLERK	    800</span><br><span class="line">JAMES	   CLERK	    950        800</span><br><span class="line">ADAMS	   CLERK	   1100        950</span><br><span class="line">WARD	   SALESMAN	   1250       1100</span><br><span class="line">MARTIN	   SALESMAN	   1250       1250</span><br><span class="line">MILLER	   CLERK	   1300       1250</span><br><span class="line">TURNER	   SALESMAN	   1500       1300</span><br><span class="line">ALLEN	   SALESMAN	   1600       1500</span><br><span class="line">CLARK	   MANAGER	   2450       1600</span><br><span class="line">BLAKE	   MANAGER	   2850       2450</span><br><span class="line">JONES	   MANAGER	   2975       2850</span><br><span class="line">SCOTT	   ANALYST	   3000       2975</span><br><span class="line">FORD	   ANALYST	   3000       3000</span><br><span class="line">KING	   PRESIDENT	   5000       3000</span><br><span class="line"></span><br><span class="line">14 rows selected.</span><br></pre></td></tr></table></figure>
+<p>设置了default 值之后 第一行对应的值 为500<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">SQL&gt; select ename,job,sal ,lag(sal,1,500) over(order by sal) last_sal from emp;</span><br><span class="line"></span><br><span class="line">ENAME	   JOB		    SAL   LAST_SAL</span><br><span class="line">---------- --------- ---------- ----------</span><br><span class="line">SMITH	   CLERK	    800        500</span><br><span class="line">JAMES	   CLERK	    950        800</span><br><span class="line">ADAMS	   CLERK	   1100        950</span><br><span class="line">WARD	   SALESMAN	   1250       1100</span><br><span class="line">MARTIN	   SALESMAN	   1250       1250</span><br><span class="line">MILLER	   CLERK	   1300       1250</span><br><span class="line">TURNER	   SALESMAN	   1500       1300</span><br><span class="line">ALLEN	   SALESMAN	   1600       1500</span><br><span class="line">CLARK	   MANAGER	   2450       1600</span><br><span class="line">BLAKE	   MANAGER	   2850       2450</span><br><span class="line">JONES	   MANAGER	   2975       2850</span><br><span class="line">SCOTT	   ANALYST	   3000       2975</span><br><span class="line">FORD	   ANALYST	   3000       3000</span><br><span class="line">KING	   PRESIDENT	   5000       3000</span><br><span class="line"></span><br><span class="line">14 rows selected.</span><br></pre></td></tr></table></figure></p>
+<p>【实例】<br>1、按天统计，每天统计前面几天的总和：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">SQL&gt; select * from t_over1;</span><br><span class="line"></span><br><span class="line">	DA	   SA</span><br><span class="line">---------- ----------</span><br><span class="line">	 1	   20</span><br><span class="line">	 2	   15</span><br><span class="line">	 3	   14</span><br><span class="line">	 4	   18</span><br><span class="line">	 5	   30</span><br><span class="line"></span><br><span class="line">SQL&gt; select da,sum(sa)over(order by da) from t_over1;</span><br><span class="line"></span><br><span class="line">	DA SUM(SA)OVER(ORDERBYDA)</span><br><span class="line">---------- ----------------------</span><br><span class="line">	 1		       20</span><br><span class="line">	 2		       35</span><br><span class="line">	 3		       49</span><br><span class="line">	 4		       67</span><br><span class="line">	 5		       97</span><br></pre></td></tr></table></figure>
+<p>2、统计各班成绩第一名的同学信息：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">NAME   CLASS  S                           </span><br><span class="line">    <span class="comment">----- ----- ----------------------   </span></span><br><span class="line">    fda    1      80                       </span><br><span class="line">    ffd    1      78                       </span><br><span class="line">    dss    1      95                       </span><br><span class="line">    cfe    2      74                       </span><br><span class="line">    gds    2      92                       </span><br><span class="line">    gf     3      99                       </span><br><span class="line">    ddd    3      99                       </span><br><span class="line">    adf    3      45                       </span><br><span class="line">    asdf   3      55                       </span><br><span class="line">    3dd    3      78                </span><br><span class="line">      </span><br><span class="line">使用分析函数：    </span><br><span class="line">    <span class="operator"><span class="keyword">select</span> * <span class="keyword">from</span>                                                                        </span><br><span class="line">    ( <span class="keyword">select</span> <span class="keyword">name</span>,<span class="keyword">class</span>,s,<span class="keyword">rank</span>()<span class="keyword">over</span>(<span class="keyword">partition</span> <span class="keyword">by</span> <span class="keyword">class</span> <span class="keyword">order</span> <span class="keyword">by</span> s <span class="keyword">desc</span>) mm <span class="keyword">from</span> t2   )                                                                              </span><br><span class="line">    <span class="keyword">where</span> mm=<span class="number">1</span>   </span><br><span class="line">得到结果：  </span><br><span class="line">    <span class="keyword">NAME</span>   <span class="keyword">CLASS</span> S                       MM                                                                                          </span><br><span class="line">    <span class="comment">----- ----- ---------------------- ----------------------   </span></span><br><span class="line">    dss    <span class="number">1</span>      <span class="number">95</span>                      <span class="number">1</span>                        </span><br><span class="line">    gds    <span class="number">2</span>      <span class="number">92</span>                      <span class="number">1</span>                        </span><br><span class="line">    gf     <span class="number">3</span>      <span class="number">99</span>                      <span class="number">1</span>                        </span><br><span class="line"></span><br><span class="line">    ddd    <span class="number">3</span>      <span class="number">99</span>                      <span class="number">1</span></span></span><br></pre></td></tr></table></figure><br>注意：<br>1.在求第一名成绩的时候，不能用row_number()，因为如果同班有两个并列第一，row_number()只返回一个结果<br>2.rank()和dense_rank()的区别是：<br>      –rank()是跳跃排序，有两个第二名时接下来就是第四名<br>      –dense_rank()l是连续排序，有两个第二名时仍然跟着第三名</p>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/oracle/" rel="tag">#oracle</a>
+          
+            <a href="/tags/分析函数/" rel="tag">#分析函数</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015/10/09/oracle-fenxihanshu-3/" rel="prev">oracle分析函数(三)——keep函数</a>
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/10/09/oracle-fenxihanshu-1/" rel="next">oracle分析函数(一)——rollup、cube</a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <div class="ds-share flat" data-thread-key="2015/10/09/oracle-fenxihanshu-2/"
+     data-title="oracle分析函数(二)——over函数"
+     data-content=""
+     data-url="http://yoursite.com/2015/10/09/oracle-fenxihanshu-2/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
+
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
+      
+    </div>
+  </div>
+
+ </div>
+
+        
+
+        
+          <div class="comments" id="comments">
+            
+              <div class="ds-thread" data-thread-key="2015/10/09/oracle-fenxihanshu-2/"
+                   data-title="oracle分析函数(二)——over函数" data-url="http://yoursite.com/2015/10/09/oracle-fenxihanshu-2/">
+              </div>
+            
+          </div>
+        
+      </div>
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="/images/lanjingling.jpg" alt="蓝精灵" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">蓝精灵</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">java程序员、爱开源、喜欢nodejs、前端js、oracle数据库、分布式技术...<br/>改变世界的是这么一群人,他们寻找梦想中的乐园,当他们找不到时,就亲手创造了她...</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">9</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">3</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">6</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/lanjingling" target="_blank">github</a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://blog.csdn.net/liuxiao723846" target="_blank">csdn</a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/1925780475" target="_blank">weibo</a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+            <p class="site-author-name">Links</p>
+            
+              <span class="links-of-author-item">
+              <a href="http://zipperary.com/" target="_blank">Zippera's Blog</a>
+              </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://wuchong.me/" target="_blank">Jark's Blog</a>
+              </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://www.ruanyifeng.com/blog/" target="_blank">阮一峰</a>
+              </span>
+            
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、分析函数"><span class="nav-number">1.</span> <span class="nav-text">一、分析函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、开窗函数"><span class="nav-number">2.</span> <span class="nav-text">二、开窗函数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1、over(order_by_col)_："><span class="nav-number">2.1.</span> <span class="nav-text">1、over(order by col) ：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2、分区（partition_by_col）："><span class="nav-number">2.2.</span> <span class="nav-text">2、分区（partition by col）：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3、范围over（order_by_salary_range_between_5_preceding_and_5_following）："><span class="nav-number">2.3.</span> <span class="nav-text">3、范围over（order by salary range between 5 preceding and 5 following）：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4、范围over（order_by_salary_rows_between_5_preceding_and_5_following）："><span class="nav-number">2.4.</span> <span class="nav-text">4、范围over（order by salary rows between 5 preceding and 5 following）：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5、可以混合使用："><span class="nav-number">2.5.</span> <span class="nav-text">5、可以混合使用：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6、下面三条语句等效："><span class="nav-number">2.6.</span> <span class="nav-text">6、下面三条语句等效：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三、常见的分析函数"><span class="nav-number">3.</span> <span class="nav-text">三、常见的分析函数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1、row_number()、rank()、dense_rank()："><span class="nav-number">3.1.</span> <span class="nav-text">1、row_number()、rank()、dense_rank()：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2、first_value()_和last_value()："><span class="nav-number">3.2.</span> <span class="nav-text">2、first_value() 和last_value()：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3、lag()和lead（）："><span class="nav-number">3.3.</span> <span class="nav-text">3、lag()和lead（）：</span></a></li></ol></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner"> <div class="copyright" >
+  
+  &copy; &nbsp;  2014 - 
+  <span itemprop="copyrightYear">2015</span>
+  <span class="with-love">
+    <i class="icon-next-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">蓝精灵</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+ </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+  
+    
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"lanjingling"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+    
+     
+
+    
+  
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.1"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.1"></script>
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/js/motion_global.js?v=0.4.5.1" id="motion.global"></script>
+
+
+
+
+  <script type="text/javascript" src="/js/nav-toggle.js?v=0.4.5.1"></script>
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.1" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 0.4 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    var $tocContent = $('.post-toc-content');
+    if (isDesktop() && CONFIG.sidebar === 'post') {
+      if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+        displaySidebar();
+      }
+    }
+  });
+</script>
+
+
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      if (CONFIG.sidebar === 'always') {
+        displaySidebar();
+      }
+      if (isMobile()) {
+        FastClick.attach(document.body);
+      }
+    });
+  </script>
+
+  
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/lazyload.js"></script>
+  <script type="text/javascript">
+    $(function () {
+      $("#posts").find('img').lazyload({
+        placeholder: "/images/loading.gif",
+        effect: "fadeIn"
+      });
+    });
+  </script>
+</body>
+</html>

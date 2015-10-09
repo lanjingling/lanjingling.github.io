@@ -1,0 +1,741 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.5.1"/>
+
+
+    <meta name="description" content="java程序员、爱开源、喜欢nodejs、前端js、oracle数据库、分布式技术...<br/>改变世界的是这么一群人,他们寻找梦想中的乐园,当他们找不到时,就亲手创造了她..." />
+
+
+
+  <meta name="keywords" content="oracle,分析函数," />
+
+
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.1" />
+
+
+<meta name="description" content="keep是Oracle下的另一个分析函数，他的用法不同于通过over关键字指定的分析函数，可以用于这样一种场合下：取同一个分组下以某个字段排序后，对指定字段取最小或最大的那个值。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="oracle分析函数(三)——keep函数">
+<meta property="og:url" content="http://yoursite.com/2015/10/09/oracle-fenxihanshu-3/index.html">
+<meta property="og:site_name" content="晓的技术博客">
+<meta property="og:description" content="keep是Oracle下的另一个分析函数，他的用法不同于通过over关键字指定的分析函数，可以用于这样一种场合下：取同一个分组下以某个字段排序后，对指定字段取最小或最大的那个值。">
+<meta property="og:updated_time" content="2015-10-09T05:54:28.869Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="oracle分析函数(三)——keep函数">
+<meta name="twitter:description" content="keep是Oracle下的另一个分析函数，他的用法不同于通过over关键字指定的分析函数，可以用于这样一种场合下：取同一个分组下以某个字段排序后，对指定字段取最小或最大的那个值。">
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'post'
+  };
+</script>
+
+  <title> oracle分析函数(三)——keep函数 | 晓的技术博客 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?93b1a723d246349c4cace650dee4a731";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand" rel="start">
+      <span class="logo">
+        <i class="icon-next-logo"></i>
+      </span>
+      <span class="site-title">晓的技术博客</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu menu-left">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            <i class="menu-item-icon icon-next-home"></i> <br />
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            <i class="menu-item-icon icon-next-archives"></i> <br />
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            <i class="menu-item-icon icon-next-categories"></i> <br />
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            <i class="menu-item-icon icon-next-tags"></i> <br />
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            <i class="menu-item-icon icon-next-about"></i> <br />
+            关于
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <form class="site-search-form">
+    <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+  </form>
+
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'iSunJWoZvxV9mKcJc6QU','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content"> 
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+
+      
+      
+        <h1 class="post-title" itemprop="name headline">
+          
+          
+            
+              oracle分析函数(三)——keep函数
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于
+          <time itemprop="dateCreated" datetime="2015-10-09T13:40:32+08:00" content="2015-10-09">
+            2015-10-09
+          </time>
+        </span>
+
+        
+          <span class="post-category" >
+            &nbsp; | &nbsp; 分类于
+            
+              <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                <a href="/categories/oracle/" itemprop="url" rel="index">
+                  <span itemprop="name">oracle</span>
+                </a>
+              </span>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+            <span class="post-comments-count">
+              &nbsp; | &nbsp;
+              <a href="/2015/10/09/oracle-fenxihanshu-3/#comments" itemprop="discussionUrl">
+                <span class="post-comments-count ds-thread-count" data-thread-key="2015/10/09/oracle-fenxihanshu-3/" itemprop="commentsCount"></span>
+              </a>
+            </span>
+          
+        
+      </div>
+    </header>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><h2 id="一、keep函数介绍">一、keep函数介绍</h2><p>keep是Oracle下的另一个分析函数，他的用法不同于通过over关键字指定的分析函数，可以用于这样一种场合下：取同一个分组下以某个字段排序后，对指定字段取最小或最大的那个值。</p>
+<p>从这个前提出发，我们可以看到其实这个目标通过一般的row_number分析函数也可以实现，即指定rn=1。但是，该函数无法实现同时获取最大和最小值。或者说用first_value和last_value，结合row_number实现，但是该种方式需要多次使用分析函数，而且还需要套一层SQL。于是出现了keep。</p>
+<p>语法：</p>
+<blockquote>
+<p>min | max(column1) keep (dense_rank first | last order by column2) over (partion by column3);</p>
+</blockquote>
+<ul>
+<li>最前是聚合函数，可以是min、max、avg、sum。。。</li>
+<li>column1为要计算的列；</li>
+<li>dense_rank first，dense_rank last为keep 函数的保留属性，表示分组、排序结果集中第一个、最后一个；</li>
+</ul>
+<p>解释：返回按照column3分组后，按照column2排序的结果集中第一个或最后一个最小值或最大值column1。</p>
+<h2 id="二、keep函数分析：">二、keep函数分析：</h2><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">SQL&gt; desc t</span><br><span class="line"> Name                                      Null?    Type</span><br><span class="line"> ----------------------------------------- -------- ----------------------------</span><br><span class="line"> X                                                  VARCHAR2(10)</span><br><span class="line"> Y                                                  DATE</span><br><span class="line"> Z                                                  NUMBER</span><br><span class="line"></span><br><span class="line">SQL&gt; select x,to_char(y,'yyyy-mm') y,z from t</span><br><span class="line">  2  order by x,y,z</span><br><span class="line">  3  /</span><br><span class="line"></span><br><span class="line">X          Y                Z</span><br><span class="line">---------- ------- ----------</span><br><span class="line">a          2011-02        111</span><br><span class="line">a          2011-02        222</span><br><span class="line">a          2011-02        888</span><br><span class="line">a          2011-03        333</span><br><span class="line">a          2011-04        555</span><br><span class="line">a          2011-04        666</span><br><span class="line">b          2011-02        111</span><br><span class="line">b          2011-02        222</span><br><span class="line">b          2011-03        333</span><br><span class="line">b          2011-04        555</span><br><span class="line"></span><br><span class="line">10 rows selected.</span><br><span class="line">SQL&gt;</span><br></pre></td></tr></table></figure>
+<p>下面，我们来使用keep函数来看一些例子。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">SQL&gt; select x, </span><br><span class="line">  2         min(z) keep(dense_rank first order by trunc(y,'mm')) first_min,</span><br><span class="line">  3         min(z) keep(dense_rank last order by trunc(y,'mm')) last_min,</span><br><span class="line">  4         max(z) keep(dense_rank first order by trunc(y,'mm')) first_max,</span><br><span class="line">  5         max(z) keep(dense_rank last order by trunc(y,'mm')) last_max</span><br><span class="line">  6  from t</span><br><span class="line">  7  group by x</span><br><span class="line">  8  /</span><br><span class="line"></span><br><span class="line">X           FIRST_MIN   LAST_MIN  FIRST_MAX   LAST_MAX</span><br><span class="line">---------- ---------- ---------- ---------- ----------</span><br><span class="line">a                 111        555        888        666</span><br><span class="line">b                 111        555        222        555</span><br></pre></td></tr></table></figure>
+<p>这是显示的效果。<br>我们来分析一下，SQL里面的group by 是作用于聚会函数的，可以这么理解一下。还有，这里我们头脑里应该有这么一个概念，排序即分组。</p>
+<p>结合结果集与keep函数里order by 子句，我们来看一下表中的数据，然后把表里的数据进行如下划分，以X为维度，按值a进行划分：<br>a          2011-02        111<br>a          2011-02        222<br>a          2011-02        888<br>————————————— 这些数据划分为第一组。<br>因为order by 是按日期（截止到月）进行排序的，上面的日期都一样。<br>a          2011-03        333<br>—————————————- 这些数据划分为第二组。<br>a          2011-04        555<br>a          2011-04        666<br>—————————————- 这些数据划分为第三组。<br>以X为维度，按值b进行划分：<br>b          2011-02        111<br>b          2011-02        222<br>—————————————– 第一组<br>b          2011-03        333<br>—————————————- 第二组<br>b          2011-04        555<br>—————————————- 第三组</p>
+<p>好，有了上述的划分，我们就不难理解SQL输出的结果集了。下面我们来分析一下SQL中输入的值。结合SQL</p>
+<ul>
+<li>min(z) keep(dense_rank first order by trunc(y,’mm’)) first_min 该子句用来显示，以a为维度，以y为序，显示第一组（因为keep函数里指定是的first子句）中的最小值，所以，它显示为111（结合上述的划分结果来看）。</li>
+<li>min(z) keep(dense_rank last order by trunc(y,’mm’)) last_min 该子句用来显示，以a为维度，以y为序，显示最后一组（因为keep函数里指定是的last子句）中的最小值，所以，这显示为555。</li>
+</ul>
+<p>下面，我们来再分析一下以X为b的结果。<br>我们来看一下x=b的那一行，last_min与last_max的值一样。这是因为x为b的最后一组，它只有一行数据，对于一行数据而言，它的最大值与最小值肯定是同一个值了，所以last_min与last_max一样。</p>
+<p>使用其他聚合函数也非常好理解了，比如我使用sum函数。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">SQL&gt; select x, </span><br><span class="line">  2         sum(z) keep(dense_rank first order by trunc(y,'mm')) first_sum,</span><br><span class="line">  3         sum(z) keep(dense_rank last order by trunc(y,'mm'))  last_sum</span><br><span class="line">  4  from t</span><br><span class="line">  5  group by x</span><br><span class="line">  6  /</span><br><span class="line"></span><br><span class="line">X           FIRST_SUM   LAST_SUM</span><br><span class="line">---------- ---------- ----------</span><br><span class="line">a                1221       1221</span><br><span class="line">b                 333        555</span><br></pre></td></tr></table></figure>
+<h2 id="三、实例">三、实例</h2><p>1、按照某字段分组、然后排序、去最值<br>创建表、插入数据<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="operator"><span class="keyword">create</span> <span class="keyword">table</span> tx2(id1 <span class="built_in">int</span> ,id2 <span class="built_in">int</span>,id3 <span class="built_in">int</span>);</span></span><br><span class="line"></span><br><span class="line"><span class="operator"><span class="keyword">insert</span> <span class="keyword">into</span> tx2(id1,id2,id3) <span class="keyword">values</span>(<span class="number">1</span>,<span class="number">111</span>,<span class="number">1</span>);</span></span><br><span class="line"><span class="operator"><span class="keyword">insert</span> <span class="keyword">into</span> tx2(id1,id2,id3) <span class="keyword">values</span>(<span class="number">1</span>,<span class="number">222</span>,<span class="number">1</span>);</span></span><br><span class="line"><span class="operator"><span class="keyword">insert</span> <span class="keyword">into</span> tx2(id1,id2,id3) <span class="keyword">values</span>(<span class="number">1</span>,<span class="number">333</span>,<span class="number">2</span>);</span></span><br><span class="line"><span class="operator"><span class="keyword">insert</span> <span class="keyword">into</span> tx2(id1,id2,id3) <span class="keyword">values</span>(<span class="number">1</span>,<span class="number">444</span>,<span class="number">3</span>);</span></span><br><span class="line"><span class="operator"><span class="keyword">insert</span> <span class="keyword">into</span> tx2(id1,id2,id3) <span class="keyword">values</span>(<span class="number">2</span>,<span class="number">555</span>,<span class="number">1</span>);</span></span><br><span class="line"><span class="operator"><span class="keyword">insert</span> <span class="keyword">into</span> tx2(id1,id2,id3) <span class="keyword">values</span>(<span class="number">2</span>,<span class="number">666</span>,<span class="number">2</span>);</span></span><br><span class="line"><span class="operator"><span class="keyword">insert</span> <span class="keyword">into</span> tx2(id1,id2,id3) <span class="keyword">values</span>(<span class="number">2</span>,<span class="number">777</span>,<span class="number">3</span>);</span></span><br></pre></td></tr></table></figure><br>查询：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">SQL&gt; select * from tx2;</span><br><span class="line"></span><br><span class="line">       ID1	  ID2	     ID3</span><br><span class="line">---------- ---------- ----------</span><br><span class="line">	 1	  111	       1</span><br><span class="line">	 1	  222	       1</span><br><span class="line">	 1	  333	       2</span><br><span class="line">	 1	  444	       3</span><br><span class="line">	 2	  555	       1</span><br><span class="line">	 2	  666	       2</span><br><span class="line">	 2	  777	       3</span><br><span class="line"></span><br><span class="line">7 rows selected.</span><br></pre></td></tr></table></figure></p>
+<p>按照ID1分组,ID3排序后，第一个最小的ID2：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="operator"><span class="keyword">select</span> <span class="keyword">t</span>.id1,<span class="keyword">t</span>.id2,<span class="keyword">t</span>.id3,<span class="keyword">min</span>(<span class="keyword">t</span>.id2)<span class="keyword">keep</span>(<span class="keyword">dense_rank</span> <span class="keyword">first</span> <span class="keyword">order</span> <span class="keyword">by</span> <span class="keyword">t</span>.id3)<span class="keyword">over</span>(<span class="keyword">partition</span> <span class="keyword">by</span> <span class="keyword">t</span>.id1) <span class="keyword">from</span> tx2 <span class="keyword">t</span>;</span></span><br><span class="line"></span><br><span class="line">       ID1	  ID2	     ID3 MIN(T.ID2)KEEP(DENSE_RANKFIRSTORDERBYT.ID3)OVER(PARTITIONBYT.ID1)</span><br><span class="line"><span class="comment">---------- ---------- ---------- -----------------------------------------------------------------</span></span><br><span class="line">	 1	  111	       1							       111</span><br><span class="line">	 1	  222	       1							       111</span><br><span class="line">	 1	  333	       2							       111</span><br><span class="line">	 1	  444	       3							       111</span><br><span class="line">	 2	  555	       1							       555</span><br><span class="line">	 2	  666	       2							       555</span><br><span class="line">	 2	  777	       3							       555</span><br><span class="line"></span><br><span class="line">7 rows selected.</span><br></pre></td></tr></table></figure>
+<p>2、统计部门最高、低工资<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">SQL&gt; SELECT t.empno,t.ename,t.mgr,t.sal,t.deptno  FROM emp t  ORDER BY t.sal,  t.deptno;  </span><br><span class="line"></span><br><span class="line">     EMPNO ENAME	     MGR	SAL	DEPTNO</span><br><span class="line">---------- ---------- ---------- ---------- ----------</span><br><span class="line">      7369 SMITH	    7902	800	    20</span><br><span class="line">      7900 JAMES	    7698	950	    30</span><br><span class="line">      7876 ADAMS	    7788       1100	    20</span><br><span class="line">      7521 WARD 	    7698       1250	    30</span><br><span class="line">      7654 MARTIN	    7698       1250	    30</span><br><span class="line">      7934 MILLER	    7782       1300	    10</span><br><span class="line">      7844 TURNER	    7698       1500	    30</span><br><span class="line">      7499 ALLEN	    7698       1600	    30</span><br><span class="line">      7782 CLARK	    7839       2450	    10</span><br><span class="line">      7698 BLAKE	    7839       2850	    30</span><br><span class="line">      7566 JONES	    7839       2975	    20</span><br><span class="line"></span><br><span class="line">     EMPNO ENAME	     MGR	SAL	DEPTNO</span><br><span class="line">---------- ---------- ---------- ---------- ----------</span><br><span class="line">      7788 SCOTT	    7566       3000	    20</span><br><span class="line">      7902 FORD 	    7566       3000	    20</span><br><span class="line">      7839 KING 		       5000	    10</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">14 rows selected.</span><br></pre></td></tr></table></figure><br>现在要查询表中工资最高的部门号的最大最小值,工资最低的部门号的最大最小值 ：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">SQL&gt; SELECT MIN(t.deptno) KEEP(DENSE_RANK FIRST ORDER BY t.sal) a,</span><br><span class="line">MAX(t.deptno) KEEP(DENSE_RANK FIRST ORDER BY t.sal) b,</span><br><span class="line">MIN(t.deptno) KEEP(DENSE_RANK LAST ORDER BY t.sal) c,</span><br><span class="line">MAX(t.deptno) KEEP(DENSE_RANK LAST ORDER BY t.sal) d</span><br><span class="line">  5  FROM emp t;  </span><br><span class="line"></span><br><span class="line">	 A	    B	       C	  D</span><br><span class="line">---------- ---------- ---------- ----------</span><br><span class="line">	20	   20	      10	 10</span><br></pre></td></tr></table></figure><br>加上over,对每一行记录做计算，看看效果：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">SQL&gt; SELECT t.empno,t.ename,t.mgr,t.sal,t.deptno,</span><br><span class="line">MIN(t.deptno) KEEP(DENSE_RANK FIRST ORDER BY t.sal)over() a,</span><br><span class="line">MAX(t.deptno) KEEP(DENSE_RANK FIRST ORDER BY t.sal)over() b,</span><br><span class="line">MIN(t.deptno) KEEP(DENSE_RANK LAST ORDER BY t.sal)over() c,</span><br><span class="line">MAX(t.deptno) KEEP(DENSE_RANK LAST ORDER BY t.sal)over() d</span><br><span class="line">  6  FROM emp t;  </span><br><span class="line"></span><br><span class="line">     EMPNO ENAME	     MGR	SAL	DEPTNO		A	   B	      C 	 D</span><br><span class="line">---------- ---------- ---------- ---------- ---------- ---------- ---------- ---------- ----------</span><br><span class="line">      7369 SMITH	    7902	800	    20	       20	  20	     10 	10</span><br><span class="line">      7499 ALLEN	    7698       1600	    30	       20	  20	     10 	10</span><br><span class="line">      7521 WARD 	    7698       1250	    30	       20	  20	     10 	10</span><br><span class="line">      7566 JONES	    7839       2975	    20	       20	  20	     10 	10</span><br><span class="line">      7654 MARTIN	    7698       1250	    30	       20	  20	     10 	10</span><br><span class="line">      7698 BLAKE	    7839       2850	    30	       20	  20	     10 	10</span><br><span class="line">      7782 CLARK	    7839       2450	    10	       20	  20	     10 	10</span><br><span class="line">      7788 SCOTT	    7566       3000	    20	       20	  20	     10 	10</span><br><span class="line">      7839 KING 		       5000	    10	       20	  20	     10 	10</span><br><span class="line">      7844 TURNER	    7698       1500	    30	       20	  20	     10 	10</span><br><span class="line">      7876 ADAMS	    7788       1100	    20	       20	  20	     10 	10</span><br><span class="line"></span><br><span class="line">     EMPNO ENAME	     MGR	SAL	DEPTNO		A	   B	      C 	 D</span><br><span class="line">---------- ---------- ---------- ---------- ---------- ---------- ---------- ---------- ----------</span><br><span class="line">      7900 JAMES	    7698	950	    30	       20	  20	     10 	10</span><br><span class="line">      7902 FORD 	    7566       3000	    20	       20	  20	     10 	10</span><br><span class="line">      7934 MILLER	    7782       1300	    10	       20	  20	     10 	10</span><br><span class="line"></span><br><span class="line">14 rows selected.</span><br></pre></td></tr></table></figure><br>下面对每一个mgr求最大(最小)工资的部门号的最大(最小)值 ：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">SQL&gt; SELECT t.empno,t.ename,t.mgr,t.sal,t.deptno,</span><br><span class="line">MIN(t.deptno) KEEP(DENSE_RANK FIRST ORDER BY t.sal)over(PARTITION BY t.mgr) a,</span><br><span class="line">MAX(t.deptno) KEEP(DENSE_RANK FIRST ORDER BY t.sal)over(PARTITION BY t.mgr) b,</span><br><span class="line">MIN(t.deptno) KEEP(DENSE_RANK LAST ORDER BY t.sal)over(PARTITION BY t.mgr) c,</span><br><span class="line">MAX(t.deptno) KEEP(DENSE_RANK LAST ORDER BY t.sal)over(PARTITION BY t.mgr) d</span><br><span class="line">  6  FROM emp t;  </span><br><span class="line"></span><br><span class="line">     EMPNO ENAME	     MGR	SAL	DEPTNO		A	   B	      C 	 D</span><br><span class="line">---------- ---------- ---------- ---------- ---------- ---------- ---------- ---------- ----------</span><br><span class="line">      7902 FORD 	    7566       3000	    20	       20	  20	     20 	20</span><br><span class="line">      7788 SCOTT	    7566       3000	    20	       20	  20	     20 	20</span><br><span class="line">      7900 JAMES	    7698	950	    30	       30	  30	     30 	30</span><br><span class="line">      7499 ALLEN	    7698       1600	    30	       30	  30	     30 	30</span><br><span class="line">      7521 WARD 	    7698       1250	    30	       30	  30	     30 	30</span><br><span class="line">      7844 TURNER	    7698       1500	    30	       30	  30	     30 	30</span><br><span class="line">      7654 MARTIN	    7698       1250	    30	       30	  30	     30 	30</span><br><span class="line">      7934 MILLER	    7782       1300	    10	       10	  10	     10 	10</span><br><span class="line">      7876 ADAMS	    7788       1100	    20	       20	  20	     20 	20</span><br><span class="line">      7698 BLAKE	    7839       2850	    30	       10	  10	     20 	20</span><br><span class="line">      7566 JONES	    7839       2975	    20	       10	  10	     20 	20</span><br><span class="line"></span><br><span class="line">     EMPNO ENAME	     MGR	SAL	DEPTNO		A	   B	      C 	 D</span><br><span class="line">---------- ---------- ---------- ---------- ---------- ---------- ---------- ---------- ----------</span><br><span class="line">      7782 CLARK	    7839       2450	    10	       10	  10	     20 	20</span><br><span class="line">      7369 SMITH	    7902	800	    20	       20	  20	     20 	20</span><br><span class="line">      7839 KING 		       5000	    10	       10	  10	     10 	10</span><br><span class="line"></span><br><span class="line">14 rows selected.</span><br></pre></td></tr></table></figure></p>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/oracle/" rel="tag">#oracle</a>
+          
+            <a href="/tags/分析函数/" rel="tag">#分析函数</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/10/09/oracle-fenxihanshu-2/" rel="next">oracle分析函数(二)——over函数</a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <div class="ds-share flat" data-thread-key="2015/10/09/oracle-fenxihanshu-3/"
+     data-title="oracle分析函数(三)——keep函数"
+     data-content=""
+     data-url="http://yoursite.com/2015/10/09/oracle-fenxihanshu-3/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
+
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
+      
+    </div>
+  </div>
+
+ </div>
+
+        
+
+        
+          <div class="comments" id="comments">
+            
+              <div class="ds-thread" data-thread-key="2015/10/09/oracle-fenxihanshu-3/"
+                   data-title="oracle分析函数(三)——keep函数" data-url="http://yoursite.com/2015/10/09/oracle-fenxihanshu-3/">
+              </div>
+            
+          </div>
+        
+      </div>
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="/images/lanjingling.jpg" alt="蓝精灵" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">蓝精灵</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">java程序员、爱开源、喜欢nodejs、前端js、oracle数据库、分布式技术...<br/>改变世界的是这么一群人,他们寻找梦想中的乐园,当他们找不到时,就亲手创造了她...</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">9</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">3</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">6</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/lanjingling" target="_blank">github</a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://blog.csdn.net/liuxiao723846" target="_blank">csdn</a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/1925780475" target="_blank">weibo</a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+            <p class="site-author-name">Links</p>
+            
+              <span class="links-of-author-item">
+              <a href="http://zipperary.com/" target="_blank">Zippera's Blog</a>
+              </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://wuchong.me/" target="_blank">Jark's Blog</a>
+              </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://www.ruanyifeng.com/blog/" target="_blank">阮一峰</a>
+              </span>
+            
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、keep函数介绍"><span class="nav-number">1.</span> <span class="nav-text">一、keep函数介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、keep函数分析："><span class="nav-number">2.</span> <span class="nav-text">二、keep函数分析：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三、实例"><span class="nav-number">3.</span> <span class="nav-text">三、实例</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner"> <div class="copyright" >
+  
+  &copy; &nbsp;  2014 - 
+  <span itemprop="copyrightYear">2015</span>
+  <span class="with-love">
+    <i class="icon-next-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">蓝精灵</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+ </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+  
+    
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"lanjingling"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+    
+     
+
+    
+  
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.1"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.1"></script>
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/js/motion_global.js?v=0.4.5.1" id="motion.global"></script>
+
+
+
+
+  <script type="text/javascript" src="/js/nav-toggle.js?v=0.4.5.1"></script>
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.1" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 0.4 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    var $tocContent = $('.post-toc-content');
+    if (isDesktop() && CONFIG.sidebar === 'post') {
+      if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+        displaySidebar();
+      }
+    }
+  });
+</script>
+
+
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      if (CONFIG.sidebar === 'always') {
+        displaySidebar();
+      }
+      if (isMobile()) {
+        FastClick.attach(document.body);
+      }
+    });
+  </script>
+
+  
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/lazyload.js"></script>
+  <script type="text/javascript">
+    $(function () {
+      $("#posts").find('img').lazyload({
+        placeholder: "/images/loading.gif",
+        effect: "fadeIn"
+      });
+    });
+  </script>
+</body>
+</html>
