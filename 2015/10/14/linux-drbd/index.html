@@ -1,0 +1,803 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.5.1"/>
+
+
+    <meta name="description" content="java程序员、爱开源、喜欢nodejs、前端js、oracle数据库、分布式技术...<br/>改变世界的是这么一群人,他们寻找梦想中的乐园,当他们找不到时,就亲手创造了她..." />
+
+
+
+  <meta name="keywords" content="drbd,linux," />
+
+
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.1" />
+
+
+<meta name="description" content="DRBD的全称为：DistributedReplicatedBlockDevice(DRBD)分布式块设备复制DRBD是由内核模块和相关脚本而构成，用以构建高可用性的集群。其实现方式是通过网络来镜像整个设备。它允许用户在远程机器上建立一个本地块设备的实时镜像。与心跳连接结合使用，也可以把它看作是一种网络RAID。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux下DRBD安装、配置">
+<meta property="og:url" content="http://yoursite.com/2015/10/14/linux-drbd/index.html">
+<meta property="og:site_name" content="晓的技术博客">
+<meta property="og:description" content="DRBD的全称为：DistributedReplicatedBlockDevice(DRBD)分布式块设备复制DRBD是由内核模块和相关脚本而构成，用以构建高可用性的集群。其实现方式是通过网络来镜像整个设备。它允许用户在远程机器上建立一个本地块设备的实时镜像。与心跳连接结合使用，也可以把它看作是一种网络RAID。">
+<meta property="og:updated_time" content="2015-10-14T07:27:36.418Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="linux下DRBD安装、配置">
+<meta name="twitter:description" content="DRBD的全称为：DistributedReplicatedBlockDevice(DRBD)分布式块设备复制DRBD是由内核模块和相关脚本而构成，用以构建高可用性的集群。其实现方式是通过网络来镜像整个设备。它允许用户在远程机器上建立一个本地块设备的实时镜像。与心跳连接结合使用，也可以把它看作是一种网络RAID。">
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'post'
+  };
+</script>
+
+  <title> linux下DRBD安装、配置 | 晓的技术博客 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?93b1a723d246349c4cace650dee4a731";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand" rel="start">
+      <span class="logo">
+        <i class="icon-next-logo"></i>
+      </span>
+      <span class="site-title">晓的技术博客</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu menu-left">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            <i class="menu-item-icon icon-next-home"></i> <br />
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            <i class="menu-item-icon icon-next-archives"></i> <br />
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            <i class="menu-item-icon icon-next-categories"></i> <br />
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            <i class="menu-item-icon icon-next-tags"></i> <br />
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            <i class="menu-item-icon icon-next-about"></i> <br />
+            关于
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <form class="site-search-form">
+    <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+  </form>
+
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'iSunJWoZvxV9mKcJc6QU','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content"> 
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+
+      
+      
+        <h1 class="post-title" itemprop="name headline">
+          
+          
+            
+              linux下DRBD安装、配置
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于
+          <time itemprop="dateCreated" datetime="2015-10-14T15:03:58+08:00" content="2015-10-14">
+            2015-10-14
+          </time>
+        </span>
+
+        
+          <span class="post-category" >
+            &nbsp; | &nbsp; 分类于
+            
+              <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                <a href="/categories/linux/" itemprop="url" rel="index">
+                  <span itemprop="name">linux</span>
+                </a>
+              </span>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+            <span class="post-comments-count">
+              &nbsp; | &nbsp;
+              <a href="/2015/10/14/linux-drbd/#comments" itemprop="discussionUrl">
+                <span class="post-comments-count ds-thread-count" data-thread-key="2015/10/14/linux-drbd/" itemprop="commentsCount"></span>
+              </a>
+            </span>
+          
+        
+      </div>
+    </header>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><h2 id="DRBD安装准备">DRBD安装准备</h2><p>1、下载：（drbd官网 <a href="http://oss.linbit.com/drbd/）" target="_blank" rel="external">http://oss.linbit.com/drbd/）</a></p>
+<blockquote>
+<p>wget <a href="http://oss.linbit.com/drbd/8.4/drbd-8.4.3.tar.gz" target="_blank" rel="external">http://oss.linbit.com/drbd/8.4/drbd-8.4.3.tar.gz</a></p>
+</blockquote>
+<p>2、为主机、备机添加准备一样大小的分区：</p>
+<ul>
+<li><p>查看硬盘信息：</p>
+<blockquote>
+<p>fdisk -l</p>
+</blockquote>
+</li>
+<li><p>添加一块新的硬盘（/dev/sdb），然后使用下面命令分区（我这里是将新加的硬盘划分成了一个扩展分区，在其上又做了一次逻辑分区）</p>
+<blockquote>
+<p>fdisk /dev/sdb</p>
+</blockquote>
+</li>
+</ul>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[root@centOS2 cdrom]# fdisk -l</span><br><span class="line">Disk /dev/sdb: 4294 MB, 4294967296 bytes</span><br><span class="line">255 heads, 63 sectors/track, 522 cylinders</span><br><span class="line">Units = cylinders of 16065 * 512 = 8225280 bytes</span><br><span class="line">Sector size (logical/physical): 512 bytes / 512 bytes</span><br><span class="line">I/O size (minimum/optimal): 512 bytes / 512 bytes</span><br><span class="line">Disk identifier: 0xb5f2a6aa</span><br><span class="line"></span><br><span class="line">   Device Boot      Start         End      Blocks   Id  System</span><br><span class="line">/dev/sdb1               1         522     4192933+   5  Extended</span><br><span class="line">/dev/sdb5               1         522     4192902   83  Linux</span><br></pre></td></tr></table></figure>
+<p>3、安装支持软件：</p>
+<p>1）挂载安装光盘、配置yum源：</p>
+<ul>
+<li>在virtualbox上添加安装ios文件，然后设置硬盘启用，重启系统；</li>
+<li>lsblk 查看光驱信息；</li>
+<li>把关盘挂载到/mnt/cdrom目录下；mount /dev/cdrom /mnt/cdrom</li>
+<li>配置yum源，修改/etc/yum.repos.d/CentOS-Media.repo</li>
+</ul>
+<p>2）安装如下如见：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">yum install gcc </span><br><span class="line">yum install kernel-devel</span><br><span class="line">yum install kernel-headers</span><br><span class="line">yum install flex </span><br><span class="line">yum install libxslt-devel</span><br><span class="line">yum install libxslt</span><br><span class="line">yum install perl</span><br></pre></td></tr></table></figure></p>
+<h2 id="DRBD安装">DRBD安装</h2><p>解压、编译、安装。在/usr/local下<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">[root@centOS2 local]# tar -vxzf drbd-8.4.3.tar.gz</span><br><span class="line">[root@centOS2 local]# cd drbd-8.4.3</span><br><span class="line">[root@centOS1 drbd-8.4.3]# ./configure --prefix=/usr/local/drbd --with-km</span><br><span class="line">[root@centOS1 drbd-8.4.3]# make KDIR=/usr/src/kernels/2.6.32-504.el6.x86_64/</span><br><span class="line">[root@centOS1 drbd-8.4.3]# make install</span><br><span class="line">[root@centOS1 drbd-8.4.3]# mkdir -p /usr/local/drbd/var/run/drbd</span><br><span class="line">[root@centOS1 drbd-8.4.3]# cp /usr/local/drbd/etc/rc.d/init.d/drbd  /etc/rc.d/init.d/</span><br><span class="line">[root@centOS1 drbd-8.4.3]# chkconfig --add drbd</span><br><span class="line">[root@centOS1 drbd-8.4.3]# chkconfig drbd on</span><br><span class="line">[root@centOS1 drbd-8.4.3]# cd drbd</span><br><span class="line">[root@centOS1 drbd]# cp drbd.ko /lib/modules/`uname -r`/kernel/lib/</span><br><span class="line">[root@centOS1 drbd]# depmod ## 更新内核包关联文件modules.dep</span><br><span class="line">[root@centOS1 drbd]# modprobe drbd  ##安装内核模块 </span><br><span class="line">[root@centOS1 drbd]# lsmod | grep drbd   ##查看模块是否加载成功</span><br><span class="line">drbd                  365675  0 </span><br><span class="line">libcrc32c               1246  1 drbd</span><br></pre></td></tr></table></figure></p>
+<h2 id="DRBD配置">DRBD配置</h2><p>1、DRBD简介：<br>DRBD的全称为：DistributedReplicatedBlockDevice(DRBD)分布式块设备复制，DRBD是由内核模块和相关脚本而构成，用以构建高可用性的集群。其实现方式是通过网络来镜像整个设备。它允许用户在远程机器上建立一个本地块设备的实时镜像。与心跳连接结合使用，也可以把它看作是一种网络RAID。</p>
+<p>2、DRBD工作机制：<br>Drbd负责接收数据，把数据写到本地磁盘，然后发送给另一个主机。另一个主机再将数据存到自己的磁盘中。目前，drbd每次只允许对一个节点进行读写访问，这对于通常的故障切换高可用性集群来讲已经足够用了。以后的版本将支持两个节点进行读写存取。</p>
+<p>3、DRBD协议说明：</p>
+<ul>
+<li>数据一旦写入磁盘并发送到网络中就认为完成了写入操作</li>
+<li>收到接收确认就认为完成了写入操作</li>
+<li>收到写入确认就认为完成了写入操作</li>
+</ul>
+<p>4、配置：（官方文档介绍：<a href="http://www.drbd.org/users-guide-8.4/）" target="_blank" rel="external">http://www.drbd.org/users-guide-8.4/）</a><br>1）drbd的配置文件在 /usr/local/drbd/etc/drbd.conf，内容如下：</p>
+<blockquote>
+<p># You can find an example in  /usr/share/doc/drbd…/drbd.conf.example<br>include “drbd.d/global_common.conf”;<br>include “drbd.d/*.res”;</p>
+</blockquote>
+<p>由此可见：主配置文件里面已经包含了全局配置文件和drbd目录下以.res结尾的文件。可以在global_common.conf中配置一些全局的设置（如protocol C;），也可以在.res文件中配置。</p>
+<p>global_common.conf内容如下：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line">global &#123;</span><br><span class="line">usage-count yes; #是否参加drbd的使用者统计，默认此选项为yes</span><br><span class="line">\# minor-count dialog-refresh disable-ip-verification</span><br><span class="line">&#125;</span><br><span class="line">common &#123;</span><br><span class="line">protocol C; #使用drbd的同步协议</span><br><span class="line">handlers &#123;</span><br><span class="line">\# These are EXAMPLE handlers only.</span><br><span class="line">\# They may have severe implications,</span><br><span class="line">\# like hard resetting the node under certain circumstances.</span><br><span class="line">\# Be careful when chosing your poison.</span><br><span class="line">pri-on-incon-degr "/usr/lib/drbd/notify-pri-on-incon-degr.sh; /usr/lib/drbd/notify-emergency-reboot.sh; echo b &gt; /proc/sysrq-trigger ; reboot -f";</span><br><span class="line">pri-lost-after-sb "/usr/lib/drbd/notify-pri-lost-after-sb.sh; /usr/lib/drbd/notify-emergency-reboot.sh; echo b &gt; /proc/sysrq-trigger ; reboot -f";</span><br><span class="line">local-io-error "/usr/lib/drbd/notify-io-error.sh; /usr/lib/drbd/notify-emergency-shutdown.sh; echo o &gt; /proc/sysrq-trigger ; halt -f";</span><br><span class="line">\# fence-peer "/usr/lib/drbd/crm-fence-peer.sh";</span><br><span class="line">\# split-brain "/usr/lib/drbd/notify-split-brain.sh root";</span><br><span class="line">\# out-of-sync "/usr/lib/drbd/notify-out-of-sync.sh root";</span><br><span class="line">\# before-resync-target "/usr/lib/drbd/snapshot-resync-target-lvm.sh -p 15 -- -c 16k";</span><br><span class="line">\# after-resync-target /usr/lib/drbd/unsnapshot-resync-target-lvm.sh;</span><br><span class="line">&#125;</span><br><span class="line">startup &#123;</span><br><span class="line">\# wfc-timeout degr-wfc-timeout outdated-wfc-timeout wait-after-sb</span><br><span class="line">&#125;</span><br><span class="line">options &#123;</span><br><span class="line">\# cpu-mask on-no-data-accessible</span><br><span class="line">&#125;</span><br><span class="line">disk &#123;</span><br><span class="line">on-io-error detach; #配置I/O错误处理策略为分离</span><br><span class="line">\# size max-bio-bvecs on-io-error fencing disk-barrier disk-flushes</span><br><span class="line">\# disk-drain md-flushes resync-rate resync-after al-extents</span><br><span class="line">\# c-plan-ahead c-delay-target c-fill-target c-max-rate</span><br><span class="line">\# c-min-rate disk-timeout</span><br><span class="line">&#125;</span><br><span class="line">net &#123;</span><br><span class="line">\# protocol timeout max-epoch-size max-buffers unplug-watermark</span><br><span class="line">\# connect-int ping-int sndbuf-size rcvbuf-size ko-count</span><br><span class="line">\# allow-two-primaries cram-hmac-alg shared-secret after-sb-0pri</span><br><span class="line">\# after-sb-1pri after-sb-2pri always-asbp rr-conflict</span><br><span class="line">\# ping-timeout data-integrity-alg tcp-cork on-congestion</span><br><span class="line">\# congestion-fill congestion-extents csums-alg verify-alg</span><br><span class="line">\# use-rle</span><br><span class="line">&#125;</span><br><span class="line">syncer &#123;</span><br><span class="line">rate 1024M; #设置主备节点同步时的网络速率</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>2）drbd.d目录下新建资源文件（drbd.res）<br>在node1、node2 上分别建立drbd.res：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">[root@node1 ~]# vim /usr/local/drbd/etc/drbd.d/drbd.res</span><br><span class="line">resource  r1 &#123;   #这个r1是定义资源的名字</span><br><span class="line">protocol C;</span><br><span class="line">on  centOS &#123;            #on开头，后面是主机名称</span><br><span class="line">device    /dev/drbd0;  #drbd设备名称</span><br><span class="line">disk      /dev/sdb5;   #drbd0使用的磁盘分区为sdb1</span><br><span class="line">address   10.0.0.105:7789; #设置drbd监听地址与端口</span><br><span class="line">meta-disk  internal;</span><br><span class="line">&#125;</span><br><span class="line">on  centOS2 &#123;            #on开头，后面是主机名称</span><br><span class="line">device    /dev/drbd0;  #drbd设备名称</span><br><span class="line">disk      /dev/sdb5;   #drbd0使用的磁盘分区为sdb1</span><br><span class="line">address   10.0.0.106:7789; #设置drbd监听地址与端口</span><br><span class="line">meta-disk  internal;</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>3）在node1、node2 上初始化资源、启动drbd：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">[root@centOS1 drbd.d]# drbdadm create-md r1</span><br><span class="line">DRBD module version: 8.4.6</span><br><span class="line">   userland version: 8.4.3</span><br><span class="line">you should upgrade your drbd tools!</span><br><span class="line">Writing meta data...</span><br><span class="line">initializing activity log</span><br><span class="line">NOT initializing bitmap</span><br><span class="line">New drbd meta data block successfully created.</span><br><span class="line">success</span><br><span class="line">启动</span><br><span class="line">[root@centOS1 drbd.d]# service drbd start</span><br><span class="line">查看状态</span><br><span class="line">[root@centOS1 drbd.d]# netstat -anput|grep 7789</span><br></pre></td></tr></table></figure></p>
+<p>4）操作drbd：</p>
+<ul>
+<li><p>查看节点角色状态：</p>
+<blockquote>
+<p>[root@centOS1 drbd.d]# drbdadm role r1<br>注：第一次启动drbd时，两个drbd节点默认都处于Secondary状态</p>
+</blockquote>
+</li>
+<li><p>由于默认没有主次节点之分，因而需要设置两个主机的主次节点，选择需要设置为主节点的主机，然后执行如下命令：</p>
+<blockquote>
+<p>[root@node1 /]# drbdadm – –overwrite-data-of-peer primary all</p>
+</blockquote>
+</li>
+</ul>
+<p>第一次执行完此命令后，在后面如果需要设置哪个是主节点时，就可以使用另外一个命令：drbdadm primary r1 （这个r1是定义资源的角色）或者drbdadm primary all </p>
+<p>这时，再查看节点状态，就为 Primary/Secondary</p>
+<ul>
+<li>查看同步状态<blockquote>
+<p>[root@node1 /]# cat /proc/drbd<br>会把主机上的数据传到备机，开始会显示同步进度，过一会显示状态都是”实时”,表示数据同步完成了。接下来就可以使用DRBD了。</p>
+</blockquote>
+</li>
+</ul>
+<h2 id="DRBD使用（测试）">DRBD使用（测试）</h2><p>你现在可以把主机上的DRBD设备挂载到一个目录上进行使用，备机的DRBD设备无法被挂载,因为它是用来接收主机数据的,由DRBD负责操作.</p>
+<p>1）格式化文件系统（文件格式根据自己的系统环境选择）</p>
+<blockquote>
+<p>[root@node1 ~]# mkfs.ext4 /dev/drbd0</p>
+</blockquote>
+<p>2）挂载此文件系统</p>
+<blockquote>
+<p>[root@node1 ~]# mkdir /data<br>[root@node1 ~]# mount /dev/drbd0  /data/</p>
+</blockquote>
+<p>在挂载data目录中创建一个测试文件，然后卸载挂载目录，然后切换主备节点，在备用节点上查看刚刚建立的测试文件还是否存在</p>
+<p>Node1：</p>
+<blockquote>
+<p>[root@node1 ~]# mkdir  /data/test<br>将node1变为备用节点<br>[root@node1 ~]# umount /data/<br>[root@node1 ~]# drbdadm secondary r1<br>[root@node1 ~]# drbdadm role r1<br>Secondary/Secondary</p>
+</blockquote>
+<p>Node2上：</p>
+<blockquote>
+<p>将node2变为主节点<br>[root@node2 ~]# drbdadm primary  r1<br>[root@node2 ~]# drbdadm role r1<br>Primary/Secondary<br>挂载设备，然后看文件是否存在<br>[root@node2 ~]# mount /dev/drbd0 /mnt/<br>[root@node2 ~]# cd /mnt/<br>[root@node2 mnt]# ls<br>test<br>OK!  到这里已经算是完成了！</p>
+</blockquote>
+<p>同样，在Node2上建立文件，然后</p>
+<ul>
+<li>卸载/mnt/：umount /mnt/</li>
+<li>将Node2降级成备用节点：drbdadm secondary r1</li>
+<li>在Node1上升级为主机节点：drbdadm primary  r1</li>
+<li>在Node1上挂载：mount /dev/drbd0 /data</li>
+</ul>
+<p>会发现Node2上的文件也同步到了Node1上。</p>
+<p>3）umount时，如果提示device is busy，使用下面方法解决：<br>fuser -m /data<br>显示：/data: 25023c<br>然后kill -9 25023 即可</p>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/drbd/" rel="tag">#drbd</a>
+          
+            <a href="/tags/linux/" rel="tag">#linux</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/10/10/mysql-hangsuo/" rel="next">mysql 行锁的实现</a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <div class="ds-share flat" data-thread-key="2015/10/14/linux-drbd/"
+     data-title="linux下DRBD安装、配置"
+     data-content=""
+     data-url="http://yoursite.com/2015/10/14/linux-drbd/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
+
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
+      
+    </div>
+  </div>
+
+ </div>
+
+        
+
+        
+          <div class="comments" id="comments">
+            
+              <div class="ds-thread" data-thread-key="2015/10/14/linux-drbd/"
+                   data-title="linux下DRBD安装、配置" data-url="http://yoursite.com/2015/10/14/linux-drbd/">
+              </div>
+            
+          </div>
+        
+      </div>
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="/images/lanjingling.jpg" alt="蓝精灵" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">蓝精灵</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">java程序员、爱开源、喜欢nodejs、前端js、oracle数据库、分布式技术...<br/>改变世界的是这么一群人,他们寻找梦想中的乐园,当他们找不到时,就亲手创造了她...</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">11</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">5</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">9</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/lanjingling" target="_blank">github</a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://blog.csdn.net/liuxiao723846" target="_blank">csdn</a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/1925780475" target="_blank">weibo</a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+            <p class="site-author-name">Links</p>
+            
+              <span class="links-of-author-item">
+              <a href="http://www.ruanyifeng.com/blog/" target="_blank">阮一峰</a>
+              </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://zipperary.com/" target="_blank">Zippera's Blog</a>
+              </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://wuchong.me/" target="_blank">Jark's Blog</a>
+              </span>
+            
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#DRBD安装准备"><span class="nav-number">1.</span> <span class="nav-text">DRBD安装准备</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DRBD安装"><span class="nav-number">2.</span> <span class="nav-text">DRBD安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DRBD配置"><span class="nav-number">3.</span> <span class="nav-text">DRBD配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DRBD使用（测试）"><span class="nav-number">4.</span> <span class="nav-text">DRBD使用（测试）</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner"> <div class="copyright" >
+  
+  &copy; &nbsp;  2014 - 
+  <span itemprop="copyrightYear">2015</span>
+  <span class="with-love">
+    <i class="icon-next-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">蓝精灵</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+ </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+  
+    
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"lanjingling"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+    
+     
+
+    
+  
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.1"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.1"></script>
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/js/motion_global.js?v=0.4.5.1" id="motion.global"></script>
+
+
+
+
+  <script type="text/javascript" src="/js/nav-toggle.js?v=0.4.5.1"></script>
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.1" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 0.4 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    var $tocContent = $('.post-toc-content');
+    if (isDesktop() && CONFIG.sidebar === 'post') {
+      if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+        displaySidebar();
+      }
+    }
+  });
+</script>
+
+
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      if (CONFIG.sidebar === 'always') {
+        displaySidebar();
+      }
+      if (isMobile()) {
+        FastClick.attach(document.body);
+      }
+    });
+  </script>
+
+  
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/lazyload.js"></script>
+  <script type="text/javascript">
+    $(function () {
+      $("#posts").find('img').lazyload({
+        placeholder: "/images/loading.gif",
+        effect: "fadeIn"
+      });
+    });
+  </script>
+</body>
+</html>
