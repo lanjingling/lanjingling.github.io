@@ -1,0 +1,734 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.5.1"/>
+
+
+    <meta name="description" content="java程序员、爱开源、喜欢nodejs、前端js、oracle数据库、分布式技术...<br/>改变世界的是这么一群人,他们寻找梦想中的乐园,当他们找不到时,就亲手创造了她..." />
+
+
+
+  <meta name="keywords" content="CXF,webservice," />
+
+
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.1" />
+
+
+<meta name="description" content="CXF框架中可以自定义拦截器（Interceptor），从而可以做到不改变核心模块的情况下，动态改变请求和响应的一些消息处理。本文介绍如何利用自定义拦截器实现权限验证。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CXF发布webService（二）">
+<meta property="og:url" content="http://yoursite.com/2015/10/16/cxf-webservice-2/index.html">
+<meta property="og:site_name" content="晓的技术博客">
+<meta property="og:description" content="CXF框架中可以自定义拦截器（Interceptor），从而可以做到不改变核心模块的情况下，动态改变请求和响应的一些消息处理。本文介绍如何利用自定义拦截器实现权限验证。">
+<meta property="og:updated_time" content="2015-10-16T05:58:23.070Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="CXF发布webService（二）">
+<meta name="twitter:description" content="CXF框架中可以自定义拦截器（Interceptor），从而可以做到不改变核心模块的情况下，动态改变请求和响应的一些消息处理。本文介绍如何利用自定义拦截器实现权限验证。">
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'post'
+  };
+</script>
+
+  <title> CXF发布webService（二） | 晓的技术博客 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?93b1a723d246349c4cace650dee4a731";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand" rel="start">
+      <span class="logo">
+        <i class="icon-next-logo"></i>
+      </span>
+      <span class="site-title">晓的技术博客</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu menu-left">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            <i class="menu-item-icon icon-next-home"></i> <br />
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            <i class="menu-item-icon icon-next-archives"></i> <br />
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            <i class="menu-item-icon icon-next-categories"></i> <br />
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            <i class="menu-item-icon icon-next-tags"></i> <br />
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            <i class="menu-item-icon icon-next-about"></i> <br />
+            关于
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <form class="site-search-form">
+    <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+  </form>
+
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'iSunJWoZvxV9mKcJc6QU','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content"> 
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+
+      
+      
+        <h1 class="post-title" itemprop="name headline">
+          
+          
+            
+              CXF发布webService（二）
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于
+          <time itemprop="dateCreated" datetime="2015-10-16T13:37:03+08:00" content="2015-10-16">
+            2015-10-16
+          </time>
+        </span>
+
+        
+          <span class="post-category" >
+            &nbsp; | &nbsp; 分类于
+            
+              <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                <a href="/categories/CXF/" itemprop="url" rel="index">
+                  <span itemprop="name">CXF</span>
+                </a>
+              </span>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+            <span class="post-comments-count">
+              &nbsp; | &nbsp;
+              <a href="/2015/10/16/cxf-webservice-2/#comments" itemprop="discussionUrl">
+                <span class="post-comments-count ds-thread-count" data-thread-key="2015/10/16/cxf-webservice-2/" itemprop="commentsCount"></span>
+              </a>
+            </span>
+          
+        
+      </div>
+    </header>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><p>CXF框架中可以自定义拦截器（Interceptor），从而可以做到不改变核心模块的情况下，动态改变请求和响应的一些消息处理。本文介绍如何利用自定义拦截器实现权限验证。</p>
+<p>CXF中的拦截器分为in拦截器和out拦截器，又有客户端拦截器和服务端拦截器。拦截器使用流程：<em>客户端（out）-&gt; 服务端（in）-&gt;处理业务-&gt;服务端（out）-&gt;客户端（in）</em>。</p>
+<p>并不是每一步都需要拦截器。在这里我们用到的是客户端Out拦截器和服务端in拦截器。服务端in拦截器检查用户级权限，客户端out浏览器发送用户信息给服务端。</p>
+<h2 id="一、对jetty中发布的服务进行拦截">一、对jetty中发布的服务进行拦截</h2><p>1、<a href="http://lanjingling.github.io/2015/10/16/cxf-webservice-1/" target="_blank" rel="external">上文</a>中介绍了如何在jetty中发布webservice服务，主要有两种方法（JaxWsServerFactoryBean 或 Endpoint），这两种方法都可以设置拦截器。</p>
+<p>1）endpoint方式：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">HelloWorldService service = <span class="keyword">new</span> HelloWorldServiceImpl();  </span><br><span class="line">String address = <span class="string">"http://localhost:8080/hello"</span>;  </span><br><span class="line">  </span><br><span class="line">EndpointImpl endpoint = (EndpointImpl)Endpoint.publish(address, service);  </span><br><span class="line">endpoint.getInInterceptors().add(<span class="keyword">new</span> AuthInterceptor());</span><br></pre></td></tr></table></figure></p>
+<p>2）JaxWsServerFactoryBean 方式：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">HelloWorldServiceImpl impl = <span class="keyword">new</span> HelloWorldServiceImpl();  </span><br><span class="line">JaxWsServerFactoryBean factory = <span class="keyword">new</span> JaxWsServerFactoryBean();  </span><br><span class="line">factory.setAddress(<span class="string">"http://localhost:8080/hello"</span>);  </span><br><span class="line">factory.setServiceClass(HelloWorldService.class);  </span><br><span class="line">factory.setServiceBean(impl);  </span><br><span class="line">factory.getInInterceptors().add(<span class="keyword">new</span> AuthInterceptor());  </span><br><span class="line">factory.create();</span><br></pre></td></tr></table></figure>
+<p>2、服务器段自定义拦截器：<br>自定义拦截去需要实现PhaseInterceptor接口，不过一般都是继承自AbstractPhaseInterceptor<t>，下面我们来实现AuthInterceptor的权限控制功能。</t></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.tiamaes.webservice.auth;  </span><br><span class="line">  </span><br><span class="line"><span class="keyword">import</span> java.util.List;  </span><br><span class="line">  </span><br><span class="line"><span class="keyword">import</span> org.apache.cxf.binding.soap.SoapMessage;  </span><br><span class="line"><span class="keyword">import</span> org.apache.cxf.headers.Header;  </span><br><span class="line"><span class="keyword">import</span> org.apache.cxf.interceptor.Fault;  </span><br><span class="line"><span class="keyword">import</span> org.apache.cxf.phase.AbstractPhaseInterceptor;  </span><br><span class="line"><span class="keyword">import</span> org.apache.cxf.phase.Phase;  </span><br><span class="line"><span class="keyword">import</span> org.w3c.dom.Element;  </span><br><span class="line"><span class="keyword">import</span> org.w3c.dom.NodeList;  </span><br><span class="line">  </span><br><span class="line"><span class="comment">/**   </span><br><span class="line"> * &lt;p&gt;类描述：用户权限验证拦截器  &lt;/p&gt; </span><br><span class="line"> * <span class="doctag">@version</span>   </span><br><span class="line"> */</span>  </span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AuthInterceptor</span> <span class="keyword">extends</span> <span class="title">AbstractPhaseInterceptor</span>&lt;<span class="title">SoapMessage</span>&gt; </span>&#123;  </span><br><span class="line">  </span><br><span class="line">    <span class="comment">//在调用之前拦截  </span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">AuthInterceptor</span><span class="params">()</span> </span>&#123;  </span><br><span class="line">        <span class="keyword">super</span>(Phase.PRE_INVOKE);  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    <span class="comment">/** </span><br><span class="line">     * 自定义拦截器需要实现handleMessage方法，该方法抛出Fault异常，可以自定义异常集成自Fault， </span><br><span class="line">     * 也可以new Fault(new Throwable()) </span><br><span class="line">     */</span>  </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handleMessage</span><span class="params">(SoapMessage soap)</span> <span class="keyword">throws</span> Fault </span>&#123;  </span><br><span class="line">        System.out.println(<span class="string">"开始验证用户信息"</span>);  </span><br><span class="line">        List&lt;Header&gt; headers = soap.getHeaders();  </span><br><span class="line">          </span><br><span class="line">        <span class="comment">//检查headers是否存在  </span></span><br><span class="line">        <span class="keyword">if</span>(headers == <span class="keyword">null</span> | headers.size()&lt;<span class="number">1</span>)&#123;  </span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> Fault(<span class="keyword">new</span> IllegalArgumentException(<span class="string">"找不到Header，无法验证用户信息"</span>));  </span><br><span class="line">        &#125;  </span><br><span class="line">          </span><br><span class="line">        Header header = headers.get(<span class="number">0</span>);  </span><br><span class="line">          </span><br><span class="line">        Element el = (Element)header.getObject();  </span><br><span class="line">        NodeList users = el.getElementsByTagName(<span class="string">"username"</span>);  </span><br><span class="line">        NodeList passwords = el.getElementsByTagName(<span class="string">"password"</span>);  </span><br><span class="line">          </span><br><span class="line">        <span class="comment">//检查是否有用户名和密码元素  </span></span><br><span class="line">        <span class="keyword">if</span>(users.getLength()&lt;<span class="number">1</span>)&#123;  </span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> Fault(<span class="keyword">new</span> IllegalArgumentException(<span class="string">"找不到用户信息"</span>));  </span><br><span class="line">        &#125;  </span><br><span class="line">        String username = users.item(<span class="number">0</span>).getTextContent().trim();  </span><br><span class="line">          </span><br><span class="line">        <span class="keyword">if</span>(passwords.getLength()&lt;<span class="number">1</span>)&#123;  </span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> Fault(<span class="keyword">new</span> IllegalArgumentException(<span class="string">"找不到密码信息"</span>));  </span><br><span class="line">        &#125;  </span><br><span class="line">        String password = passwords.item(<span class="number">0</span>).getTextContent();  </span><br><span class="line">          </span><br><span class="line">        <span class="comment">//检查用户名和密码是否正确  </span></span><br><span class="line">        <span class="keyword">if</span>(!<span class="string">"admin"</span>.equals(username) || !<span class="string">"admin"</span>.equals(password))&#123;  </span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> Fault(<span class="keyword">new</span> IllegalArgumentException(<span class="string">"用户名或密码不正确"</span>));  </span><br><span class="line">        &#125;<span class="keyword">else</span>&#123;  </span><br><span class="line">            System.out.println(<span class="string">"用户名密码正确允许访问"</span>);  </span><br><span class="line">        &#125;  </span><br><span class="line">    &#125;  </span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>3、客户端需要添加out拦截器，在out拦截器中加入消息头：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line">package com.tiamaes.webservice.auth;  </span><br><span class="line">  </span><br><span class="line">import java.util.List;  </span><br><span class="line">  </span><br><span class="line">import javax.xml.namespace.QName;  </span><br><span class="line">  </span><br><span class="line">import org.apache.cxf.binding.soap.SoapMessage;  </span><br><span class="line">import org.apache.cxf.headers.Header;  </span><br><span class="line">import org.apache.cxf.helpers.DOMUtils;  </span><br><span class="line">import org.apache.cxf.interceptor.Fault;  </span><br><span class="line">import org.apache.cxf.phase.AbstractPhaseInterceptor;  </span><br><span class="line">import org.apache.cxf.phase.Phase;  </span><br><span class="line">import org.w3c.dom.Document;  </span><br><span class="line">import org.w3c.dom.Element;  </span><br><span class="line">  </span><br><span class="line">/**   </span><br><span class="line"> * 客户端拦截器 </span><br><span class="line"> * @version   </span><br><span class="line"> */  </span><br><span class="line">public class ClientLoginInterceptor extends AbstractPhaseInterceptor<span class="tag">&lt;<span class="title">SoapMessage</span>&gt;</span> &#123;  </span><br><span class="line">  </span><br><span class="line">    private String username;  </span><br><span class="line">    private String password;  </span><br><span class="line">    public void setUsername(String username) &#123;  </span><br><span class="line">        this.username = username;  </span><br><span class="line">    &#125;  </span><br><span class="line">    public void setPassword(String password) &#123;  </span><br><span class="line">        this.password = password;  </span><br><span class="line">    &#125;  </span><br><span class="line">    /** </span><br><span class="line">     * 创建一个新的实例 ClientLoginInterceptor. </span><br><span class="line">     * </span><br><span class="line">     * @param username </span><br><span class="line">     * @param password </span><br><span class="line">     */  </span><br><span class="line">    public ClientLoginInterceptor(String username, String password) &#123;  </span><br><span class="line">        super(Phase.PREPARE_SEND);  </span><br><span class="line">        this.username = username;  </span><br><span class="line">        this.password = password;  </span><br><span class="line">    &#125;  </span><br><span class="line">    /* (non-Javadoc) </span><br><span class="line">     * @see org.apache.cxf.interceptor.Interceptor#handleMessage(org.apache.cxf.message.Message) </span><br><span class="line">     */  </span><br><span class="line">    public void handleMessage(SoapMessage soap) throws Fault &#123;  </span><br><span class="line">        // TODO Auto-generated method stub  </span><br><span class="line">        List<span class="tag">&lt;<span class="title">Header</span>&gt;</span> headers = soap.getHeaders();  </span><br><span class="line">          </span><br><span class="line">        Document doc = DOMUtils.createDocument();  </span><br><span class="line">          </span><br><span class="line">        Element auth = doc.createElement("authrity");  </span><br><span class="line">        Element username = doc.createElement("username");  </span><br><span class="line">        Element password = doc.createElement("password");  </span><br><span class="line">          </span><br><span class="line">        username.setTextContent(this.username);  </span><br><span class="line">        password.setTextContent(this.password);  </span><br><span class="line">          </span><br><span class="line">        auth.appendChild(username);  </span><br><span class="line">        auth.appendChild(password);  </span><br><span class="line">        //doc.appendChild(auth);  </span><br><span class="line">          </span><br><span class="line">        headers.add(0, new Header(new QName("tiamaes"),auth));  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>4、客户端调用webService服务时，添加out拦截器：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">JaxWsProxyFactoryBean svr = <span class="keyword">new</span> JaxWsProxyFactoryBean();</span><br><span class="line">	</span><br><span class="line">svr.setServiceClass(IHelloService.class);</span><br><span class="line">svr.setAddress(<span class="string">"http://localhost:9000/helloWorld"</span>);</span><br><span class="line">svr.getOutInterceptors().add(<span class="keyword">new</span> ClientLoginInterceptor(<span class="string">"admin"</span>,<span class="string">"admin"</span>));<span class="comment">//设置out拦截器</span></span><br><span class="line"> </span><br><span class="line">IHelloService hw = (IHelloService) svr.create();</span><br><span class="line">System.out.println(hw.sayHi(<span class="string">"测试1111144444411111。。。。。。。。。"</span>));</span><br></pre></td></tr></table></figure>
+<h2 id="二、对web容器中发布的webservice设置拦截器">二、对web容器中发布的webservice设置拦截器</h2><p>1、服务端自定义拦截器：<br> 同上</p>
+<p>2、在application.xml中配置服务端的In拦截器：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 相当于使用endpoint进行服务发布   --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">jaxws:endpoint</span> <span class="attribute">id</span>=<span class="value">"helloWorld"</span></span><br><span class="line">                              <span class="attribute">implementor</span>=<span class="value">"cn.edu.nuc.springMaven.services.impl.HelloService"</span></span><br><span class="line">                              <span class="attribute">address</span>=<span class="value">"/helloWorld"</span> &gt;</span></span><br><span class="line">    	<span class="comment">&lt;!-- 配置IN拦截器 --&gt;</span>  </span><br><span class="line">        <span class="tag">&lt;<span class="title">jaxws:inInterceptors</span>&gt;</span>  </span><br><span class="line">            <span class="tag">&lt;<span class="title">bean</span> <span class="attribute">class</span>=<span class="value">"org.apache.cxf.interceptor.LoggingInInterceptor"</span>&gt;</span><span class="tag">&lt;/<span class="title">bean</span>&gt;</span>  </span><br><span class="line">            <span class="tag">&lt;<span class="title">bean</span> <span class="attribute">class</span>=<span class="value">"cn.edu.nuc.springMaven.interceptors.AuthInterceptor"</span>&gt;</span><span class="tag">&lt;/<span class="title">bean</span>&gt;</span>  </span><br><span class="line">        <span class="tag">&lt;/<span class="title">jaxws:inInterceptors</span>&gt;</span>  </span><br><span class="line"></span><br><span class="line">        <span class="comment">&lt;!-- 配置OUT拦截器  </span><br><span class="line">        &lt;jaxws:outInterceptors&gt;  </span><br><span class="line">            &lt;bean class="org.apache.cxf.interceptor.LoggingOutInterceptor"&gt;&lt;/bean&gt;  </span><br><span class="line">        &lt;/jaxws:outInterceptors&gt;   --&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">jaxws:endpoint</span>&gt;</span></span><br></pre></td></tr></table></figure><br><em>然后启动tomcat。。。</em></p>
+<p>3、客户端拦截器：<br>同上</p>
+<p>4、客户端调用webService服务时，添加out拦截器：<br>1）普通客户端调用</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">JaxWsProxyFactoryBean svr = <span class="keyword">new</span> JaxWsProxyFactoryBean();</span><br><span class="line">	</span><br><span class="line">svr.setServiceClass(IHelloService.class);</span><br><span class="line">svr.setAddress(<span class="string">"http://localhost:9000/helloWorld"</span>);</span><br><span class="line">svr.getOutInterceptors().add(<span class="keyword">new</span> ClientLoginInterceptor(<span class="string">"admin"</span>,<span class="string">"admin"</span>));<span class="comment">//设置out拦截器</span></span><br><span class="line"> </span><br><span class="line">IHelloService hw = (IHelloService) svr.create();</span><br><span class="line">System.out.println(hw.sayHi(<span class="string">"刘晓1111144444411111。。。。。。。。。"</span>));</span><br></pre></td></tr></table></figure>
+<p>2）使用spring的依赖注入，通过配置调用webService服务：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="title">jaxws:client</span> <span class="attribute">id</span>=<span class="value">"sayHello2"</span></span><br><span class="line">            <span class="attribute">serviceClass</span>=<span class="value">"cn.edu.nuc.springMaven.services.IHelloService"</span> </span><br><span class="line">            <span class="attribute">address</span>=<span class="value">"http://localhost:8080/SpringMaven/webservice/helloWorld"</span>&gt;</span></span><br><span class="line">            </span><br><span class="line">     <span class="comment">&lt;!-- &lt;jaxws:inInterceptors&gt; </span><br><span class="line">	             &lt;bean class="org.apache.cxf.interceptor.LoggingInInterceptor"/&gt; </span><br><span class="line">	             &lt;bean class="com.benben.Interceptor.SampleInterceptor"/&gt; </span><br><span class="line">	&lt;/jaxws:inInterceptors&gt;  --&gt;</span></span><br><span class="line"></span><br><span class="line">	<span class="tag">&lt;<span class="title">jaxws:outInterceptors</span>&gt;</span> </span><br><span class="line">		<span class="tag">&lt;<span class="title">bean</span> <span class="attribute">class</span>=<span class="value">"org.apache.cxf.interceptor.LoggingOutInterceptor"</span>/&gt;</span> </span><br><span class="line">		<span class="comment">&lt;!--ClientLoginInterceptor没有默认构造函数，所以这里需要constructor-arg把username和password注入到ClientLoginInterceptor--&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="title">bean</span> <span class="attribute">class</span>=<span class="value">"cn.edu.nuc.springMaven.interceptors.ClientLoginInterceptor"</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">constructor-arg</span> <span class="attribute">name</span>=<span class="value">"username"</span> <span class="attribute">value</span>=<span class="value">"admin"</span>&gt;</span><span class="tag">&lt;/<span class="title">constructor-arg</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">constructor-arg</span> <span class="attribute">name</span>=<span class="value">"password"</span> <span class="attribute">value</span>=<span class="value">"admin"</span>&gt;</span><span class="tag">&lt;/<span class="title">constructor-arg</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;/<span class="title">bean</span>&gt;</span> </span><br><span class="line">	 <span class="tag">&lt;/<span class="title">jaxws:outInterceptors</span>&gt;</span> </span><br><span class="line"><span class="tag">&lt;/<span class="title">jaxws:client</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>代码：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">public class Client &#123;</span><br><span class="line">	</span><br><span class="line">	</span><br><span class="line">	public static void main(String[] args) &#123;</span><br><span class="line">		ApplicationContext ctx = new ClassPathXmlApplicationContext("application.xml"); </span><br><span class="line">		</span><br><span class="line">		IHelloService clietn = (IHelloService)ctx.getBean("sayHello2");</span><br><span class="line">		</span><br><span class="line">		System.out.println(clietn.sayHi("liuxiao"));</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/CXF/" rel="tag">#CXF</a>
+          
+            <a href="/tags/webservice/" rel="tag">#webservice</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/10/16/cxf-webservice-1/" rel="next">CXF发布webService（一）</a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <div class="ds-share flat" data-thread-key="2015/10/16/cxf-webservice-2/"
+     data-title="CXF发布webService（二）"
+     data-content=""
+     data-url="http://yoursite.com/2015/10/16/cxf-webservice-2/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
+
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
+      
+    </div>
+  </div>
+
+ </div>
+
+        
+
+        
+          <div class="comments" id="comments">
+            
+              <div class="ds-thread" data-thread-key="2015/10/16/cxf-webservice-2/"
+                   data-title="CXF发布webService（二）" data-url="http://yoursite.com/2015/10/16/cxf-webservice-2/">
+              </div>
+            
+          </div>
+        
+      </div>
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="/images/lanjingling.jpg" alt="蓝精灵" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">蓝精灵</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">java程序员、爱开源、喜欢nodejs、前端js、oracle数据库、分布式技术...<br/>改变世界的是这么一群人,他们寻找梦想中的乐园,当他们找不到时,就亲手创造了她...</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">13</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">6</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">11</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/lanjingling" target="_blank">github</a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://blog.csdn.net/liuxiao723846" target="_blank">csdn</a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/1925780475" target="_blank">weibo</a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+            <p class="site-author-name">Links</p>
+            
+              <span class="links-of-author-item">
+              <a href="http://www.ruanyifeng.com/blog/" target="_blank">阮一峰</a>
+              </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://zipperary.com/" target="_blank">Zippera's Blog</a>
+              </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://wuchong.me/" target="_blank">Jark's Blog</a>
+              </span>
+            
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、对jetty中发布的服务进行拦截"><span class="nav-number">1.</span> <span class="nav-text">一、对jetty中发布的服务进行拦截</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、对web容器中发布的webservice设置拦截器"><span class="nav-number">2.</span> <span class="nav-text">二、对web容器中发布的webservice设置拦截器</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner"> <div class="copyright" >
+  
+  &copy; &nbsp;  2014 - 
+  <span itemprop="copyrightYear">2015</span>
+  <span class="with-love">
+    <i class="icon-next-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">蓝精灵</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+ </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+  
+    
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"lanjingling"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+    
+     
+
+    
+  
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.1"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.1"></script>
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/js/motion_global.js?v=0.4.5.1" id="motion.global"></script>
+
+
+
+
+  <script type="text/javascript" src="/js/nav-toggle.js?v=0.4.5.1"></script>
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.1" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 0.4 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    var $tocContent = $('.post-toc-content');
+    if (isDesktop() && CONFIG.sidebar === 'post') {
+      if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+        displaySidebar();
+      }
+    }
+  });
+</script>
+
+
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      if (CONFIG.sidebar === 'always') {
+        displaySidebar();
+      }
+      if (isMobile()) {
+        FastClick.attach(document.body);
+      }
+    });
+  </script>
+
+  
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/lazyload.js"></script>
+  <script type="text/javascript">
+    $(function () {
+      $("#posts").find('img').lazyload({
+        placeholder: "/images/loading.gif",
+        effect: "fadeIn"
+      });
+    });
+  </script>
+</body>
+</html>
