@@ -1,0 +1,819 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.5.1"/>
+
+
+    <meta name="description" content="java程序员、爱开源、喜欢nodejs、前端js、oracle数据库、分布式技术...<br/>改变世界的是这么一群人,他们寻找梦想中的乐园,当他们找不到时,就亲手创造了她..." />
+
+
+
+  <meta name="keywords" content="keepalived,linux," />
+
+
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.1" />
+
+
+<meta name="description" content="keepalived是linux集群管理中保证集群高可用（HA）的一个服务软件，其功能类似于heartbeat，用来防止单点故障。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="keepalived 安装、配置">
+<meta property="og:url" content="http://yoursite.com/2015/10/25/linux-keepalived/index.html">
+<meta property="og:site_name" content="晓的技术博客">
+<meta property="og:description" content="keepalived是linux集群管理中保证集群高可用（HA）的一个服务软件，其功能类似于heartbeat，用来防止单点故障。">
+<meta property="og:updated_time" content="2015-10-25T11:55:13.510Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="keepalived 安装、配置">
+<meta name="twitter:description" content="keepalived是linux集群管理中保证集群高可用（HA）的一个服务软件，其功能类似于heartbeat，用来防止单点故障。">
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'post'
+  };
+</script>
+
+  <title> keepalived 安装、配置 | 晓的技术博客 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?93b1a723d246349c4cace650dee4a731";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand" rel="start">
+      <span class="logo">
+        <i class="icon-next-logo"></i>
+      </span>
+      <span class="site-title">晓的技术博客</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu menu-left">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            <i class="menu-item-icon icon-next-home"></i> <br />
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            <i class="menu-item-icon icon-next-archives"></i> <br />
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            <i class="menu-item-icon icon-next-categories"></i> <br />
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            <i class="menu-item-icon icon-next-tags"></i> <br />
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            <i class="menu-item-icon icon-next-about"></i> <br />
+            关于
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <form class="site-search-form">
+    <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+  </form>
+
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'iSunJWoZvxV9mKcJc6QU','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content"> 
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+
+      
+      
+        <h1 class="post-title" itemprop="name headline">
+          
+          
+            
+              keepalived 安装、配置
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于
+          <time itemprop="dateCreated" datetime="2015-10-25T19:31:20+08:00" content="2015-10-25">
+            2015-10-25
+          </time>
+        </span>
+
+        
+          <span class="post-category" >
+            &nbsp; | &nbsp; 分类于
+            
+              <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                <a href="/categories/keepalived/" itemprop="url" rel="index">
+                  <span itemprop="name">keepalived</span>
+                </a>
+              </span>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+            <span class="post-comments-count">
+              &nbsp; | &nbsp;
+              <a href="/2015/10/25/linux-keepalived/#comments" itemprop="discussionUrl">
+                <span class="post-comments-count ds-thread-count" data-thread-key="2015/10/25/linux-keepalived/" itemprop="commentsCount"></span>
+              </a>
+            </span>
+          
+        
+      </div>
+    </header>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><h2 id="一、keepalived是什么">一、keepalived是什么</h2><p>keepalived是linux集群管理中保证集群高可用的一个服务软件，其功能类似于heartbeat，用来防止单点故障。<br>官网地址：<a href="http://www.keepalived.org/" target="_blank" rel="external">http://www.keepalived.org/</a></p>
+<p>1、keepalived工作原理：<br>keepalived是以VRRP协议为实现基础的，VRRP全称Virtual Router Redundancy Protocol，即虚拟路由冗余协议。</p>
+<p>虚拟路由冗余协议，可以认为是实现路由器高可用的协议，即将N台提供相同功能的路由器组成一个路由器组，这个组里面有一个master和多个backup，master上面有一个对外提供服务的vip（该路由器所在局域网内其他机器的默认路由为该vip），master会发组播，当backup收不到vrrp包时就认为master宕掉了，这时就需要根据VRRP的优先级来选举一个backup当master。这样的话就可以保证路由器的高可用了。</p>
+<p>简单来说，<font color="red">keepalived对外提供一个虚拟ip（vip），master定期向slave发送组播，当slave在一定时间内没有接收到组播时，会根据priority选举一个slave来接管这个虚拟ip，继续对外提供服务。</font></p>
+<p>2、keepalived主要有三个模块，分别是core、check和vrrp。</p>
+<ul>
+<li>core模块为keepalived的核心，负责主进程的启动、维护以及全局配置文件的加载和解析。</li>
+<li>check负责健康检查，包括常见的各种检查方式。</li>
+<li>vrrp模块是来实现VRRP协议的。</li>
+</ul>
+<h2 id="二、keepalived安装">二、keepalived安装</h2><p>1、下载keepalived，解压：<br>wget <a href="http://www.keepalived.org/software/keepalived-1.2.17.tar.gz" target="_blank" rel="external">http://www.keepalived.org/software/keepalived-1.2.17.tar.gz</a><br>[root@centOS2 local]# tar -xvzf keepalived-1.2.17.tar.gz</p>
+<p>2、编译、安装：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line">[root@centOS2 keepalived-1.2.17]# cd keepalived-1.2.17</span><br><span class="line">[root@centOS2 keepalived-1.2.17]# ./configure</span><br><span class="line">Keepalived configuration</span><br><span class="line">\------------------------</span><br><span class="line">Keepalived version       : 1.2.17</span><br><span class="line">Compiler                 : gcc</span><br><span class="line">Compiler flags           : -g -O2</span><br><span class="line">Extra Lib                : -lssl -lcrypto -lcrypt </span><br><span class="line">Use IPVS Framework       : Yes</span><br><span class="line">IPVS sync daemon support : Yes</span><br><span class="line">IPVS use libnl           : No</span><br><span class="line">fwmark socket support    : Yes</span><br><span class="line">Use VRRP Framework       : Yes</span><br><span class="line">Use VRRP VMAC            : Yes</span><br><span class="line">SNMP support             : No</span><br><span class="line">SHA1 support             : No</span><br><span class="line">Use Debug flags          : No</span><br><span class="line"></span><br><span class="line">[root@centOS2 keepalived-1.2.17]# make</span><br><span class="line">[root@centOS2 keepalived-1.2.17]# make install</span><br><span class="line">make -C keepalived install</span><br><span class="line">make[1]: Entering directory `/usr/local/keepalived-1.2.17/keepalived'</span><br><span class="line">install -d /usr/local/sbin</span><br><span class="line">install -m 700 ../bin/keepalived /usr/local/sbin/</span><br><span class="line">install -d /usr/local/etc/rc.d/init.d</span><br><span class="line">install -m 755 etc/init.d/keepalived.init /usr/local/etc/rc.d/init.d/keepalived</span><br><span class="line">install -d /usr/local/etc/sysconfig</span><br><span class="line">install -m 644 etc/init.d/keepalived.sysconfig /usr/local/etc/sysconfig/keepalived</span><br><span class="line">install -d /usr/local/etc/keepalived/samples</span><br><span class="line">install -m 644 etc/keepalived/keepalived.conf /usr/local/etc/keepalived/</span><br><span class="line">install -m 644 ../doc/samples/* /usr/local/etc/keepalived/samples/</span><br><span class="line">install -d /usr/local/share/man/man5</span><br><span class="line">install -d /usr/local/share/man/man8</span><br><span class="line">install -m 644 ../doc/man/man5/keepalived.conf.5 /usr/local/share/man/man5</span><br><span class="line">install -m 644 ../doc/man/man8/keepalived.8 /usr/local/share/man/man8</span><br><span class="line">make[1]: Leaving directory `/usr/local/keepalived-1.2.17/keepalived'</span><br><span class="line">make -C genhash install</span><br><span class="line">make[1]: Entering directory `/usr/local/keepalived-1.2.17/genhash'</span><br><span class="line">install -d /usr/local/bin</span><br><span class="line">install -m 755 ../bin/genhash /usr/local/bin/</span><br><span class="line">install -d /usr/local/share/man/man1</span><br><span class="line">install -m 644 ../doc/man/man1/genhash.1 /usr/local/share/man/man1</span><br><span class="line">make[1]: Leaving directory `/usr/local/keepalived-1.2.17/genhash'</span><br><span class="line">mkdir -p /usr/share/snmp/mibs/</span><br><span class="line">cp -f doc/VRRP-MIB /usr/share/snmp/mibs/</span><br><span class="line">cp -f doc/KEEPALIVED-MIB /usr/share/snmp/mibs/</span><br></pre></td></tr></table></figure></p>
+<p>3、准备工作：</p>
+<p>默认情况下，keepalived 会读取 /etc/keepalived 下keepalived.conf 文件，如果你没有建立这个文件，keepalived也不会报错</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[root@centOS2 local]# mkdir  /etc/keepalived </span><br><span class="line">[root@centOS2 local]# cp /usr/local/etc/keepalived/keepalived.conf /etc/keepalived/</span><br><span class="line"></span><br><span class="line">[root@centOS2 local]# cp /usr/local/sbin/keepalived /usr/sbin/</span><br><span class="line"></span><br><span class="line">[root@centOS2 local]# cp /usr/local/etc/sysconfig/keepalived /etc/sysconfig/</span><br><span class="line"></span><br><span class="line">[root@centOS2 local]# cp /usr/local/etc/rc.d/init.d/keepalived /etc/rc.d/init.d/</span><br></pre></td></tr></table></figure>
+<p>4、启动、关闭 keepalived：</p>
+<ul>
+<li><p>启动<br>  [root@centOS2 local]# service keepalived start<br>  Starting keepalived:                                       [  OK  ]</p>
+</li>
+<li><p>关闭<br>  [root@centOS2 local]# service keepalived stop<br>  Stopping keepalived:                                       [  OK  ]</p>
+</li>
+<li><p>开机自启动<br>  [root@centOS2 local]# vim /etc/rc.local<br>  里面添加 service keepalived start</p>
+</li>
+</ul>
+<p><em>注</em>：configure时有可能报以下错：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">checking for openssl/ssl.h... no</span><br><span class="line">configure: error: </span><br><span class="line">  !!! OpenSSL is not properly installed on your system. !!!</span><br><span class="line">  !!! Can not include OpenSSL headers files.            !!!</span><br><span class="line"></span><br><span class="line">[root@centOS2 keepalived-1.2.17]# yum install -y openssl openssl-devel</span><br></pre></td></tr></table></figure>
+<h2 id="三、keepalived的配置">三、keepalived的配置</h2><p>keepalived只有一个配置文件keepalived.conf，里面主要包括以下几个配置区域，分别是：global_defs、static_ipaddress、static_routes、vrrp_script、vrrp_instance和virtual_server。</p>
+<p>1、global_defs区域：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">global_defs &#123;</span><br><span class="line">    notification_email &#123;</span><br><span class="line">        a@abc.com</span><br><span class="line">        b@abc.com</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">    notification_email_from alert@abc.com</span><br><span class="line">    smtp_server smtp.abc.com</span><br><span class="line">    smtp_connect_timeout 30</span><br><span class="line">    enable_traps</span><br><span class="line">    router_id host163</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>notification_email 故障发生时给谁发邮件通知。</li>
+<li>notification_email_from 通知邮件从哪个地址发出。</li>
+<li>smpt_server 通知邮件的smtp地址。</li>
+<li>smtp_connect_timeout 连接smtp服务器的超时时间。</li>
+<li>enable_traps 开启SNMP陷阱（Simple Network Management Protocol）。</li>
+<li>router_id 标识本节点的字条串，通常为hostname，但不一定非得是hostname。故障发生时，邮件通知会用到。<font color="red">一般只配这个即可。</font></li>
+</ul>
+<p>2、static_ipaddress和static_routes区域：</p>
+<p>static_ipaddress和static_routes区域配置的是是本节点的IP和路由信息。如果你的机器上已经配置了IP和路由，那么这两个区域可以不用配置。其实，一般情况下你的机器都会有IP地址和路由信息的，<font color="red">因此没必要再在这两个区域配置。</font></p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">static_ipaddress &#123;</span><br><span class="line">    10.210.214.163/24 brd 10.210.214.255 dev eth0</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br><span class="line">static_routes &#123;</span><br><span class="line">    10.0.0.0/8 via 10.210.214.1 dev eth0</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>3、<em>vrrp_script区域</em>：</p>
+<p>用来做健康检查的，当时检查失败时会将vrrp_instance的priority减少相应的值。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">vrrp_script chk_http_port &#123;</span><br><span class="line">    script "<span class="tag">&lt;/<span class="title">dev</span>/<span class="attribute">tcp</span>/<span class="attribute">127.0.0.1</span>/<span class="attribute">80</span>"</span><br><span class="line">    <span class="attribute">interval</span> <span class="attribute">1</span></span><br><span class="line">    <span class="attribute">weight</span> <span class="attribute">-10</span></span><br><span class="line">&#125;</span></span><br></pre></td></tr></table></figure>
+<p>以上意思是如果script中的指令执行失败，那么相应的vrrp_instance的优先级会减少10个点。</p>
+<p>4、vrrp_instance和vrrp_sync_group区域：</p>
+<p>vrrp_instance用来定义对外提供服务的VIP区域及其相关属性。vrrp_rsync_group用来定义vrrp_intance组，使得这个组内成员动作一致。举个例子来说明一下其功能：</p>
+<p>两个vrrp_instance同属于一个vrrp_rsync_group，那么其中一个vrrp_instance发生故障切换时，另一个vrrp_instance也会跟着切换（即使这个instance没有发生故障）。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line">vrrp_sync_group VG_1 &#123;</span><br><span class="line">    group &#123;</span><br><span class="line">        inside_network   # name of vrrp_instance (below)</span><br><span class="line">        outside_network  # One for each moveable IP.</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">    notify_master /path/to_master.sh</span><br><span class="line">    notify_backup /path/to_backup.sh</span><br><span class="line">    notify_fault "/path/fault.sh VG_1"</span><br><span class="line">    notify /path/notify.sh</span><br><span class="line">    smtp_alert</span><br><span class="line">&#125;</span><br><span class="line">vrrp_instance VI_1 &#123;</span><br><span class="line">    state MASTER</span><br><span class="line">    interface eth0</span><br><span class="line">    use_vmac <span class="tag">&lt;<span class="title">VMAC_INTERFACE</span>&gt;</span></span><br><span class="line">    dont_track_primary</span><br><span class="line">    track_interface &#123;</span><br><span class="line">        eth0</span><br><span class="line">        eth1</span><br><span class="line">    &#125;</span><br><span class="line">    mcast_src_ip <span class="tag">&lt;<span class="title">IPADDR</span>&gt;</span></span><br><span class="line">    lvs_sync_daemon_interface eth1</span><br><span class="line">    garp_master_delay 10</span><br><span class="line">    virtual_router_id 1</span><br><span class="line">    priority 100</span><br><span class="line">    advert_int 1</span><br><span class="line">    authentication &#123;</span><br><span class="line">        auth_type PASS</span><br><span class="line">        auth_pass 12345678</span><br><span class="line">    &#125;</span><br><span class="line">    virtual_ipaddress &#123;</span><br><span class="line">        10.210.214.253/24 brd 10.210.214.255 dev eth0</span><br><span class="line">        192.168.1.11/24 brd 192.168.1.255 dev eth1</span><br><span class="line">    &#125;</span><br><span class="line">    virtual_routes &#123;</span><br><span class="line">        172.16.0.0/12 via 10.210.214.1</span><br><span class="line">        192.168.1.0/24 via 192.168.1.1 dev eth1</span><br><span class="line">        default via 202.102.152.1</span><br><span class="line">    &#125;</span><br><span class="line">    track_script &#123;</span><br><span class="line">        chk_http_port</span><br><span class="line">    &#125;</span><br><span class="line">    nopreempt</span><br><span class="line">    preempt_delay 300</span><br><span class="line">    debug</span><br><span class="line">    notify_master <span class="tag">&lt;<span class="title">STRING</span>&gt;</span>|<span class="tag">&lt;<span class="title">QUOTED-STRING</span>&gt;</span></span><br><span class="line">    notify_backup <span class="tag">&lt;<span class="title">STRING</span>&gt;</span>|<span class="tag">&lt;<span class="title">QUOTED-STRING</span>&gt;</span></span><br><span class="line">    notify_fault <span class="tag">&lt;<span class="title">STRING</span>&gt;</span>|<span class="tag">&lt;<span class="title">QUOTED-STRING</span>&gt;</span></span><br><span class="line">    notify <span class="tag">&lt;<span class="title">STRING</span>&gt;</span>|<span class="tag">&lt;<span class="title">QUOTED-STRING</span>&gt;</span></span><br><span class="line">    smtp_alert</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>说明：</p>
+<ul>
+<li>notify_master/backup/fault 分别表示切换为主/备/出错时所执行的脚本。</li>
+<li>notify 表示任何一状态切换时都会调用该脚本，并且该脚本在以上三个脚本执行完成之后进行调用，keepalived会自动传递三个参数（$1 = “GROUP”|”INSTANCE”，$2 = name of group or instance，$3 = target state of transition(MASTER/BACKUP/FAULT)）。</li>
+<li>smtp_alert 表示是否开启邮件通知（用全局区域的邮件设置来发通知）。</li>
+<li>state 可以是MASTER或BACKUP，不过当其他节点keepalived启动时会将priority比较大的节点选举为MASTER，因此该项其实没有实质用途。</li>
+<li>interface 节点固有IP（非VIP）的网卡，用来发VRRP包。</li>
+<li>use_vmac 是否使用VRRP的虚拟MAC地址。</li>
+<li>dont_track_primary 忽略VRRP网卡错误。（默认未设置）</li>
+<li>track_interface 监控以下网卡，如果任何一个不通就会切换到FALT状态。（可选项）</li>
+<li>mcast_src_ip 修改vrrp组播包的源地址，默认源地址为master的IP。（由于是组播，因此即使修改了源地址，该master还是能收到回应的）</li>
+<li>lvs_sync_daemon_interface 绑定lvs syncd的网卡。</li>
+<li>garp_master_delay 当切为主状态后多久更新ARP缓存，默认5秒。</li>
+<li>virtual_router_id 取值在0-255之间，用来区分多个instance的VRRP组播。</li>
+<li>priority 用来选举master的，要成为master，那么这个选项的值最好高于其他机器50个点，该项取值范围是1-255（在此范围之外会被识别成默认值100）。</li>
+<li>advert_int 发VRRP包的时间间隔，即多久进行一次master选举（可以认为是健康查检时间间隔）。</li>
+<li>authentication 认证区域，认证类型有PASS和HA（IPSEC），推荐使用PASS（密码只识别前8位）。</li>
+<li>virtual_ipaddress vip，不解释了。</li>
+<li>virtual_routes 虚拟路由，当IP漂过来之后需要添加的路由信息。</li>
+<li>virtual_ipaddress_excluded 发送的VRRP包里不包含的IP地址，为减少回应VRRP包的个数。在网卡上绑定的IP地址比较多的时候用。</li>
+<li>nopreempt 允许一个priority比较低的节点作为master，即使有priority更高的节点启动。</li>
+<li>preempt_delay master启动多久之后进行接管资源（VIP/Route信息等），并提是没有nopreempt选项。</li>
+</ul>
+<p>注：首先nopreemt必须在state为BACKUP的节点上才生效（因为是BACKUP节点决定是否来成为MASTER的），其次要实现类似于关闭auto failback的功能需要将所有节点的state都设置为BACKUP，或者将master节点的priority设置的比BACKUP低。我个人推荐使用将所有节点的state都设置成BACKUP并且都加上nopreempt选项，这样就完成了关于autofailback功能，当想手动将某节点切换为MASTER时只需去掉该节点的nopreempt选项并且将priority改的比其他节点大，然后重新加载配置文件即可（等MASTER切过来之后再将配置文件改回去再reload一下）。</p>
+<p>5、virtual_server_group和virtual_server区域：</p>
+<p>virtual_server_group一般在超大型的LVS中用到，一般LVS用不过这东西，因此不多说。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">virtual_server IP Port &#123;</span><br><span class="line">    delay_loop <span class="tag">&lt;<span class="title">INT</span>&gt;</span></span><br><span class="line">    lb_algo rr|wrr|lc|wlc|lblc|sh|dh</span><br><span class="line">    lb_kind NAT|DR|TUN</span><br><span class="line">    persistence_timeout <span class="tag">&lt;<span class="title">INT</span>&gt;</span></span><br><span class="line">    persistence_granularity <span class="tag">&lt;<span class="title">NETMASK</span>&gt;</span></span><br><span class="line">    protocol TCP</span><br><span class="line">    ha_suspend</span><br><span class="line">    virtualhost <span class="tag">&lt;<span class="title">STRING</span>&gt;</span></span><br><span class="line">    alpha</span><br><span class="line">    omega</span><br><span class="line">    quorum <span class="tag">&lt;<span class="title">INT</span>&gt;</span></span><br><span class="line">    hysteresis <span class="tag">&lt;<span class="title">INT</span>&gt;</span></span><br><span class="line">    quorum_up <span class="tag">&lt;<span class="title">STRING</span>&gt;</span>|<span class="tag">&lt;<span class="title">QUOTED-STRING</span>&gt;</span></span><br><span class="line">    quorum_down <span class="tag">&lt;<span class="title">STRING</span>&gt;</span>|<span class="tag">&lt;<span class="title">QUOTED-STRING</span>&gt;</span></span><br><span class="line">    sorry_server <span class="tag">&lt;<span class="title">IPADDR</span>&gt;</span> <span class="tag">&lt;<span class="title">PORT</span>&gt;</span></span><br><span class="line">    real_server <span class="tag">&lt;<span class="title">IPADDR</span>&gt;</span> <span class="tag">&lt;<span class="title">PORT</span>&gt;</span> &#123;</span><br><span class="line">        weight <span class="tag">&lt;<span class="title">INT</span>&gt;</span></span><br><span class="line">        inhibit_on_failure</span><br><span class="line">        notify_up <span class="tag">&lt;<span class="title">STRING</span>&gt;</span>|<span class="tag">&lt;<span class="title">QUOTED-STRING</span>&gt;</span></span><br><span class="line">        notify_down <span class="tag">&lt;<span class="title">STRING</span>&gt;</span>|<span class="tag">&lt;<span class="title">QUOTED-STRING</span>&gt;</span></span><br><span class="line">        # HTTP_GET|SSL_GET|TCP_CHECK|SMTP_CHECK|MISC_CHECK</span><br><span class="line">        HTTP_GET|SSL_GET &#123;</span><br><span class="line">            url &#123;</span><br><span class="line">                path <span class="tag">&lt;<span class="title">STRING</span>&gt;</span></span><br><span class="line">                # Digest computed with genhash</span><br><span class="line">                digest <span class="tag">&lt;<span class="title">STRING</span>&gt;</span></span><br><span class="line">                status_code <span class="tag">&lt;<span class="title">INT</span>&gt;</span></span><br><span class="line">            &#125;</span><br><span class="line">            connect_port <span class="tag">&lt;<span class="title">PORT</span>&gt;</span></span><br><span class="line">            connect_timeout <span class="tag">&lt;<span class="title">INT</span>&gt;</span></span><br><span class="line">            nb_get_retry <span class="tag">&lt;<span class="title">INT</span>&gt;</span></span><br><span class="line">            delay_before_retry <span class="tag">&lt;<span class="title">INT</span>&gt;</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>delay_loop 延迟轮询时间（单位秒）。  </li>
+<li>lb_algo 后端调试算法（load balancing algorithm）。  </li>
+<li>lb_kind LVS调度类型NAT/DR/TUN。  </li>
+<li>virtualhost 用来给HTTP_GET和SSL_GET配置请求header的。  </li>
+<li><font color="red">sorry_server</font> 当所有real server宕掉时，sorry server顶替。  </li>
+<li><font color="red">real_server</font> 真正提供服务的服务器。  </li>
+<li>weight 权重。  </li>
+<li><font color="red">notify_up/down</font> 当real server宕掉或启动时执行的脚本。  </li>
+<li>健康检查的方式，N多种方式。  </li>
+<li>path 请求real serserver上的路径。  </li>
+<li>digest/status_code 分别表示用genhash算出的结果和http状态码。  </li>
+<li><font color="red">connect_port</font> 健康检查，如果端口通则认为服务器正常。</li>
+<li>connect_timeout,nb_get_retry,delay_before_retry分别表示超时时长、重试次数，下次重试的时间延迟。</li>
+</ul>
+<p>参考：<a href="http://outofmemory.cn/wiki/keepalived-configuration" target="_blank" rel="external">http://outofmemory.cn/wiki/keepalived-configuration</a></p>
+<h2 id="四、keepalived_应用">四、keepalived 应用</h2><p>1、keepalived常用来做双机热备，集群中的高可用（HA）解决方案，如下：</p>
+<ul>
+<li>linux上使用keepalived+nginx 搭建双机热备的高可用nginx；</li>
+<li>linux上使用keepalived+mysql 搭建mysql的高可用服务；</li>
+</ul>
+<p>2、keepalived的监控类型：</p>
+<ul>
+<li>主服务器网络不通；</li>
+<li>主服务器keepalived服务down掉；</li>
+<li><p>应用程序的服务；</p>
+<p>最常见的两种就是主服务器网络不通和主服务器keepalived服务down掉，备份机能够自动接管。 监控应用程序的服务状态，可以用vrrp_script实现（也可以通过监控服务器的某一个端口来完成监控应用程序）。</p>
+</li>
+</ul>
+<p>具体实例，在下一篇文章中介绍。</p>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/keepalived/" rel="tag">#keepalived</a>
+          
+            <a href="/tags/linux/" rel="tag">#linux</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015/10/25/keepalived-example-1/" rel="prev">keepalived 实战</a>
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/10/19/spring-ico/" rel="next">Spring依赖注入、IOC容器</a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <div class="ds-share flat" data-thread-key="2015/10/25/linux-keepalived/"
+     data-title="keepalived 安装、配置"
+     data-content=""
+     data-url="http://yoursite.com/2015/10/25/linux-keepalived/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
+
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
+      
+    </div>
+  </div>
+
+ </div>
+
+        
+
+        
+          <div class="comments" id="comments">
+            
+              <div class="ds-thread" data-thread-key="2015/10/25/linux-keepalived/"
+                   data-title="keepalived 安装、配置" data-url="http://yoursite.com/2015/10/25/linux-keepalived/">
+              </div>
+            
+          </div>
+        
+      </div>
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="/images/lanjingling.jpg" alt="蓝精灵" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">蓝精灵</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">java程序员、爱开源、喜欢nodejs、前端js、oracle数据库、分布式技术...<br/>改变世界的是这么一群人,他们寻找梦想中的乐园,当他们找不到时,就亲手创造了她...</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">16</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">8</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">14</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/lanjingling" target="_blank">github</a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://blog.csdn.net/liuxiao723846" target="_blank">csdn</a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/1925780475" target="_blank">weibo</a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+            <p class="site-author-name">Links</p>
+            
+              <span class="links-of-author-item">
+              <a href="http://www.ruanyifeng.com/blog/" target="_blank">阮一峰</a>
+              </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://zipperary.com/" target="_blank">Zippera's Blog</a>
+              </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://wuchong.me/" target="_blank">Jark's Blog</a>
+              </span>
+            
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、keepalived是什么"><span class="nav-number">1.</span> <span class="nav-text">一、keepalived是什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、keepalived安装"><span class="nav-number">2.</span> <span class="nav-text">二、keepalived安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三、keepalived的配置"><span class="nav-number">3.</span> <span class="nav-text">三、keepalived的配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#四、keepalived_应用"><span class="nav-number">4.</span> <span class="nav-text">四、keepalived 应用</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner"> <div class="copyright" >
+  
+  &copy; &nbsp;  2014 - 
+  <span itemprop="copyrightYear">2015</span>
+  <span class="with-love">
+    <i class="icon-next-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">蓝精灵</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+ </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+  
+    
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"lanjingling"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+    
+     
+
+    
+  
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.1"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.1"></script>
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/js/motion_global.js?v=0.4.5.1" id="motion.global"></script>
+
+
+
+
+  <script type="text/javascript" src="/js/nav-toggle.js?v=0.4.5.1"></script>
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.1" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 0.4 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    var $tocContent = $('.post-toc-content');
+    if (isDesktop() && CONFIG.sidebar === 'post') {
+      if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+        displaySidebar();
+      }
+    }
+  });
+</script>
+
+
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      if (CONFIG.sidebar === 'always') {
+        displaySidebar();
+      }
+      if (isMobile()) {
+        FastClick.attach(document.body);
+      }
+    });
+  </script>
+
+  
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/lazyload.js"></script>
+  <script type="text/javascript">
+    $(function () {
+      $("#posts").find('img').lazyload({
+        placeholder: "/images/loading.gif",
+        effect: "fadeIn"
+      });
+    });
+  </script>
+</body>
+</html>
