@@ -30,7 +30,7 @@
 
 
 
-  <meta name="keywords" content="hexo," />
+  <meta name="keywords" content="mysql,主从复制," />
 
 
 
@@ -39,16 +39,17 @@
   <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.1" />
 
 
-<meta name="description" content="上文介绍了hexo的安装、部署，从这节开始主要介绍如何使用hexo。hexo安装目录介绍、hexo主要命令、配置next主题...">
+<meta name="description" content="Mysql 主从复制是单向的复制，主机提供写入操作，从机同步主机数据、可以提供读操作。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="hexo使用心得（一）">
-<meta property="og:url" content="http://yoursite.com/2015/09/24/ues-of-hexo-1/index.html">
+<meta property="og:title" content="Mysql 主从复制">
+<meta property="og:url" content="http://yoursite.com/2015/10/26/mysql-replication-master-slave/index.html">
 <meta property="og:site_name" content="晓的技术博客">
-<meta property="og:description" content="上文介绍了hexo的安装、部署，从这节开始主要介绍如何使用hexo。hexo安装目录介绍、hexo主要命令、配置next主题...">
-<meta property="og:updated_time" content="2015-09-24T07:13:25.457Z">
+<meta property="og:description" content="Mysql 主从复制是单向的复制，主机提供写入操作，从机同步主机数据、可以提供读操作。">
+<meta property="og:image" content="http://ww3.sinaimg.cn/mw690/72c913fbjw1exelwftny9j20e209f3yt.jpg">
+<meta property="og:updated_time" content="2015-10-26T08:33:24.971Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="hexo使用心得（一）">
-<meta name="twitter:description" content="上文介绍了hexo的安装、部署，从这节开始主要介绍如何使用hexo。hexo安装目录介绍、hexo主要命令、配置next主题...">
+<meta name="twitter:title" content="Mysql 主从复制">
+<meta name="twitter:description" content="Mysql 主从复制是单向的复制，主机提供写入操作，从机同步主机数据、可以提供读操作。">
 
 
 <script type="text/javascript" id="hexo.configuration">
@@ -58,7 +59,7 @@
   };
 </script>
 
-  <title> hexo使用心得（一） | 晓的技术博客 </title>
+  <title> Mysql 主从复制 | 晓的技术博客 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -204,7 +205,7 @@
           
           
             
-              hexo使用心得（一）
+              Mysql 主从复制
             
           
         </h1>
@@ -213,8 +214,8 @@
       <div class="post-meta">
         <span class="post-time">
           发表于
-          <time itemprop="dateCreated" datetime="2015-09-24T13:20:14+08:00" content="2015-09-24">
-            2015-09-24
+          <time itemprop="dateCreated" datetime="2015-10-26T15:42:32+08:00" content="2015-10-26">
+            2015-10-26
           </time>
         </span>
 
@@ -223,8 +224,8 @@
             &nbsp; | &nbsp; 分类于
             
               <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                <a href="/categories/hexo/" itemprop="url" rel="index">
-                  <span itemprop="name">hexo</span>
+                <a href="/categories/mysql/" itemprop="url" rel="index">
+                  <span itemprop="name">mysql</span>
                 </a>
               </span>
 
@@ -239,8 +240,8 @@
           
             <span class="post-comments-count">
               &nbsp; | &nbsp;
-              <a href="/2015/09/24/ues-of-hexo-1/#comments" itemprop="discussionUrl">
-                <span class="post-comments-count ds-thread-count" data-thread-key="2015/09/24/ues-of-hexo-1/" itemprop="commentsCount"></span>
+              <a href="/2015/10/26/mysql-replication-master-slave/#comments" itemprop="discussionUrl">
+                <span class="post-comments-count ds-thread-count" data-thread-key="2015/10/26/mysql-replication-master-slave/" itemprop="commentsCount"></span>
               </a>
             </span>
           
@@ -254,41 +255,35 @@
       
 
       
-        <span itemprop="articleBody"><p>上文介绍了hexo的安装、部署，从这节开始主要介绍如何使用hexo。</p>
-<h2 id="hexo配置">hexo配置</h2><p>安装完hexo，其默认的目录结构如下：</p>
-<blockquote>
-<p>├── _config.yml<br>├── package.json<br>├── scaffolds<br>├── scripts<br>├── source<br> &nbsp;|     &nbsp; &nbsp; &nbsp; &nbsp; ├── _drafts<br> &nbsp;|     &nbsp; &nbsp; &nbsp; &nbsp; └── _posts<br>└── themes</p>
-</blockquote>
-<h3 id="1、介绍hexo目录下文件(夹)的含义：">1、介绍hexo目录下文件(夹)的含义：</h3><ul>
-<li>_config.yml文件，是hexo的主配置文件</li>
-<li>source/_drafts 是草稿目录，source/_posts是发表的博文目录(.md文件)，source/about 是关于页面的目录，source/categories 是分类页面目录，source/tags 是标签页面目录</li>
-<li>theme目录，存放主题信息</li>
-<li>public目录，存放hexo根据.md生成好的html静态也文件</li>
-<li>scaffolds目录，存放了文章布局的相关文件，默认是post布局</li>
+        <span itemprop="articleBody"><h2 id="主从复制原理：">主从复制原理：</h2><p>1、主从复制主要有一下三个步骤：(单向的)</p>
+<ul>
+<li>master将改变记录到二进制日志(binary log)中（这些记录叫做二进制日志事件，binary log events）；</li>
+<li>slave将master的binary log events拷贝到它的中继日志(relay log)；</li>
+<li>slave重做中继日志中的事件，将改变反映它自己的数据。<br><img src="http://ww3.sinaimg.cn/mw690/72c913fbjw1exelwftny9j20e209f3yt.jpg" alt=""></li>
 </ul>
-<h3 id="2、介绍hexo主要命令：">2、介绍hexo主要命令：</h3><blockquote>
-<p>$ hexo n title #等价于 hexo new [layout] title 发布新文章<br>$ hexo p filename #等价于hexo publish filename 将_drafts下的文件放到_posts下，也就是发布草稿<br>$ hexo g  #等价于hexo generate 生成静态网页<br>$ hexo s  #等价于hexo server 启动预览服务器，开启-d选项时可以预览草稿<br>$ hexo d  #等价于hexo deploy 发布到远程服务器，开启–generate选项可以在deploy前自动generate</p>
-</blockquote>
-<p>使用hexo s 启动本地服务后，如果修改了配置或者文章内容，需要停止服务后重新启动才能生效。这样，在调试或写文章阶段非常不方便，可以使用下面命令，以debug的方式启动，这样每次修改后就无需重启服务了。</p>
-<blockquote>
-<p>$ hexo s –debug </p>
-</blockquote>
-<h3 id="3、配置hexo主题：">3、配置hexo主题：</h3><p>默认hexo使用landspace，你可以在<a href="https://github.com/hexojs/hexo/wiki/themes" target="_blank" rel="external">这里</a>查看hexo所有主题。这里以next主题为例、介绍如何配置一个主题（配置其他主题时类似）<a href="https://github.com/iissnan/hexo-theme-next" target="_blank" rel="external">next</a>有一个很好的使用说明，点击<a href="http://theme-next.iissnan.com/" target="_blank" rel="external">这里</a>查看。还有一个不错的主题<a href="https://github.com/litten/hexo-theme-yilia" target="_blank" rel="external">yilia</a>，也非常的简介。</p>
-<ol>
-<li><p>下载安装next：进入到hexo目录(H:\hexo)，右键点击git bash，然后使用git克隆到本地，如下。这时，在hexo的theme目录下就会多一个next目录，里面是next主题相关文件。<em>（所有）主题目录下也会有一个_config.yml文件，用来配置主题内容。</em></p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone https://github.com/iissnan/hexo-theme-next themes/next</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>配置next：修改hexo的_config.yml文件，找到theme属性，把值改为next。可以在下面添加一句 <em>compress: true</em> 用来压缩css等。</p>
-</li>
-<li><p>更新next：</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd themes/yilia</span><br><span class="line">git pull</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<h3 id="4、优化next主题：">4、优化next主题：</h3><p>在<a href="http://theme-next.iissnan.com/" target="_blank" rel="external">next的使用说明</a>中，详细介绍了next的所有配置。这里只把一些主要的点罗列出来。</p>
-<p><strong>1）Scheme</strong> 修改next的配置文件_config.yml，将 #scheme: Mist 前面的 # 注释去掉即可。</p>
-<p><strong>2）语言</strong> 修改next的配置文件_config.yml，language: zh-hk</p>
-<p><strong>3）菜单</strong> 菜单配置实例：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">menu:</span><br><span class="line">  home: /</span><br><span class="line">  archives: /archives</span><br><span class="line">  #about: /about</span><br><span class="line">  #categories: /categories</span><br><span class="line">  tags: /tags</span><br><span class="line">  #commonweal: /404.html</span><br></pre></td></tr></table></figure><br>默认，about、categories和tags这三个页面是不存在的，使用以下命令创建这三个页面。（会在hexo/source目录下创建about、tags和categories三个目录）<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">hexo new page "about"</span><br><span class="line">hexo new page "tags"</span><br><span class="line">hexo new page categories</span><br></pre></td></tr></table></figure></p>
-<p><strong>4）其他</strong> 例如：Swiftype 站内搜索 、多说评论、百度统计等功能。博客要想使用这些功能，非常简单，去他们的官网注册一个帐号（都是免费的），然后把相应的代码配置到next主题的_config.yml文件中即可。</p>
+<p>2、主从复制应用：</p>
+<ul>
+<li>实时备份；</li>
+<li>读写分离；</li>
+</ul>
+<h2 id="主从复制配置：">主从复制配置：</h2><p>1、前期准备工作：<br>1）关闭防火墙、SELINUX：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@centOS1 ~]# service iptables <span class="operator"><span class="keyword">stop</span></span><br><span class="line"></span><br><span class="line">vi /etc/sysconfig/selinux</span><br><span class="line">SELINUX=disabled</span></span><br></pre></td></tr></table></figure></p>
+<p>2)两台服务器：192.168.137.122 （master） 和 192.168.137.101 （slave） ，在上面安装一样的mysql版本。<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[root@centOS1 ~]# rpm -qa | grep mysql</span><br><span class="line">mysql-5.1.73-3.el6_5.x86_64</span><br><span class="line">mysql-devel-5.1.73-3.el6_5.x86_64</span><br><span class="line">mysql-libs-5.1.73-3.el6_5.x86_64</span><br><span class="line">mysql-server-5.1.73-3.el6_5.x86_64</span><br></pre></td></tr></table></figure></p>
+<p>3）登录mysql删除空用户：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; SELECT user,host,password FROM mysql.user;</span><br><span class="line">+------+-----------+-------------------------------------------+</span><br><span class="line">| user | host      | password                                  |</span><br><span class="line">+------+-----------+-------------------------------------------+</span><br><span class="line">| root | localhost | *81F5E21E35407D884A6CD4A731AEBFB6AF209E1B |</span><br><span class="line">| root | centos1   |                                           |</span><br><span class="line">| root | 127.0.0.1 |                                           |</span><br><span class="line">|      | localhost |                                           |</span><br><span class="line">|      | centos1   |                                           |</span><br><span class="line">+------+-----------+-------------------------------------------+</span><br><span class="line"></span><br><span class="line">mysql&gt; DROP user ''@localhost;</span><br><span class="line">Query OK, 0 rows affected (0.00 sec)</span><br><span class="line"></span><br><span class="line">mysql&gt; DROP user ''@centos1;</span><br><span class="line">Query OK, 0 rows affected (0.01 sec)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">mysql&gt; update mysql.user set password=PASSWORD('root') where user='root';</span><br><span class="line">Query OK, 3 rows affected (0.00 sec)</span><br></pre></td></tr></table></figure>
+<p>2、主库上创建复制用户：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; GRANT REPLICATION SLAVE,REPLICATION CLIENT ON *.* TO gechong@'%' IDENTIFIED BY 'gechong';</span><br><span class="line">mysql&gt; flush privileges;</span><br></pre></td></tr></table></figure></p>
+<p>3、修改配置文件：<br>1）主库需改配置文件，在/etc/my.cnf中添加<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">port = 3306</span><br><span class="line">log_bin = /var/lib/mysql/mysql-binlog</span><br><span class="line">server-id = 1 //只要主从不一样就行</span><br><span class="line">binlog_do_db = test//要做同步的数据库名字，可以是多个数据库，之间用分号分割。</span><br><span class="line">\# 忽略mysql系统库复制</span><br><span class="line">binlog-ignore-db=mysql</span><br><span class="line">binlog-ignore-db=information_schema</span><br></pre></td></tr></table></figure></p>
+<p>2）从库的配置文件中添加（/etc/my.cnf）<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">server-id = 2</span><br><span class="line">master-host = 10.4.14.168</span><br><span class="line">master-user = gechong</span><br><span class="line">master-password = gechong</span><br><span class="line">master-port = 3306</span><br><span class="line">master-connect-retry = 5</span><br><span class="line">replicate-<span class="operator"><span class="keyword">do</span>-db = <span class="keyword">test</span></span></span><br></pre></td></tr></table></figure></p>
+<p>然后分别重启mysql服务。</p>
+<p>4、设置从库的同步位置：</p>
+<p>1）查看主库状态：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; show master status;</span><br><span class="line">+---------------------+----------+--------------+--------------------------+</span><br><span class="line">| File                | Position | Binlog_Do_DB | Binlog_Ignore_DB         |</span><br><span class="line">+---------------------+----------+--------------+--------------------------+</span><br><span class="line">| mysql-binlog.000002 |      265 | test         | mysql,information_schema |</span><br><span class="line">+---------------------+----------+--------------+--------------------------+</span><br></pre></td></tr></table></figure><br>记住file和position两项。</p>
+<p>2）从库设置同步日志位置：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; change master to</span><br><span class="line">&gt; master_host='master_ip',</span><br><span class="line">&gt; master_user='gechong',</span><br><span class="line">&gt; master_password='gechong',</span><br><span class="line">&gt; master_port=3306,</span><br><span class="line">&gt; master_log_file='mysql-binlog.000002',</span><br><span class="line">&gt; master_log_pos=265;</span><br><span class="line">1 row in set (0.00 sec)</span><br></pre></td></tr></table></figure>
+<p>3）从库上启动同步：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; slave start;</span><br><span class="line">1 row in set (0.00 sec)</span><br></pre></td></tr></table></figure>
+<p>4）从库上查看同步状态：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; show slave status\G</span><br><span class="line">*************************** 1. row ***************************</span><br><span class="line">               Slave_IO_State: Waiting for master to send event</span><br><span class="line">                  Master_Host: 192.168.137.122</span><br><span class="line">                  Master_User: repli</span><br><span class="line">                  Master_Port: 3306</span><br><span class="line">                Connect_Retry: 5</span><br><span class="line">              Master_Log_File: mysql-binlog.000002</span><br><span class="line">          Read_Master_Log_Pos: 265</span><br><span class="line">               Relay_Log_File: mysqld-relay-bin.000005</span><br><span class="line">                Relay_Log_Pos: 413</span><br><span class="line">        Relay_Master_Log_File: mysql-binlog.000002</span><br><span class="line">             Slave_IO_Running: Yes</span><br><span class="line">            Slave_SQL_Running: Yes</span><br><span class="line">              Replicate_Do_DB: test</span><br><span class="line">......</span><br></pre></td></tr></table></figure></p>
+<p>可以看到：Slave_IO_Running | Slave_SQL_Running两个值都是YES，说明配置成功了。</p>
+<p>5、测试：</p>
+<p>在主库上插入数据，在从库上查看插入信息。<em>由于是单向的，所以只能在主库上执行DML操作；在从库上执行查询。</em></p>
 </span>
       
     </div>
@@ -297,7 +292,9 @@
       
         <div class="post-tags">
           
-            <a href="/tags/hexo/" rel="tag">#hexo</a>
+            <a href="/tags/mysql/" rel="tag">#mysql</a>
+          
+            <a href="/tags/主从复制/" rel="tag">#主从复制</a>
           
         </div>
       
@@ -306,13 +303,13 @@
         <div class="post-nav">
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2015/09/24/use-of-hexo-2/" rel="prev">hexo使用心得（二）</a>
+              <a href="/2015/10/26/mysql-replication-master-master/" rel="prev">Mysql 主主复制</a>
             
           </div>
 
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2015/09/23/hexo简介/" rel="next">hexo简介、安装、部署</a>
+              <a href="/2015/10/25/keepalived-example-1/" rel="next">keepalived 实战</a>
             
           </div>
         </div>
@@ -327,10 +324,10 @@
 
     <div class="post-spread">
       
-        <div class="ds-share flat" data-thread-key="2015/09/24/ues-of-hexo-1/"
-     data-title="hexo使用心得（一）"
+        <div class="ds-share flat" data-thread-key="2015/10/26/mysql-replication-master-slave/"
+     data-title="Mysql 主从复制"
      data-content=""
-     data-url="http://yoursite.com/2015/09/24/ues-of-hexo-1/">
+     data-url="http://yoursite.com/2015/10/26/mysql-replication-master-slave/">
   <div class="ds-share-inline">
     <ul  class="ds-share-icons-16">
 
@@ -356,8 +353,8 @@
         
           <div class="comments" id="comments">
             
-              <div class="ds-thread" data-thread-key="2015/09/24/ues-of-hexo-1/"
-                   data-title="hexo使用心得（一）" data-url="http://yoursite.com/2015/09/24/ues-of-hexo-1/">
+              <div class="ds-thread" data-thread-key="2015/10/26/mysql-replication-master-slave/"
+                   data-title="Mysql 主从复制" data-url="http://yoursite.com/2015/10/26/mysql-replication-master-slave/">
               </div>
             
           </div>
@@ -468,7 +465,7 @@
           <div class="post-toc">
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#hexo配置"><span class="nav-number">1.</span> <span class="nav-text">hexo配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1、介绍hexo目录下文件(夹)的含义："><span class="nav-number">1.1.</span> <span class="nav-text">1、介绍hexo目录下文件(夹)的含义：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2、介绍hexo主要命令："><span class="nav-number">1.2.</span> <span class="nav-text">2、介绍hexo主要命令：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3、配置hexo主题："><span class="nav-number">1.3.</span> <span class="nav-text">3、配置hexo主题：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4、优化next主题："><span class="nav-number">1.4.</span> <span class="nav-text">4、优化next主题：</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#主从复制原理："><span class="nav-number">1.</span> <span class="nav-text">主从复制原理：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#主从复制配置："><span class="nav-number">2.</span> <span class="nav-text">主从复制配置：</span></a></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator"></div>
