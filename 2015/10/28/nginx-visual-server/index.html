@@ -30,7 +30,7 @@
 
 
 
-  <meta name="keywords" content="mysql,集群," />
+  <meta name="keywords" content="nginx," />
 
 
 
@@ -39,17 +39,16 @@
   <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.1" />
 
 
-<meta name="description" content="Mysql 主从复制是单向的复制，主机提供写入操作，从机同步主机数据、可以提供读操作。">
+<meta name="description" content="虚拟主机使用的是特殊的软硬件技术，它把一台运行在因特网上的服务器主机分成一台台“虚拟”的主机，每台虚拟主机都可以是一个独立的网站，可以具有独立的域名，具有完整的Intemet服务器功能（WWW、FTP、Email等），同一台主机上的虚拟主机之间是完全独立的。从网站访问者来看，每一台虚拟主机和一台独立的主机完全一样。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Mysql 主从复制">
-<meta property="og:url" content="http://yoursite.com/2015/10/26/mysql-replication-master-slave/index.html">
+<meta property="og:title" content="nginx虚拟主机搭建">
+<meta property="og:url" content="http://yoursite.com/2015/10/28/nginx-visual-server/index.html">
 <meta property="og:site_name" content="晓的技术博客">
-<meta property="og:description" content="Mysql 主从复制是单向的复制，主机提供写入操作，从机同步主机数据、可以提供读操作。">
-<meta property="og:image" content="http://ww3.sinaimg.cn/mw690/72c913fbjw1exelwftny9j20e209f3yt.jpg">
-<meta property="og:updated_time" content="2015-10-28T02:38:33.272Z">
+<meta property="og:description" content="虚拟主机使用的是特殊的软硬件技术，它把一台运行在因特网上的服务器主机分成一台台“虚拟”的主机，每台虚拟主机都可以是一个独立的网站，可以具有独立的域名，具有完整的Intemet服务器功能（WWW、FTP、Email等），同一台主机上的虚拟主机之间是完全独立的。从网站访问者来看，每一台虚拟主机和一台独立的主机完全一样。">
+<meta property="og:updated_time" content="2015-10-28T03:17:31.759Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Mysql 主从复制">
-<meta name="twitter:description" content="Mysql 主从复制是单向的复制，主机提供写入操作，从机同步主机数据、可以提供读操作。">
+<meta name="twitter:title" content="nginx虚拟主机搭建">
+<meta name="twitter:description" content="虚拟主机使用的是特殊的软硬件技术，它把一台运行在因特网上的服务器主机分成一台台“虚拟”的主机，每台虚拟主机都可以是一个独立的网站，可以具有独立的域名，具有完整的Intemet服务器功能（WWW、FTP、Email等），同一台主机上的虚拟主机之间是完全独立的。从网站访问者来看，每一台虚拟主机和一台独立的主机完全一样。">
 
 
 <script type="text/javascript" id="hexo.configuration">
@@ -59,7 +58,7 @@
   };
 </script>
 
-  <title> Mysql 主从复制 | 晓的技术博客 </title>
+  <title> nginx虚拟主机搭建 | 晓的技术博客 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -205,7 +204,7 @@
           
           
             
-              Mysql 主从复制
+              nginx虚拟主机搭建
             
           
         </h1>
@@ -214,8 +213,8 @@
       <div class="post-meta">
         <span class="post-time">
           发表于
-          <time itemprop="dateCreated" datetime="2015-10-26T15:42:32+08:00" content="2015-10-26">
-            2015-10-26
+          <time itemprop="dateCreated" datetime="2015-10-28T10:45:43+08:00" content="2015-10-28">
+            2015-10-28
           </time>
         </span>
 
@@ -224,8 +223,8 @@
             &nbsp; | &nbsp; 分类于
             
               <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                <a href="/categories/mysql/" itemprop="url" rel="index">
-                  <span itemprop="name">mysql</span>
+                <a href="/categories/nginx/" itemprop="url" rel="index">
+                  <span itemprop="name">nginx</span>
                 </a>
               </span>
 
@@ -240,8 +239,8 @@
           
             <span class="post-comments-count">
               &nbsp; | &nbsp;
-              <a href="/2015/10/26/mysql-replication-master-slave/#comments" itemprop="discussionUrl">
-                <span class="post-comments-count ds-thread-count" data-thread-key="2015/10/26/mysql-replication-master-slave/" itemprop="commentsCount"></span>
+              <a href="/2015/10/28/nginx-visual-server/#comments" itemprop="discussionUrl">
+                <span class="post-comments-count ds-thread-count" data-thread-key="2015/10/28/nginx-visual-server/" itemprop="commentsCount"></span>
               </a>
             </span>
           
@@ -255,35 +254,14 @@
       
 
       
-        <span itemprop="articleBody"><h2 id="主从复制原理：">主从复制原理：</h2><p>1、主从复制主要有一下三个步骤：(单向的)</p>
-<ul>
-<li>master将改变记录到二进制日志(binary log)中（这些记录叫做二进制日志事件，binary log events）；</li>
-<li>slave将master的binary log events拷贝到它的中继日志(relay log)；</li>
-<li>slave重做中继日志中的事件，将改变反映它自己的数据。<br><img src="http://ww3.sinaimg.cn/mw690/72c913fbjw1exelwftny9j20e209f3yt.jpg" alt=""></li>
-</ul>
-<p>2、主从复制应用：</p>
-<ul>
-<li>实时备份；</li>
-<li>读写分离；</li>
-</ul>
-<h2 id="主从复制配置：">主从复制配置：</h2><p>1、前期准备工作：<br>1）关闭防火墙、SELINUX：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@centOS1 ~]# service iptables <span class="operator"><span class="keyword">stop</span></span><br><span class="line"></span><br><span class="line">vi /etc/sysconfig/selinux</span><br><span class="line">SELINUX=disabled</span></span><br></pre></td></tr></table></figure></p>
-<p>2)两台服务器：192.168.137.122 （master） 和 192.168.137.101 （slave） ，在上面安装一样的mysql版本。<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[root@centOS1 ~]# rpm -qa | grep mysql</span><br><span class="line">mysql-5.1.73-3.el6_5.x86_64</span><br><span class="line">mysql-devel-5.1.73-3.el6_5.x86_64</span><br><span class="line">mysql-libs-5.1.73-3.el6_5.x86_64</span><br><span class="line">mysql-server-5.1.73-3.el6_5.x86_64</span><br></pre></td></tr></table></figure></p>
-<p>3）登录mysql删除空用户：</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; SELECT user,host,password FROM mysql.user;</span><br><span class="line">+------+-----------+-------------------------------------------+</span><br><span class="line">| user | host      | password                                  |</span><br><span class="line">+------+-----------+-------------------------------------------+</span><br><span class="line">| root | localhost | *81F5E21E35407D884A6CD4A731AEBFB6AF209E1B |</span><br><span class="line">| root | centos1   |                                           |</span><br><span class="line">| root | 127.0.0.1 |                                           |</span><br><span class="line">|      | localhost |                                           |</span><br><span class="line">|      | centos1   |                                           |</span><br><span class="line">+------+-----------+-------------------------------------------+</span><br><span class="line"></span><br><span class="line">mysql&gt; DROP user ''@localhost;</span><br><span class="line">Query OK, 0 rows affected (0.00 sec)</span><br><span class="line"></span><br><span class="line">mysql&gt; DROP user ''@centos1;</span><br><span class="line">Query OK, 0 rows affected (0.01 sec)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">mysql&gt; update mysql.user set password=PASSWORD('root') where user='root';</span><br><span class="line">Query OK, 3 rows affected (0.00 sec)</span><br></pre></td></tr></table></figure>
-<p>2、主库上创建复制用户：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; GRANT REPLICATION SLAVE,REPLICATION CLIENT ON *.* TO gechong@'%' IDENTIFIED BY 'gechong';</span><br><span class="line">mysql&gt; flush privileges;</span><br></pre></td></tr></table></figure></p>
-<p>3、修改配置文件：<br>1）主库需改配置文件，在/etc/my.cnf中添加<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">port = 3306</span><br><span class="line">log_bin = /var/lib/mysql/mysql-binlog</span><br><span class="line">server-id = 1 //只要主从不一样就行</span><br><span class="line">binlog_do_db = test//要做同步的数据库名字，可以是多个数据库，之间用分号分割。</span><br><span class="line">\# 忽略mysql系统库复制</span><br><span class="line">binlog-ignore-db=mysql</span><br><span class="line">binlog-ignore-db=information_schema</span><br></pre></td></tr></table></figure></p>
-<p>2）从库的配置文件中添加（/etc/my.cnf）<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">server-id = 2</span><br><span class="line">master-host = 10.4.14.168</span><br><span class="line">master-user = gechong</span><br><span class="line">master-password = gechong</span><br><span class="line">master-port = 3306</span><br><span class="line">master-connect-retry = 5</span><br><span class="line">replicate-<span class="operator"><span class="keyword">do</span>-db = <span class="keyword">test</span></span></span><br></pre></td></tr></table></figure></p>
-<p>然后分别重启mysql服务。</p>
-<p>4、设置从库的同步位置：</p>
-<p>1）查看主库状态：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; show master status;</span><br><span class="line">+---------------------+----------+--------------+--------------------------+</span><br><span class="line">| File                | Position | Binlog_Do_DB | Binlog_Ignore_DB         |</span><br><span class="line">+---------------------+----------+--------------+--------------------------+</span><br><span class="line">| mysql-binlog.000002 |      265 | test         | mysql,information_schema |</span><br><span class="line">+---------------------+----------+--------------+--------------------------+</span><br></pre></td></tr></table></figure><br>记住file和position两项。</p>
-<p>2）从库设置同步日志位置：</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; change master to</span><br><span class="line">&gt; master_host='master_ip',</span><br><span class="line">&gt; master_user='gechong',</span><br><span class="line">&gt; master_password='gechong',</span><br><span class="line">&gt; master_port=3306,</span><br><span class="line">&gt; master_log_file='mysql-binlog.000002',</span><br><span class="line">&gt; master_log_pos=265;</span><br><span class="line">1 row in set (0.00 sec)</span><br></pre></td></tr></table></figure>
-<p>3）从库上启动同步：</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; slave start;</span><br><span class="line">1 row in set (0.00 sec)</span><br></pre></td></tr></table></figure>
-<p>4）从库上查看同步状态：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; show slave status\G</span><br><span class="line">*************************** 1. row ***************************</span><br><span class="line">               Slave_IO_State: Waiting for master to send event</span><br><span class="line">                  Master_Host: 192.168.137.122</span><br><span class="line">                  Master_User: repli</span><br><span class="line">                  Master_Port: 3306</span><br><span class="line">                Connect_Retry: 5</span><br><span class="line">              Master_Log_File: mysql-binlog.000002</span><br><span class="line">          Read_Master_Log_Pos: 265</span><br><span class="line">               Relay_Log_File: mysqld-relay-bin.000005</span><br><span class="line">                Relay_Log_Pos: 413</span><br><span class="line">        Relay_Master_Log_File: mysql-binlog.000002</span><br><span class="line">             Slave_IO_Running: Yes</span><br><span class="line">            Slave_SQL_Running: Yes</span><br><span class="line">              Replicate_Do_DB: test</span><br><span class="line">......</span><br></pre></td></tr></table></figure></p>
-<p>可以看到：Slave_IO_Running | Slave_SQL_Running两个值都是YES，说明配置成功了。</p>
-<p>5、测试：</p>
-<p>在主库上插入数据，在从库上查看插入信息。<em>由于是单向的，所以只能在主库上执行DML操作；在从库上执行查询。</em></p>
+        <span itemprop="articleBody"><p>虚拟主机使用的是特殊的软硬件技术，它把一台运行在因特网上的服务器主机分成一台台“虚拟”的主机，每台虚拟主机都可以是一个独立的网站，可以具有独立的域名，具有完整的Intemet服务器功能（WWW、FTP、Email等），同一台主机上的虚拟主机之间是完全独立的。从网站访问者来看，每一台虚拟主机和一台独立的主机完全一样。<br>利用虚拟主机，不用为每个要运行的网站提供一台单独的Nginx服务器或单独运行一组Nginx进程。虚拟主机提供了在同一台服务器、同一组Nginx进程上运行多个网站的功能。</p>
+<p>本例实现一个nginx监听80和81两个端口，分别指向/data/site1和/data/site2 两个不同的站点。也可以为一台主机设置多个域名，这样在nginx上可以根据域名来做不同的虚拟主机。</p>
+<h2 id="配置">配置</h2><p>1、在/usr/local/nginx/conf 目录下建立一个conf.d 文件夹；然后在conf.d 下建立site1.conf和site2.conf文件：</p>
+<p>Site1.conf<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    listen       80;</span><br><span class="line">    server_name  localhost;</span><br><span class="line"></span><br><span class="line">    #access_log  off;</span><br><span class="line">    #error_log  /data/logs/nginx/iisad.error.log;</span><br><span class="line">    </span><br><span class="line">    index index.html index.shtml;</span><br><span class="line">    root  /data/site1/;</span><br><span class="line"></span><br><span class="line">    location / &#123;</span><br><span class="line">        root   /data/site1;</span><br><span class="line">        index  index.html index.htm;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>Site2.conf<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    listen       81;</span><br><span class="line">    server_name  localhost;</span><br><span class="line"></span><br><span class="line">    #access_log  off;</span><br><span class="line">    #error_log  /data/logs/nginx/iisad.error.log;</span><br><span class="line">    </span><br><span class="line">    index index.html index.shtml;</span><br><span class="line">    root  /data/site2/;</span><br><span class="line"></span><br><span class="line">    location / &#123;</span><br><span class="line">        root   /data/site2;</span><br><span class="line">        index  index.html index.htm;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>2、在/data/下建立site1和site2文件夹，然后分别在其中创建一个index.html文件。</p>
+<p>3、修改nginx配置文件nginx.conf<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">#user  nobody;</span><br><span class="line">worker_processes  1;</span><br><span class="line"></span><br><span class="line">#error_log  logs/error.log;</span><br><span class="line">#error_log  logs/error.log  notice;</span><br><span class="line">#error_log  logs/error.log  info;</span><br><span class="line"></span><br><span class="line">#pid        logs/nginx.pid;</span><br><span class="line"></span><br><span class="line">events &#123;</span><br><span class="line">    worker_connections  1024;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">http &#123;</span><br><span class="line">    include       mime.types;</span><br><span class="line">    default_type  application/octet-stream;</span><br><span class="line"></span><br><span class="line">    #log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '</span><br><span class="line">    #                  '$status $body_bytes_sent "$http_referer" '</span><br><span class="line">    #                  '"$http_user_agent" "$http_x_forwarded_for"';</span><br><span class="line"></span><br><span class="line">    #access_log  logs/access.log  main;</span><br><span class="line"></span><br><span class="line">    sendfile        on;</span><br><span class="line">    #tcp_nopush     on;</span><br><span class="line"></span><br><span class="line">    #keepalive_timeout  0;</span><br><span class="line">    keepalive_timeout  65;</span><br><span class="line"></span><br><span class="line">    #gzip  on;</span><br><span class="line"></span><br><span class="line">    include conf.d/*.conf;    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>4）测试：<br>在浏览器中输入：<a href="http://192.168.137.122/" target="_blank" rel="external">http://192.168.137.122/</a> 和<a href="http://192.168.137.122:81/" target="_blank" rel="external">http://192.168.137.122:81/</a> 可以查看site1和site2下的两个index.html。</p>
 </span>
       
     </div>
@@ -292,9 +270,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/mysql/" rel="tag">#mysql</a>
-          
-            <a href="/tags/集群/" rel="tag">#集群</a>
+            <a href="/tags/nginx/" rel="tag">#nginx</a>
           
         </div>
       
@@ -303,13 +279,13 @@
         <div class="post-nav">
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2015/10/26/mysql-replication-master-master/" rel="prev">Mysql 主主复制</a>
+              <a href="/2015/10/28/nginx-tomcat-cluster/" rel="prev">nginx tomcat集群</a>
             
           </div>
 
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2015/10/25/keepalived-example-1/" rel="next">keepalived 实战</a>
+              <a href="/2015/10/28/nginx-install-config/" rel="next">nginx安装、配置（linux下）</a>
             
           </div>
         </div>
@@ -324,10 +300,10 @@
 
     <div class="post-spread">
       
-        <div class="ds-share flat" data-thread-key="2015/10/26/mysql-replication-master-slave/"
-     data-title="Mysql 主从复制"
+        <div class="ds-share flat" data-thread-key="2015/10/28/nginx-visual-server/"
+     data-title="nginx虚拟主机搭建"
      data-content=""
-     data-url="http://yoursite.com/2015/10/26/mysql-replication-master-slave/">
+     data-url="http://yoursite.com/2015/10/28/nginx-visual-server/">
   <div class="ds-share-inline">
     <ul  class="ds-share-icons-16">
 
@@ -353,8 +329,8 @@
         
           <div class="comments" id="comments">
             
-              <div class="ds-thread" data-thread-key="2015/10/26/mysql-replication-master-slave/"
-                   data-title="Mysql 主从复制" data-url="http://yoursite.com/2015/10/26/mysql-replication-master-slave/">
+              <div class="ds-thread" data-thread-key="2015/10/28/nginx-visual-server/"
+                   data-title="nginx虚拟主机搭建" data-url="http://yoursite.com/2015/10/28/nginx-visual-server/">
               </div>
             
           </div>
@@ -465,7 +441,7 @@
           <div class="post-toc">
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#主从复制原理："><span class="nav-number">1.</span> <span class="nav-text">主从复制原理：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#主从复制配置："><span class="nav-number">2.</span> <span class="nav-text">主从复制配置：</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#配置"><span class="nav-number">1.</span> <span class="nav-text">配置</span></a></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator"></div>

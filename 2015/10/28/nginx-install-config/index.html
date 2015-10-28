@@ -30,7 +30,7 @@
 
 
 
-  <meta name="keywords" content="mysql,集群," />
+  <meta name="keywords" content="nginx," />
 
 
 
@@ -39,17 +39,16 @@
   <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.1" />
 
 
-<meta name="description" content="Mysql 主从复制是单向的复制，主机提供写入操作，从机同步主机数据、可以提供读操作。">
+<meta name="description" content="Nginx (&quot;engine x&quot;) 是一个高性能的 HTTP 和 反向代理 服务器，也是一个 IMAP/POP3/SMTP 代理服务器，在高连接并发的情况下Nginx 是 Apache 服务器不错的替代品.其特点是占有内存少，并发能力强。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Mysql 主从复制">
-<meta property="og:url" content="http://yoursite.com/2015/10/26/mysql-replication-master-slave/index.html">
+<meta property="og:title" content="nginx安装、配置（linux下）">
+<meta property="og:url" content="http://yoursite.com/2015/10/28/nginx-install-config/index.html">
 <meta property="og:site_name" content="晓的技术博客">
-<meta property="og:description" content="Mysql 主从复制是单向的复制，主机提供写入操作，从机同步主机数据、可以提供读操作。">
-<meta property="og:image" content="http://ww3.sinaimg.cn/mw690/72c913fbjw1exelwftny9j20e209f3yt.jpg">
-<meta property="og:updated_time" content="2015-10-28T02:38:33.272Z">
+<meta property="og:description" content="Nginx (&quot;engine x&quot;) 是一个高性能的 HTTP 和 反向代理 服务器，也是一个 IMAP/POP3/SMTP 代理服务器，在高连接并发的情况下Nginx 是 Apache 服务器不错的替代品.其特点是占有内存少，并发能力强。">
+<meta property="og:updated_time" content="2015-10-28T03:11:49.831Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Mysql 主从复制">
-<meta name="twitter:description" content="Mysql 主从复制是单向的复制，主机提供写入操作，从机同步主机数据、可以提供读操作。">
+<meta name="twitter:title" content="nginx安装、配置（linux下）">
+<meta name="twitter:description" content="Nginx (&quot;engine x&quot;) 是一个高性能的 HTTP 和 反向代理 服务器，也是一个 IMAP/POP3/SMTP 代理服务器，在高连接并发的情况下Nginx 是 Apache 服务器不错的替代品.其特点是占有内存少，并发能力强。">
 
 
 <script type="text/javascript" id="hexo.configuration">
@@ -59,7 +58,7 @@
   };
 </script>
 
-  <title> Mysql 主从复制 | 晓的技术博客 </title>
+  <title> nginx安装、配置（linux下） | 晓的技术博客 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -205,7 +204,7 @@
           
           
             
-              Mysql 主从复制
+              nginx安装、配置（linux下）
             
           
         </h1>
@@ -214,8 +213,8 @@
       <div class="post-meta">
         <span class="post-time">
           发表于
-          <time itemprop="dateCreated" datetime="2015-10-26T15:42:32+08:00" content="2015-10-26">
-            2015-10-26
+          <time itemprop="dateCreated" datetime="2015-10-28T10:45:07+08:00" content="2015-10-28">
+            2015-10-28
           </time>
         </span>
 
@@ -224,8 +223,8 @@
             &nbsp; | &nbsp; 分类于
             
               <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                <a href="/categories/mysql/" itemprop="url" rel="index">
-                  <span itemprop="name">mysql</span>
+                <a href="/categories/nginx/" itemprop="url" rel="index">
+                  <span itemprop="name">nginx</span>
                 </a>
               </span>
 
@@ -240,8 +239,8 @@
           
             <span class="post-comments-count">
               &nbsp; | &nbsp;
-              <a href="/2015/10/26/mysql-replication-master-slave/#comments" itemprop="discussionUrl">
-                <span class="post-comments-count ds-thread-count" data-thread-key="2015/10/26/mysql-replication-master-slave/" itemprop="commentsCount"></span>
+              <a href="/2015/10/28/nginx-install-config/#comments" itemprop="discussionUrl">
+                <span class="post-comments-count ds-thread-count" data-thread-key="2015/10/28/nginx-install-config/" itemprop="commentsCount"></span>
               </a>
             </span>
           
@@ -255,35 +254,94 @@
       
 
       
-        <span itemprop="articleBody"><h2 id="主从复制原理：">主从复制原理：</h2><p>1、主从复制主要有一下三个步骤：(单向的)</p>
+        <span itemprop="articleBody"><p>Nginx (“engine x”) 是一个高性能的 HTTP 和 反向代理 服务器，也是一个 IMAP/POP3/SMTP 代理服务器，在高连接并发的情况下Nginx 是 Apache 服务器不错的替代品.其特点是占有内存少，并发能力强。</p>
+<h2 id="安装">安装</h2><p>1）下载nginx，在官网<a href="http://nginx.org/download/" target="_blank" rel="external">http://nginx.org/download/</a>  上下载相应的版本  </p>
+<blockquote>
+<p>wget <a href="http://nginx.org/download/nginx-1.5.9.tar.gz" target="_blank" rel="external">http://nginx.org/download/nginx-1.5.9.tar.gz</a></p>
+</blockquote>
+<p>2）解压：</p>
+<blockquote>
+<p>tar -xvzf nginx-1.7.5.tar.gz</p>
+</blockquote>
+<p> 3）编译：<br> 编译 （make）的过程是把各种语言写的源码文件，变成可执行文件和各种库文件。</p>
+<blockquote>
+<p>cd nginx-1.7.5<br>./configure –prefix=/usr/local/nginx</p>
+</blockquote>
+<p><em>注：</em> –prefix表示要安装的目录，可以不指定、直接默认安装。</p>
+<p>4）安装 ：<br>安装（make install）是把这些编译出来的可执行文件和库文件复制到合适的地方</p>
+<blockquote>
+<p>make install </p>
+</blockquote>
+<p>5）在configure的时候可能有如下错误<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">checking for PCRE library in /opt/local/ ... not found</span><br><span class="line"></span><br><span class="line">./configure: error: the HTTP rewrite module requires the PCRE library.</span><br><span class="line">You can either disable the module by using --without-http_rewrite_module</span><br><span class="line">option, or install the PCRE library into the system, or build the PCRE library</span><br><span class="line">statically from the source with nginx by using --with-pcre=<span class="tag">&lt;<span class="title">path</span>&gt;</span> option.</span><br></pre></td></tr></table></figure></p>
+<p>安装pcre-devel解决问题</p>
+<blockquote>
+<p>yum -y install pcre-devel</p>
+</blockquote>
+<p>也有可能遇到下面问题，<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">./configure: error: the HTTP cache module requires md5 functions</span><br><span class="line">from OpenSSL library.   You can either disable the module by using</span><br><span class="line">--without-http-cache option, or install the OpenSSL library into the system,</span><br><span class="line">or build the OpenSSL library statically from the source with nginx by using</span><br><span class="line">--with-http_ssl_module --with-openssl=<span class="tag">&lt;<span class="title">path</span>&gt;</span> options.</span><br></pre></td></tr></table></figure></p>
+<p>安装openssl 解决问题</p>
+<blockquote>
+<p>yum -y install openssl openssl-devel</p>
+</blockquote>
+<p>6）启动</p>
 <ul>
-<li>master将改变记录到二进制日志(binary log)中（这些记录叫做二进制日志事件，binary log events）；</li>
-<li>slave将master的binary log events拷贝到它的中继日志(relay log)；</li>
-<li>slave重做中继日志中的事件，将改变反映它自己的数据。<br><img src="http://ww3.sinaimg.cn/mw690/72c913fbjw1exelwftny9j20e209f3yt.jpg" alt=""></li>
+<li><p>启动:</p>
+<blockquote>
+<p>cd /usr/local/nginx/sbin<br>./nginx</p>
+</blockquote>
+</li>
+<li><p>修改了配置文件后最好先检查一下修改过的配置文件是否正确：</p>
+<blockquote>
+<p>/usr/nginx/sbin/nginx -t</p>
+</blockquote>
+</li>
+<li><p>平滑重启:</p>
+<blockquote>
+<p>/usr/nginx/sbin/nginx -s reload</p>
+</blockquote>
+</li>
 </ul>
-<p>2、主从复制应用：</p>
+<h2 id="配置">配置</h2><p>Nginx 就一个配置文件，位于/usr/local/nginx/conf 下nginx.conf</p>
+<p>1、Nginx 的 Location 配置指令块：</p>
+<p>Nginx 允许用户定义 Location block ，并指定一个匹配模式（pattern）匹配特定的 URI。除了简单的字符串（比如文件系统路径），还允许使用更为复杂的匹配模式（pattern）。Location 配置项在http &gt; server 里面。</p>
+<p>1）Location block 的基本语法形式是：</p>
+<blockquote>
+<p>location [=|~|~*|^~|@] pattern { … }</p>
+</blockquote>
+<p>[=|~|~*|^~|@] 被称作 location modifier ，这会定义 Nginx 如何去匹配其后的 pattern ，以及该 pattern 的最基本的属性（简单字符串或正则表达式）。</p>
+<p>2）关于 location modifier：</p>
 <ul>
-<li>实时备份；</li>
-<li>读写分离；</li>
+<li>=<br>这会完全匹配指定的 pattern ，且这里的 pattern 被限制成简单的字符串，也就是说这里不能使用正则表达式。</li>
 </ul>
-<h2 id="主从复制配置：">主从复制配置：</h2><p>1、前期准备工作：<br>1）关闭防火墙、SELINUX：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@centOS1 ~]# service iptables <span class="operator"><span class="keyword">stop</span></span><br><span class="line"></span><br><span class="line">vi /etc/sysconfig/selinux</span><br><span class="line">SELINUX=disabled</span></span><br></pre></td></tr></table></figure></p>
-<p>2)两台服务器：192.168.137.122 （master） 和 192.168.137.101 （slave） ，在上面安装一样的mysql版本。<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[root@centOS1 ~]# rpm -qa | grep mysql</span><br><span class="line">mysql-5.1.73-3.el6_5.x86_64</span><br><span class="line">mysql-devel-5.1.73-3.el6_5.x86_64</span><br><span class="line">mysql-libs-5.1.73-3.el6_5.x86_64</span><br><span class="line">mysql-server-5.1.73-3.el6_5.x86_64</span><br></pre></td></tr></table></figure></p>
-<p>3）登录mysql删除空用户：</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; SELECT user,host,password FROM mysql.user;</span><br><span class="line">+------+-----------+-------------------------------------------+</span><br><span class="line">| user | host      | password                                  |</span><br><span class="line">+------+-----------+-------------------------------------------+</span><br><span class="line">| root | localhost | *81F5E21E35407D884A6CD4A731AEBFB6AF209E1B |</span><br><span class="line">| root | centos1   |                                           |</span><br><span class="line">| root | 127.0.0.1 |                                           |</span><br><span class="line">|      | localhost |                                           |</span><br><span class="line">|      | centos1   |                                           |</span><br><span class="line">+------+-----------+-------------------------------------------+</span><br><span class="line"></span><br><span class="line">mysql&gt; DROP user ''@localhost;</span><br><span class="line">Query OK, 0 rows affected (0.00 sec)</span><br><span class="line"></span><br><span class="line">mysql&gt; DROP user ''@centos1;</span><br><span class="line">Query OK, 0 rows affected (0.01 sec)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">mysql&gt; update mysql.user set password=PASSWORD('root') where user='root';</span><br><span class="line">Query OK, 3 rows affected (0.00 sec)</span><br></pre></td></tr></table></figure>
-<p>2、主库上创建复制用户：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; GRANT REPLICATION SLAVE,REPLICATION CLIENT ON *.* TO gechong@'%' IDENTIFIED BY 'gechong';</span><br><span class="line">mysql&gt; flush privileges;</span><br></pre></td></tr></table></figure></p>
-<p>3、修改配置文件：<br>1）主库需改配置文件，在/etc/my.cnf中添加<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">port = 3306</span><br><span class="line">log_bin = /var/lib/mysql/mysql-binlog</span><br><span class="line">server-id = 1 //只要主从不一样就行</span><br><span class="line">binlog_do_db = test//要做同步的数据库名字，可以是多个数据库，之间用分号分割。</span><br><span class="line">\# 忽略mysql系统库复制</span><br><span class="line">binlog-ignore-db=mysql</span><br><span class="line">binlog-ignore-db=information_schema</span><br></pre></td></tr></table></figure></p>
-<p>2）从库的配置文件中添加（/etc/my.cnf）<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">server-id = 2</span><br><span class="line">master-host = 10.4.14.168</span><br><span class="line">master-user = gechong</span><br><span class="line">master-password = gechong</span><br><span class="line">master-port = 3306</span><br><span class="line">master-connect-retry = 5</span><br><span class="line">replicate-<span class="operator"><span class="keyword">do</span>-db = <span class="keyword">test</span></span></span><br></pre></td></tr></table></figure></p>
-<p>然后分别重启mysql服务。</p>
-<p>4、设置从库的同步位置：</p>
-<p>1）查看主库状态：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; show master status;</span><br><span class="line">+---------------------+----------+--------------+--------------------------+</span><br><span class="line">| File                | Position | Binlog_Do_DB | Binlog_Ignore_DB         |</span><br><span class="line">+---------------------+----------+--------------+--------------------------+</span><br><span class="line">| mysql-binlog.000002 |      265 | test         | mysql,information_schema |</span><br><span class="line">+---------------------+----------+--------------+--------------------------+</span><br></pre></td></tr></table></figure><br>记住file和position两项。</p>
-<p>2）从库设置同步日志位置：</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; change master to</span><br><span class="line">&gt; master_host='master_ip',</span><br><span class="line">&gt; master_user='gechong',</span><br><span class="line">&gt; master_password='gechong',</span><br><span class="line">&gt; master_port=3306,</span><br><span class="line">&gt; master_log_file='mysql-binlog.000002',</span><br><span class="line">&gt; master_log_pos=265;</span><br><span class="line">1 row in set (0.00 sec)</span><br></pre></td></tr></table></figure>
-<p>3）从库上启动同步：</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; slave start;</span><br><span class="line">1 row in set (0.00 sec)</span><br></pre></td></tr></table></figure>
-<p>4）从库上查看同步状态：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; show slave status\G</span><br><span class="line">*************************** 1. row ***************************</span><br><span class="line">               Slave_IO_State: Waiting for master to send event</span><br><span class="line">                  Master_Host: 192.168.137.122</span><br><span class="line">                  Master_User: repli</span><br><span class="line">                  Master_Port: 3306</span><br><span class="line">                Connect_Retry: 5</span><br><span class="line">              Master_Log_File: mysql-binlog.000002</span><br><span class="line">          Read_Master_Log_Pos: 265</span><br><span class="line">               Relay_Log_File: mysqld-relay-bin.000005</span><br><span class="line">                Relay_Log_Pos: 413</span><br><span class="line">        Relay_Master_Log_File: mysql-binlog.000002</span><br><span class="line">             Slave_IO_Running: Yes</span><br><span class="line">            Slave_SQL_Running: Yes</span><br><span class="line">              Replicate_Do_DB: test</span><br><span class="line">......</span><br></pre></td></tr></table></figure></p>
-<p>可以看到：Slave_IO_Running | Slave_SQL_Running两个值都是YES，说明配置成功了。</p>
-<p>5、测试：</p>
-<p>在主库上插入数据，在从库上查看插入信息。<em>由于是单向的，所以只能在主库上执行DML操作；在从库上执行查询。</em></p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    server_name website.com;</span><br><span class="line">    location = /abcd &#123;</span><br><span class="line">    […]</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>匹配情况：<br>    <a href="http://website.com/abcd" target="_blank" rel="external">http://website.com/abcd</a>        # 正好完全匹配<br>    <a href="http://website.com/ABCD" target="_blank" rel="external">http://website.com/ABCD</a>        # 如果运行 Nginx server 的系统本身对大小写不敏感，比如 Windows ，那么也匹配<br>    <a href="http://website.com/abcd?param1¶m2" target="_blank" rel="external">http://website.com/abcd?param1¶m2</a>    # 忽略查询串参数（query string arguments），这里就是 /abcd 后面的 ?param1¶m2<br>    <a href="http://website.com/abcd/" target="_blank" rel="external">http://website.com/abcd/</a>    # 不匹配，因为末尾存在反斜杠（trailing slash），Nginx 不认为这种情况是完全匹配<br>    <a href="http://website.com/abcde" target="_blank" rel="external">http://website.com/abcde</a>    # 不匹配，因为不是完全匹配</p>
+<ul>
+<li>(None)<br>可以不写 location modifier ，Nginx 仍然能去匹配 pattern 。这种情况下，匹配那些以指定的 patern 开头的 URI，注意这里的 URI 只能是普通字符串，不能使用正则表达式。</li>
+</ul>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    server_name website.com;</span><br><span class="line">    location /abcd &#123;</span><br><span class="line">    […]</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>匹配情况：<br>    <a href="http://website.com/abcd" target="_blank" rel="external">http://website.com/abcd</a>        # 正好完全匹配<br>    <a href="http://website.com/ABCD" target="_blank" rel="external">http://website.com/ABCD</a>        # 如果运行 Nginx server 的系统本身对大小写不敏感，比如 Windows ，那么也匹配<br>    <a href="http://website.com/abcd?param1¶m2" target="_blank" rel="external">http://website.com/abcd?param1¶m2</a>    # 忽略查询串参数（query string arguments），这里就是 /abcd 后面的 ?param1¶m2<br>    <a href="http://website.com/abcd/" target="_blank" rel="external">http://website.com/abcd/</a>    # 末尾存在反斜杠（trailing slash）也属于匹配范围内<br>    <a href="http://website.com/abcde" target="_blank" rel="external">http://website.com/abcde</a>    # 仍然匹配，因为 URI 是以 pattern 开头的</p>
+<ul>
+<li>~<br>这个 location modifier 对大小写敏感，且 pattern 须是正则表达式</li>
+</ul>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    server_name website.com;</span><br><span class="line">    location ~ ^/abcd$ &#123;</span><br><span class="line">    […]</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>匹配情况：<br>    <a href="http://website.com/abcd" target="_blank" rel="external">http://website.com/abcd</a>        # 完全匹配<br>    <a href="http://website.com/ABCD" target="_blank" rel="external">http://website.com/ABCD</a>        # 不匹配，~ 对大小写是敏感的<br>    <a href="http://website.com/abcd?param1¶m2" target="_blank" rel="external">http://website.com/abcd?param1¶m2</a>    # 忽略查询串参数（query string arguments），这里就是 /abcd 后面的 ?param1¶m2<br>    <a href="http://website.com/abcd/" target="_blank" rel="external">http://website.com/abcd/</a>    # 不匹配，因为末尾存在反斜杠（trailing slash），并不匹配正则表达式 ^/abcd$<br>    <a href="http://website.com/abcde" target="_blank" rel="external">http://website.com/abcde</a>    # 不匹配正则表达式 ^/abcd$</p>
+<p><em>注意：对于一些对大小写不敏感的系统，比如 Windows ，~ 和 ~</em> 都是不起作用的，这主要是操作系统的原因。*</p>
+<ul>
+<li>~*<br>与 ~ 类似，但这个 location modifier 不区分大小写，pattern 须是正则表达式</li>
+</ul>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    server_name website.com;</span><br><span class="line">    location ~* ^/abcd$ &#123;</span><br><span class="line">    […]</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>匹配情况：<br>    <a href="http://website.com/abcd" target="_blank" rel="external">http://website.com/abcd</a>        # 完全匹配<br>    <a href="http://website.com/ABCD" target="_blank" rel="external">http://website.com/ABCD</a>        # 匹配，这就是它不区分大小写的特性<br>    <a href="http://website.com/abcd?param1¶m2" target="_blank" rel="external">http://website.com/abcd?param1¶m2</a>    # 忽略查询串参数（query string arguments），这里就是 /abcd 后面的 ?param1¶m2<br>    <a href="http://website.com/abcd/" target="_blank" rel="external">http://website.com/abcd/</a>    # 不匹配，因为末尾存在反斜杠（trailing slash），并不匹配正则表达式 ^/abcd$<br>    <a href="http://website.com/abcde" target="_blank" rel="external">http://website.com/abcde</a>    # 不匹配正则表达式 ^/abcd$</p>
+<ul>
+<li><p>^~<br>匹配情况类似 2. (None) 的情况，以指定匹配模式开头的 URI 被匹配，不同的是，一旦匹配成功，那么 Nginx 就停止去寻找其他的 Location 块进行匹配了（与 Location 匹配顺序有关）</p>
+</li>
+<li><p>@<br>用于定义一个 Location 块，且该块不能被外部 Client 所访问，只能被 Nginx 内部配置指令所访问，比如 try_files or error_page</p>
+</li>
+</ul>
+<p>3）搜索顺序以及生效优先级：</p>
+<p>因为可以定义多个 Location 块，每个 Location 块可以有各自的 pattern 。因此就需要明白（不管是 Nginx 还是你），当 Nginx 收到一个请求时，它是如何去匹配 URI 并找到合适的 Location 的。<br>要注意的是，写在配置文件中每个 Server 块中的 Location 块的次序是不重要的，Nginx 会按 location modifier 的优先级来依次用 URI 去匹配 pattern ，顺序如下：</p>
+<blockquote>
+<p>1、 =<br>2、 (None)    如果 pattern 完全匹配 URI（不是只匹配 URI 的头部）<br>3、 ^~<br>4、 ~ 或 ~*<br>5、 (None)    pattern 匹配 URI 的头部</p>
+</blockquote>
+<p>2、nginx 一些全局配置项含义：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">#配置用户和用户组</span><br><span class="line">user www www;</span><br><span class="line">#工作进程数，建议设置为CPU的总核数</span><br><span class="line">worker_processes  2;</span><br><span class="line">#全局错误日志定义类型，日志等级从低到高依次为： debug | info | notice | warn | error | crit</span><br><span class="line">error_log  logs/error.log  info;</span><br><span class="line">#记录主进程ID的文件</span><br><span class="line">pid  /usr/local/nginx/nginx.pid;</span><br><span class="line">#一个进程能打开的文件描述符最大值，理论上该值因该是最多能打开的文件数除以进程数。但是由于nginx负载并不是完全均衡的，</span><br><span class="line">#所以这个值最好等于最多能打开的文件数。执行 sysctl -a | grep fs.file 可以看到linux文件描述符。</span><br><span class="line">worker_rlimit_nofile 65535;</span><br><span class="line">#工作模式与连接数上限</span><br><span class="line">events &#123;</span><br><span class="line">    #工作模式，linux2.6版本以上用epoll</span><br><span class="line">    use epoll;</span><br><span class="line">    #单个进程允许的最大连接数</span><br><span class="line">    worker_connections  65535;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 </span>
       
     </div>
@@ -292,9 +350,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/mysql/" rel="tag">#mysql</a>
-          
-            <a href="/tags/集群/" rel="tag">#集群</a>
+            <a href="/tags/nginx/" rel="tag">#nginx</a>
           
         </div>
       
@@ -303,13 +359,13 @@
         <div class="post-nav">
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2015/10/26/mysql-replication-master-master/" rel="prev">Mysql 主主复制</a>
+              <a href="/2015/10/28/nginx-visual-server/" rel="prev">nginx虚拟主机搭建</a>
             
           </div>
 
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2015/10/25/keepalived-example-1/" rel="next">keepalived 实战</a>
+              <a href="/2015/10/26/mysql-replication-master-master/" rel="next">Mysql 主主复制</a>
             
           </div>
         </div>
@@ -324,10 +380,10 @@
 
     <div class="post-spread">
       
-        <div class="ds-share flat" data-thread-key="2015/10/26/mysql-replication-master-slave/"
-     data-title="Mysql 主从复制"
+        <div class="ds-share flat" data-thread-key="2015/10/28/nginx-install-config/"
+     data-title="nginx安装、配置（linux下）"
      data-content=""
-     data-url="http://yoursite.com/2015/10/26/mysql-replication-master-slave/">
+     data-url="http://yoursite.com/2015/10/28/nginx-install-config/">
   <div class="ds-share-inline">
     <ul  class="ds-share-icons-16">
 
@@ -353,8 +409,8 @@
         
           <div class="comments" id="comments">
             
-              <div class="ds-thread" data-thread-key="2015/10/26/mysql-replication-master-slave/"
-                   data-title="Mysql 主从复制" data-url="http://yoursite.com/2015/10/26/mysql-replication-master-slave/">
+              <div class="ds-thread" data-thread-key="2015/10/28/nginx-install-config/"
+                   data-title="nginx安装、配置（linux下）" data-url="http://yoursite.com/2015/10/28/nginx-install-config/">
               </div>
             
           </div>
@@ -465,7 +521,7 @@
           <div class="post-toc">
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#主从复制原理："><span class="nav-number">1.</span> <span class="nav-text">主从复制原理：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#主从复制配置："><span class="nav-number">2.</span> <span class="nav-text">主从复制配置：</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#安装"><span class="nav-number">1.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置"><span class="nav-number">2.</span> <span class="nav-text">配置</span></a></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator"></div>
