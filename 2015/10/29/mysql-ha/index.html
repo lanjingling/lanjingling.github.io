@@ -30,7 +30,7 @@
 
 
 
-  <meta name="keywords" content="hexo,markdown," />
+  <meta name="keywords" content="mysql,集群,高可用," />
 
 
 
@@ -39,17 +39,19 @@
   <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.1" />
 
 
-<meta name="description" content="上文介绍了如何配置个性化的hexo、以及配置next主题，本节主要介绍如何使用hexo发布新文章，以及一些常用的使用技巧（不错的markdown在线编辑器、图床等）...">
+<meta name="description" content="本文主要介绍mysql高可用的几种常见架构：集群、基于复制的思想（主主、主从）">
 <meta property="og:type" content="article">
-<meta property="og:title" content="hexo使用心得（二）">
-<meta property="og:url" content="http://yoursite.com/2015/09/24/use-of-hexo-2/index.html">
+<meta property="og:title" content="mysql 高可用（HA）">
+<meta property="og:url" content="http://yoursite.com/2015/10/29/mysql-ha/index.html">
 <meta property="og:site_name" content="晓的技术博客">
-<meta property="og:description" content="上文介绍了如何配置个性化的hexo、以及配置next主题，本节主要介绍如何使用hexo发布新文章，以及一些常用的使用技巧（不错的markdown在线编辑器、图床等）...">
-<meta property="og:image" content="http://ww3.sinaimg.cn/large/72c913fbgw1ewdoaj5kggj207r0243yg.jpg">
-<meta property="og:updated_time" content="2015-09-24T09:39:31.051Z">
+<meta property="og:description" content="本文主要介绍mysql高可用的几种常见架构：集群、基于复制的思想（主主、主从）">
+<meta property="og:image" content="http://ww1.sinaimg.cn/mw690/72c913fbjw1exhv53wam8j20l00czdh9.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/mw690/72c913fbjw1exhxt6kybkj20b7071gls.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/mw690/72c913fbjw1exhy8uodfnj20dn08nglz.jpg">
+<meta property="og:updated_time" content="2015-10-29T05:40:32.722Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="hexo使用心得（二）">
-<meta name="twitter:description" content="上文介绍了如何配置个性化的hexo、以及配置next主题，本节主要介绍如何使用hexo发布新文章，以及一些常用的使用技巧（不错的markdown在线编辑器、图床等）...">
+<meta name="twitter:title" content="mysql 高可用（HA）">
+<meta name="twitter:description" content="本文主要介绍mysql高可用的几种常见架构：集群、基于复制的思想（主主、主从）">
 
 
 <script type="text/javascript" id="hexo.configuration">
@@ -59,7 +61,7 @@
   };
 </script>
 
-  <title> hexo使用心得（二） | 晓的技术博客 </title>
+  <title> mysql 高可用（HA） | 晓的技术博客 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -205,7 +207,7 @@
           
           
             
-              hexo使用心得（二）
+              mysql 高可用（HA）
             
           
         </h1>
@@ -214,8 +216,8 @@
       <div class="post-meta">
         <span class="post-time">
           发表于
-          <time itemprop="dateCreated" datetime="2015-09-24T15:26:59+08:00" content="2015-09-24">
-            2015-09-24
+          <time itemprop="dateCreated" datetime="2015-10-29T11:26:03+08:00" content="2015-10-29">
+            2015-10-29
           </time>
         </span>
 
@@ -224,8 +226,8 @@
             &nbsp; | &nbsp; 分类于
             
               <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                <a href="/categories/hexo/" itemprop="url" rel="index">
-                  <span itemprop="name">hexo</span>
+                <a href="/categories/mysql/" itemprop="url" rel="index">
+                  <span itemprop="name">mysql</span>
                 </a>
               </span>
 
@@ -240,8 +242,8 @@
           
             <span class="post-comments-count">
               &nbsp; | &nbsp;
-              <a href="/2015/09/24/use-of-hexo-2/#comments" itemprop="discussionUrl">
-                <span class="post-comments-count ds-thread-count" data-thread-key="2015/09/24/use-of-hexo-2/" itemprop="commentsCount"></span>
+              <a href="/2015/10/29/mysql-ha/#comments" itemprop="discussionUrl">
+                <span class="post-comments-count ds-thread-count" data-thread-key="2015/10/29/mysql-ha/" itemprop="commentsCount"></span>
               </a>
             </span>
           
@@ -255,62 +257,58 @@
       
 
       
-        <span itemprop="articleBody"><p>上文介绍了如何配置个性化的hexo、以及配置next主题，本节主要介绍如何使用hexo发布新文章，以及一些常用的使用技巧（不错的markdown在线编辑器、图床等）…</p>
-<h2 id="发布新文章">发布新文章</h2><p>执行new命令，生成指定名称的文章至hexo\source_posts\postName.md。<br><code>hexo new [layout] &quot;postName&quot; #新建文章</code></p>
-<p>其中layout是可选参数，默认值为post。有哪些layout呢，请到scaffolds目录下查看，这些文件名称就是layout名称。当然你可以添加自己的layout，方法就是添加一个文件即可，同时你也可以编辑现有的layout，比如post的layout默认是hexo\scaffolds\post.md</p>
-<p>然后，使用文本编辑器打来postName.md，文件的开头是属性，采用统一的yaml格式，用三条短横线分隔。下面是文章正文。<br>可以直接修改title（标题名字）、date（时间）等。description是文章概要，该项为空时hexo默认在首页会显示全部文章内容，如果文章比较长就会显的内容很乱；写让该项后hexo会显示摘要和“阅读全文”连接。</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">title: postName #文章页面上的显示名称，可以任意修改，不会出现在URL中</span><br><span class="line">date: 2013-12-02 15:30:16 #文章生成时间，一般不改，当然也可以任意修改</span><br><span class="line">categories: #文章分类目录，可以为空，注意:后面有个空格</span><br><span class="line">tags: #文章标签，可空，多标签请用格式[tag1,tag2,tag3]，注意:后面有个空格</span><br><span class="line">description: #概要信息</span><br><span class="line">---</span><br><span class="line">这里开始使用markdown格式输入你的正文。</span><br></pre></td></tr></table></figure>
-<p><strong><font color="red">注意:</font></strong> 所有文件：后面都必须有个空格，不然会报错。</p>
-<p>接下来，你就可以选择一款自己熟练的markdown编辑器写文章，然后把内容粘贴到paostName.md中。这里推荐一个不错的在线markdown编辑器<a href="https://www.zybuluo.com" target="_blank" rel="external">Cmd Markdown</a>,作业部落产品的。</p>
-<p><a href="http://ibruce.info/2013/11/22/hexo-your-blog/" target="_blank" rel="external">这里</a>是一个不错的hexo使用教程文章。</p>
-<h2 id="其他方面">其他方面</h2><h3 id="草稿">草稿</h3><p>草稿相当于很多博客都有的“私密文章”功能。使用如下命令创建：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new draft "new draft"</span><br></pre></td></tr></table></figure></p>
-<p>会在source/_drafts目录下生成一个new-draft.md文件。但是这个文件不被显示在页面上，链接也访问不到。也就是说如果你想把某一篇文章移除显示，又不舍得删除，可以把它移动到_drafts目录之中。</p>
-<p>如果你希望强行预览草稿，更改配置文件（_config.yml）：<br><code>render_drafts: true</code><br>或者如下方式启动server：<br><code>$ hexo server --drafts</code></p>
-<p>下面这条命令可以把草稿变成文章，或者页面：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo publish [layout] <span class="tag">&lt;<span class="title">filename</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
-<h3 id="图床">图床</h3><p>如果想在文章中显示一副图片，再考虑到博客的速度，同时也为了便于博客的迁移，那么图床是必须的。（所谓图床，就是可以保存图片，同时允许使用图片外链）现在有很多免费的图床服务器，例如：七牛、新浪微博。我的博客使用的是新浪微博作为图床，这里简单介绍一下：</p>
+        <span itemprop="articleBody"><p>1、Mysql 高可用（HA）的架构大致可以分成：</p>
+<ol>
+<li><strong><em>集群</em></strong>：多台主机一起工作，各自运行一个或几个服务，各为服务定义一个或多个备用主机，当某个主机故障时，运行在其上的服务就可以被其它主机接管；</li>
+<li><strong><em>基于复制的方式</em></strong>：主要思想是通过mysql的二进制日志进行主-从、主-主同步，不同主机之间通过keepalived或者heartbeat软件进行双机热备。当有一台机器发生故障，keepalived（或者heartbeat）会自动切换到备机继续提供服务。这种方式、又分为以下两种：</li>
+</ol>
 <ul>
-<li>进入新浪微博的微相册 ：<a href="http://photo.weibo.com" target="_blank" rel="external">http://photo.weibo.com</a></li>
-<li>上传图片，然后把图片拖到浏览器地址栏查看连接。新浪微博的图片会上传到ww1-ww4几台服务器上，同时会生成几张不同尺寸的图片，常用的有以下几种形式：<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">http://ww1.sinaimg.cn/thumbnail/6ee58152gw1dxmhny2ga3j.jpg （缩略图）</span><br><span class="line">http://ww1.sinaimg.cn/small/6ee58152gw1dxmhny2ga3j.jpg （稍微大点的图）</span><br><span class="line">http://ww1.sinaimg.cn/bmiddle/6ee58152gw1dxmhny2ga3j.jpg （再大点的图）</span><br><span class="line">http://ww1.sinaimg.cn/large/6ee58152gw1dxmhny2ga3j.jpg（最大的）</span><br></pre></td></tr></table></figure>
-</li>
+<li>主备方式：主机工作，备机处于监控准备状况；当主机宕机时，备机接管主机的一切工作。通常用作读写分离（单点写入），由于主备方式中的复制往往都是单向的，所以在备机上的写入操作无法复制到主机；</li>
+<li>主主方式：两台主机同时运行各自的服务工作且相互监测情况，当任一台主机宕机时，另一台主机立即接管它的一切工作，待主机恢复正常后，按使用者的设定以自动或手动方式将服务切换到主机上运行；</li>
 </ul>
-<h3 id="markdown语法">markdown语法</h3><p>下面介绍你种常用的语法，详细使用请参照后面的几个连接。</p>
-<p><strong>1、标题：</strong></p>
+<p><em>注：</em>为了保证数据的一致性，所以即使是主-主方式，通常也是单点写入，另一台主机作为备机。</p>
+<p>2、脑裂：</p>
+<p>1）什么是脑裂？</p>
+<p>在心跳失效的时候，就发生了脑裂（split-brain）。 </p>
+<p> 一种常见的脑裂情况可以描述如下，比如正常情况下，（集群中的）NodeA 和 NodeB 会通过心跳检测以确认对方存在，在通过心跳检测确认不到对方存在时，就接管对应的（共享） resource 。如果突然间，NodeA 和 NodeB 之间的心跳不存在了（如网络断开），而 NodeA 和 NodeB 事实上却都处于 Active 状态，此时 NodeA 要接管 NodeB 的 resource ，同时 NodeB 要接管 NodeA 的 resource ，这时就是脑裂（split-brain）。 </p>
+<p>2）影响：<br>脑裂（split-brain）会 引起数据的不完整性 ，并且可能会 对服务造成严重影响 。这时由于，集群中节点（在脑裂期间）同时访问同一共享资源，而此时并没有锁机制来控制针对该数据访问（都脑裂了，咋控制哩），那么就存在数据的不完整性的可能。</p>
+<p>3）解决方法：</p>
+<ul>
+<li>添加冗余的心跳线。例如双“心跳线”。尽量减少“裂脑”发生机会。</li>
+<li>启用磁盘锁。</li>
+<li>设置仲裁机制。</li>
+</ul>
+<h2 id="mysql_集群（cluster）">mysql 集群（cluster）</h2><p>MySQL Cluster实际上是在无共享存储设备（Shared Nothing）的情况下实现的一种完全分布式数据库系统，其主要通过 NDBCluster（简称NDB）存储引擎来实现。</p>
+<p>MySQL Cluster 由一组计算机构成，每台计算机上均运行着多种进程，包括MySQL服务器，NDB Cluster 的数据节点，管理服务器，以及（可能）专门的数据访问程序。关于 Cluster 中这些组件的关系，请参见下图：<br><img src="http://ww1.sinaimg.cn/mw690/72c913fbjw1exhv53wam8j20l00czdh9.jpg" alt=""></p>
+<p>虽然Mysql Cluster一直再不断的改进，但由于种种原因，一直在业界没有流行起来。</p>
+<h2 id="基于复制的高可用">基于复制的高可用</h2><p>1、主从复制+keepalived</p>
+<p>描述：两台主机搭建了一个mysql主从复制的环境；两台机器分别安装了keepalived，用一个虚IP（VIP）实现mysql服务器的主备自动切换功能。当master宕掉后，keepalived会自动接管这个VIP，使用slave继续提供服务。在这样的集群中，Master对外提供全部的服务，Slave处于备份状态。</p>
+<p><img src="http://ww1.sinaimg.cn/mw690/72c913fbjw1exhxt6kybkj20b7071gls.jpg" alt=""></p>
+<ul>
+<li>优点：简单、可以提供一致性；</li>
+<li>缺点：只有一台机器提供服务；切换到slave后，在其上面的写入操作无法同步回master</li>
+</ul>
+<p>配置过程如下：（70为master、slavery为slave、199为VIP）</p>
+<p>1）在70、80两台机子上部署mysql主从复制。<a href="http://lanjingling.github.io/2015/10/26/mysql-replication-master-slave/" target="_blank" rel="external">详情见这里</a></p>
+<p>2）安装keepalived。<a href="http://lanjingling.github.io/2015/10/25/linux-keepalived/" target="_blank" rel="external">详情见这里</a></p>
+<p>3）配置keepalived文件：<br>在master（70）上的vim /etc/keepalived/keepalived.conf<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">! Configuration File for keepalived</span><br><span class="line">global_defs &#123;</span><br><span class="line">    router_id HA_MySQL</span><br><span class="line">&#125;</span><br><span class="line">vrrp_instance VI_1 &#123;</span><br><span class="line">     state BACKUP</span><br><span class="line">     interface eth0</span><br><span class="line">     virtual_router_id 51</span><br><span class="line">     priority 100</span><br><span class="line">     advert_int 1</span><br><span class="line">     nopreempt</span><br><span class="line">     authentication &#123;</span><br><span class="line">         auth_type PASS</span><br><span class="line">         auth_pass 1111</span><br><span class="line">     &#125;</span><br><span class="line">     virtual_ipaddress &#123;</span><br><span class="line">         192.168.1.199</span><br><span class="line">     &#125;</span><br><span class="line">&#125;</span><br><span class="line">virtual_server 192.168.1.199 3306 &#123;</span><br><span class="line">     delay_loop 2</span><br><span class="line">     lb_algo wrr</span><br><span class="line">     lb_kind DR</span><br><span class="line">     persistence_timeout 60</span><br><span class="line">     protocol TCP</span><br><span class="line">     real_server 192.168.1.70 3306 &#123;</span><br><span class="line">         weight 3</span><br><span class="line">         notify_down /root/shutdown.sh</span><br><span class="line">         TCP_CHECK &#123;</span><br><span class="line">             connect_timeout 10</span><br><span class="line">             nb_get_retry 3</span><br><span class="line">             delay_before_retry 3</span><br><span class="line">             connect_port 3306</span><br><span class="line">         &#125; </span><br><span class="line">     &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>在slave（80）上vim /etc/keepalived/keepalived.conf</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">! Configuration File for keepalived</span><br><span class="line">global_defs &#123;</span><br><span class="line">     router_id HA_MySQL</span><br><span class="line">&#125;</span><br><span class="line">vrrp_instance VI_1 &#123;</span><br><span class="line">     state BACKUP</span><br><span class="line">     interface eth0</span><br><span class="line">     virtual_router_id 51</span><br><span class="line">     priority 90</span><br><span class="line">     advert_int 1</span><br><span class="line">     nopreempt</span><br><span class="line">     authentication &#123;</span><br><span class="line">         auth_type PASS</span><br><span class="line">         auth_pass 1111</span><br><span class="line">     &#125;</span><br><span class="line">     virtual_ipaddress &#123;</span><br><span class="line">         192.168.1.199</span><br><span class="line">     &#125;</span><br><span class="line">&#125;</span><br><span class="line">virtual_server 192.168.1.199 3306 &#123;</span><br><span class="line">     delay_loop 2</span><br><span class="line">     lb_algo wrr</span><br><span class="line">     lb_kind DR</span><br><span class="line">     persistence_timeout 60</span><br><span class="line">     protocol TCP</span><br><span class="line">     real_server 192.168.1.80 3306 &#123;</span><br><span class="line">         weight 3</span><br><span class="line">         notify_down /root/shutdown.sh</span><br><span class="line">         TCP_CHECK &#123;</span><br><span class="line">             connect_timeout 10</span><br><span class="line">             nb_get_retry 3</span><br><span class="line">             delay_before_retry 3</span><br><span class="line">             connect_port 3306</span><br><span class="line">         &#125;</span><br><span class="line">     &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>4）shutdown.sh 文件：<br>可以考虑加入邮件告警的功能:<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">#!/bin/bash</span><br><span class="line">pkill keepalived</span><br></pre></td></tr></table></figure></p>
+<p>5）在master、slave分别启动mysql和keepalived：</p>
 <blockquote>
-<p># 一级标题<br>## 二级标题<br>### 三级标题<br>#### 四级标题<br>##### 五级标题<br>###### 六级标题</p>
+<p>service mysql start<br>service keepalived start</p>
 </blockquote>
-<p><strong>2、列表：</strong><br>无语列表：</p>
-<blockquote>
-<p>- 文本1<br>- 文本2<br>- 文本3</p>
-</blockquote>
-<p>有序列表：</p>
-<blockquote>
-<ol>
-<li>文本1</li>
-<li>文本2</li>
-<li>文本3</li>
-</ol>
-</blockquote>
-<p><strong>3、超链接：</strong></p>
-<blockquote>
-<p><code>[晓的技术博客](http://lanjingling.github.io/)</code></p>
-</blockquote>
-<p><strong>4、图片：</strong></p>
-<blockquote>
-<p><code>![](http://ww4.sinaimg.cn/bmiddle/aa397b7fjw1dzplsgpdw5j.jpg)</code></p>
-</blockquote>
-<p><strong>5、引用：</strong><br>Markdown 中，你只需要在你希望引用的文字前面加上 &gt; 就好了</p>
-<p><strong>6、转义：</strong><br>Markdown中的转义字符为\，可以转义的有：</p>
-<blockquote>
-<p>\\ 反斜杠<br>\` 反引号<br>\* 星号<br>\_ 下划线<br>\{} 大括号<br>\[] 中括号<br>\() 小括号<br>\# 井号<br>\+ 加号<br>\- 减号<br>\. 英文句号<br>\! 感叹号</p>
-</blockquote>
-<p>此外，对于一些markdown中有意义的语法（如图片语法），要转移的化需要使用反引号“`”括起来。例如（`<code>[晓的技术博客](http://lanjingling.github.io/)</code>`）</p>
-<p>在论坛上又看到了一个无敌转移方法，使用如下方式:<br><img src="http://ww3.sinaimg.cn/large/72c913fbgw1ewdoaj5kggj207r0243yg.jpg" alt=""></p>
-<p><strong>7、图表、流程图</strong><br>见<a href="https://www.zybuluo.com/mdeditor#180745" target="_blank" rel="external">这里</a></p>
-<p><strong>8、其他语法见如下连接：</strong></p>
-<ol>
-<li><a href="http://www.jianshu.com/p/q81RER" target="_blank" rel="external">简书：献给写作者的 Markdown 新手指南</a></li>
-<li><a href="http://wowubuntu.com/markdown/#p" target="_blank" rel="external">官方文档(中文版)：Markdown 语法说明</a></li>
-</ol>
+<p>6)测试：</p>
+<p>在master上kiil mysql后，keepalived检测到3306端口无法通信后会自杀（通过shutdown.sh实现）。然后slave上的keepalived会自动接管VIP，提供服务。</p>
+<p>2、主备方式+DRBD：</p>
+<p>这种架构同上，也是单点写入；唯一的区别是使用了<a href="http://lanjingling.github.io/2015/10/14/linux-drbd/" target="_blank" rel="external">DRBD</a>代替了主从复制。</p>
+<p>3、主-主复制 单点写入+keepalived：</p>
+<p>同方式1，也是单点写入。区别是mysql的主从复制改为了主-主复制。</p>
+<p>4、MMM高可用方案：</p>
+<p>MMM即Master-Master Replication Manager for MySQL（mysql主主复制管理器）关于mysql主主复制配置的监控、故障转移和管理的一套可伸缩的脚本套件（在任何时候只有一个节点可以被写入），这个套件也能对居于标准的主从配置的任意数量的从服务器进行读负载均衡，所以你可以用它来在一组居于复制的服务器启动虚拟ip，除此之外，它还有实现数据备份、节点之间重新同步功能的脚本。</p>
+<p>MySQL本身没有提供replication failover的解决方案，通过MMM方案能实现服务器的故障转移，从而实现mysql的高可用。MMM不仅能提供浮动IP的功能，更可贵的是如果当前的主服务器挂掉后，会将你后端的从服务器自动转向新的主服务器进行同步复制，不用手工更改同步配置。这个方案是目前比较成熟的解决方案。</p>
+<p><img src="http://ww1.sinaimg.cn/mw690/72c913fbjw1exhy8uodfnj20dn08nglz.jpg" alt=""></p>
 </span>
       
     </div>
@@ -319,9 +317,11 @@
       
         <div class="post-tags">
           
-            <a href="/tags/hexo/" rel="tag">#hexo</a>
+            <a href="/tags/mysql/" rel="tag">#mysql</a>
           
-            <a href="/tags/markdown/" rel="tag">#markdown</a>
+            <a href="/tags/集群/" rel="tag">#集群</a>
+          
+            <a href="/tags/高可用/" rel="tag">#高可用</a>
           
         </div>
       
@@ -330,13 +330,11 @@
         <div class="post-nav">
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2015/09/24/use-of-markdown-1/" rel="prev">markdown 高亮代码</a>
-            
           </div>
 
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2015/09/24/ues-of-hexo-1/" rel="next">hexo使用心得（一）</a>
+              <a href="/2015/10/28/nginx-tomcat-cluster/" rel="next">nginx tomcat集群</a>
             
           </div>
         </div>
@@ -351,10 +349,10 @@
 
     <div class="post-spread">
       
-        <div class="ds-share flat" data-thread-key="2015/09/24/use-of-hexo-2/"
-     data-title="hexo使用心得（二）"
+        <div class="ds-share flat" data-thread-key="2015/10/29/mysql-ha/"
+     data-title="mysql 高可用（HA）"
      data-content=""
-     data-url="http://yoursite.com/2015/09/24/use-of-hexo-2/">
+     data-url="http://yoursite.com/2015/10/29/mysql-ha/">
   <div class="ds-share-inline">
     <ul  class="ds-share-icons-16">
 
@@ -380,8 +378,8 @@
         
           <div class="comments" id="comments">
             
-              <div class="ds-thread" data-thread-key="2015/09/24/use-of-hexo-2/"
-                   data-title="hexo使用心得（二）" data-url="http://yoursite.com/2015/09/24/use-of-hexo-2/">
+              <div class="ds-thread" data-thread-key="2015/10/29/mysql-ha/"
+                   data-title="mysql 高可用（HA）" data-url="http://yoursite.com/2015/10/29/mysql-ha/">
               </div>
             
           </div>
@@ -492,7 +490,7 @@
           <div class="post-toc">
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#发布新文章"><span class="nav-number">1.</span> <span class="nav-text">发布新文章</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其他方面"><span class="nav-number">2.</span> <span class="nav-text">其他方面</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#草稿"><span class="nav-number">2.1.</span> <span class="nav-text">草稿</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#图床"><span class="nav-number">2.2.</span> <span class="nav-text">图床</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#markdown语法"><span class="nav-number">2.3.</span> <span class="nav-text">markdown语法</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#mysql_集群（cluster）"><span class="nav-number">1.</span> <span class="nav-text">mysql 集群（cluster）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#基于复制的高可用"><span class="nav-number">2.</span> <span class="nav-text">基于复制的高可用</span></a></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator"></div>
