@@ -30,7 +30,7 @@
 
 
 
-  <meta name="keywords" content="markdown," />
+  <meta name="keywords" content="nosql,redis," />
 
 
 
@@ -39,16 +39,16 @@
   <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.1" />
 
 
-<meta name="description" content="上文介绍了一些关于markdown的简单教程，本节主要针对hexo上代码高亮的一些配置...">
+<meta name="description" content="redis支持两种持久化方案：RDB和AOF。本文着重对其实现原理尽心分析。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="markdown 高亮代码">
-<meta property="og:url" content="http://yoursite.com/2015/09/24/use-of-markdown-1/index.html">
+<meta property="og:title" content="redis持久化——RDB、AOF">
+<meta property="og:url" content="http://yoursite.com/2015/11/16/redis-chijiuhua/index.html">
 <meta property="og:site_name" content="晓的技术博客">
-<meta property="og:description" content="上文介绍了一些关于markdown的简单教程，本节主要针对hexo上代码高亮的一些配置...">
-<meta property="og:updated_time" content="2015-09-24T09:27:46.927Z">
+<meta property="og:description" content="redis支持两种持久化方案：RDB和AOF。本文着重对其实现原理尽心分析。">
+<meta property="og:updated_time" content="2015-11-16T08:13:06.064Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="markdown 高亮代码">
-<meta name="twitter:description" content="上文介绍了一些关于markdown的简单教程，本节主要针对hexo上代码高亮的一些配置...">
+<meta name="twitter:title" content="redis持久化——RDB、AOF">
+<meta name="twitter:description" content="redis支持两种持久化方案：RDB和AOF。本文着重对其实现原理尽心分析。">
 
 
 <script type="text/javascript" id="hexo.configuration">
@@ -58,7 +58,7 @@
   };
 </script>
 
-  <title> markdown 高亮代码 | 晓的技术博客 </title>
+  <title> redis持久化——RDB、AOF | 晓的技术博客 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -204,7 +204,7 @@
           
           
             
-              markdown 高亮代码
+              redis持久化——RDB、AOF
             
           
         </h1>
@@ -213,8 +213,8 @@
       <div class="post-meta">
         <span class="post-time">
           发表于
-          <time itemprop="dateCreated" datetime="2015-09-24T17:07:45+08:00" content="2015-09-24">
-            2015-09-24
+          <time itemprop="dateCreated" datetime="2015-11-16T13:58:59+08:00" content="2015-11-16">
+            2015-11-16
           </time>
         </span>
 
@@ -223,8 +223,8 @@
             &nbsp; | &nbsp; 分类于
             
               <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                <a href="/categories/hexo/" itemprop="url" rel="index">
-                  <span itemprop="name">hexo</span>
+                <a href="/categories/redis/" itemprop="url" rel="index">
+                  <span itemprop="name">redis</span>
                 </a>
               </span>
 
@@ -239,8 +239,8 @@
           
             <span class="post-comments-count">
               &nbsp; | &nbsp;
-              <a href="/2015/09/24/use-of-markdown-1/#comments" itemprop="discussionUrl">
-                <span class="post-comments-count ds-thread-count" data-thread-key="2015/09/24/use-of-markdown-1/" itemprop="commentsCount"></span>
+              <a href="/2015/11/16/redis-chijiuhua/#comments" itemprop="discussionUrl">
+                <span class="post-comments-count ds-thread-count" data-thread-key="2015/11/16/redis-chijiuhua/" itemprop="commentsCount"></span>
               </a>
             </span>
           
@@ -254,28 +254,91 @@
       
 
       
-        <span itemprop="articleBody"><p>在hexo上写了几篇文章后，发现使用markdown的“`”语法插入代码后， 代码区域没有高亮、而且没有行号。。。郁闷，google了一下发现<a href="http://heckaitor.github.io/2014/04/10/hexo-markdown-code-highlight/" target="_blank" rel="external">这篇文章</a>里有解决方法，现在记录一下。</p>
-<p>常用的“`”来框起一个单词或短句，Markdown最终会转化成<code>&lt;pre&gt;&lt;/pre&gt;</code>或<code>&lt;code&gt;&lt;/code&gt;</code>对于成段的代码块，使用这种方式后代码区域显示出来的没有语法高亮，也没有行号，一点美感都没有，查询<a href="http://octopress.org/docs/plugins/codeblock/" target="_blank" rel="external">Markdown</a>语法，发现了另外一种格式：</p>
+        <span itemprop="articleBody"><p>redis支持两种持久化方案：RDB和AOF。</p>
+<h2 id="RDB">RDB</h2><p>RDB持久化是redis默认的，用来生成某一个时间点的数据快照；RDB是一个经过压缩的二进制文件，采用RDB持久化时服务器只会保存一个RDB文件（维护比较简单）；</p>
+<ul>
+<li>每次进行RDB持久化时，redis都是将内存中完成的数据写到文件中，<em>不是增量的持久化（写脏数据）</em>；</li>
+<li>写RDB文件时，<em>先把内存中数据写到临时文件，然后替换原来的RDB文件；</em></li>
+</ul>
+<p>1、RDB文件的生成：<br>RDB持久化可以手动执行，也可以按照服务器的配置定期执行。<br>1）save和bgsave命令：（手动用于生成RDB文件的命令）</p>
+<ul>
+<li>save：会阻塞redis服务器进程，直到创建RDB文件完毕为止；（在此期间进程不能处理任何请求）</li>
+<li>bgsave：fork一个子进程来创建RDB文件，父进程可以继续处理命令请求；</li>
+</ul>
+<p>2）自动执行：<br>redis服务器允许用户通过设置配置文件save选项，让服务器每隔一段时间自动执行一次<em>bgsave命令</em>。如下：配置文件中的save选项<br>save 900 1<br>save 300 10<br>save 60 10000</p>
+<p>服务器内部维护了一个dirty计数器和lastsave属性：</p>
+<ul>
+<li>dirty：记录了距上次成功执行了save或bgsave命令之后，数据库修改的次数（写入、删除、更新等）；</li>
+<li>lastsave：unix时间戳，记录了上一次成功执行save或bgsave命令的时间；</li>
+</ul>
+<p>redis服务器的周期性操作函数serverCron默认<font color="red">每100毫秒执行一次</font>，该函数的一个主要作用就是检查save选项所设置的保存条件是否满足，如果满足就执行bgsave命令。检查的过程：根据系统当前时间、dirty和lastsave属性的值来检验保存条件是否满足。</p>
+<p>补充：</p>
+<ul>
+<li>在执行bgsave期间，客户端发送的save、bgsave命令会被服务器拒绝执行（防止产生竞争）；</li>
+<li>如果bgsave在执行，bgrewriteaof命令会被延迟到bgsave执行完毕后再执行；</li>
+<li>如果bgrewriteaof在执行，bgsave命令也会被延迟到bgrewriteaof命令执行完毕后再执行（bgsave和bgrewriteaof都是通过子进程完成的，不存在冲突，主要是考虑性能）；</li>
+</ul>
+<p>2、RDB文件的载入：</p>
+<ul>
+<li>redis并没有专门的命令去载入RDB文件，只有在服务器启动的时候检测到RDB文件存在就会自动执行载入。</li>
+<li>如果redis启用了AOF持久化功能，那么服务器优先使用AOF文件还原数据。</li>
+<li>当服务器载入RDB文件时，会一直处于阻塞状态，直到载入完毕为止。</li>
+<li>载入时RDB文件时,系统会自动检查、如果是过期键不会加载到数据库中。</li>
+</ul>
+<p>3、其他：<br>1）redis会根据配置文件中rdbcompression属性决定保存RDB文件时是否进行压缩存储（默认为yes），如果打开了压缩功能，redis会判断字符串长度&gt;=20字节则压缩，否则不压缩存储；<br>2）redis自带了RDB文件检查工具redis-check-dump；<br>3）使用od命令打印RDB文件：[root@centOS1 dir]# od -oc dump.rdb<br>4）RDB文件名通过配置文件dbfilename dump.rdb指定，存放位置通过配置文件dir /var/lib/redis/ 指定；</p>
+<h2 id="AOF">AOF</h2><p>有上面分析可知：RDB方式持久化的颗粒比较大，当服务器宕机时，到上次save或bgsave后的所有数据都会丢失。而AOF的持久化颗粒比较细，当服务器宕机后，只有宕机之前没来得AOF的操作数据会丢失。</p>
+<p>1、AOF实现：</p>
+<p>1）AOF持久化是通过保存redis服务器所执行的写命令来记录数据库状态的；被写入AOF文件的所有命令都是以Redis的命令请求协议格式保存的<font color="red">（Redis的请求协议是纯文本的）</font>。服务器在启动时，通过载入AOF文件、并执行其中的命令来还原服务器状态。</p>
+<p>2）AOF文件名通过配置文件appendfilename appendonly.aof 指定，存放位置通过配置文件dir /var/lib/redis/ 指定；</p>
+<p>3）AOF步骤：</p>
+<ul>
+<li>命令追加：服务器在执行玩一个写命令后，会以协议的格式把其追加到<font color="red">aof_buf缓冲区末尾；</font></li>
+<li>文件写入：redis服务器进程就是一个事件循环，在每次事件循环结束，会根据配置文件中的appednfsync属性值决定是否将aof_buf中的数据写入到AOF文件中；</li>
+<li>文件同步：将内存缓冲区的数据写到磁盘；（由于OS的特性导致）</li>
+</ul>
+<p>补充：</p>
 <blockquote>
-
-{% codeblock [lang:language] [title] [url] [link text] %}<br>
-code snippet<br>
-{% endcodeblock %}
+<p>为了提高文件写入效率，现代OS中通常会把写入数据暂时保存在一个内存的缓冲区里面，等到缓冲区满或超时，一次性把其中的内容再写到磁盘。</p>
 </blockquote>
-<p>其中</p>
+<p>4）appendfsync选项：</p>
 <ul>
-<li>lang 语言</li>
-<li>title 代码块上方的标题</li>
-<li>url 为本段代码指定一个url，用于下载或引用</li>
-<li>link text url显示的文字</li>
+<li>always：将aof_buf中所有内容写入、同步到AOF文件；</li>
+<li>everysec：将aof_buf中所有内容写到AOF文件，如果上次同步AOF文件时间距当前时间超过1s，那么对AOF文件同步；（由专门线程负责）</li>
+<li>no：将aof_buf中所有内容写入AOF文件，合适同步根据操作系统决定；</li>
 </ul>
-<p>以下三个用于控制行号显示</p>
+<p>5）AOF持久化效率和安全性：（appendfsync选项控制）<br>always每次都要写入、同步，所以其安全性最高，效率是最慢的；everysec效率也足够快，也安全性也可以得到保证；no效率最高，但安全性比较差。</p>
+<p>2、AOF文件载入：<br>AOF文件中记录了数据库中所有写操作的命令，所以服务器只需要重新执行一遍AOF文件中的命令即可恢复服务器关闭之前的状态。步骤如下：</p>
 <ul>
-<li>start:# 从第#行开始显示行号</li>
-<li>mark:#,#-# 在第#行，以及第#-#行显示行号</li>
-<li>linenos:false true 所有行都显示行号，false所有行都不显示行号<br>对于lang，这里列出了支持的语言以及对应的字段名，如java，cpp等，以上字段均为可选字段，可以使用默认值，如:<figure class="highlight java"><figcaption><span>java代码实例</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">hashMap</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		Map map1  = <span class="keyword">new</span> LinkedHashMap();</span><br><span class="line">		map1.put(<span class="string">"a3"</span>, <span class="string">"aa"</span>);       </span><br><span class="line">	    map1.put(<span class="string">"a2"</span>, <span class="string">"bb"</span>); </span><br><span class="line">	    map1.put(<span class="string">"b1"</span>, <span class="string">"cc"</span>);</span><br><span class="line">		Iterator keysIterator = map1.values().iterator();</span><br><span class="line">		<span class="keyword">while</span> (keysIterator.hasNext()) &#123;</span><br><span class="line">			System.out.println(keysIterator.next());</span><br><span class="line">		&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
+<li>创建一个不带网络连接的伪客户端；</li>
+<li>从AOF文件中分析并读取一条写命令；</li>
+<li>使用伪客户端执行被读出的写命令；</li>
 </ul>
+<p>3、AOF重写：<br>由于AOF记录了数据库的所有写命令，所以随着服务器的运行，AOF文件中内容会越来越大。实际上，对于一个键值，由于多次的修改，会产生很多写命令；中间的一些写操作可以直接省去，直接把最终的键值信息记录到AOF文件中即可，从而减小AOF文件大小。</p>
+<p>1）AOF重写：<br>为了解决AOF文件体积膨胀问题，redis服务器使用了AOF重写功能：创建一个新的AOF文件来代替现有的AOF文件，新旧两个AOF文件所保存的数据库状态相同，但新AOF文件不会包含任何浪费空间的冗余命令，所以新AOF文件体积会比旧AOF文件体积小很多。</p>
+<p>2）原理：<br>AOF文件重写并<font color="red">不需要对现有AOF文件进行任何读取</font>、分析或者写入操作，这个功能是通过读取服务器当前的数据库状态来实现的。首先，从数据库中读取键现在的值，然后使用一条命令去记录键值对，代替之前记录这个键值对的多条命令，这就是AOF重写的原理。</p>
+<p>注：</p>
+<blockquote>
+<p>为了避免在执行命令时造成客户端缓冲区溢出，重写程序在处理集合、链表等发现带有多个元素时，会检查元素数量是否超过redis默认的64，如果超过了，redis会使用多个命令代替这一条命令。</p>
+</blockquote>
+<p>3）bgrewriteaof命令、AOF重写缓冲区：<br>由于redis是单进程的，为了不在进行重写时阻塞服务，redis使用了子进程的方式进行AOF重写。——bgrewriteaof</p>
+<p>在使用子进程进程AOF重写时会产生另一个问题：子进程在AOF重写时，服务器主进程还在继续处理命令请求，而新的命令可能会对现有数据库状态进行修改，而从使得服务器当前状态和重写后的AOF文件所保存的服务器状态不一致。为了解决这个问题，redis引入了AOF重写缓冲区。</p>
+<font color="red">AOF重写缓冲区是在服务器创建子进程之后开始使用：</font>
+
+<ul>
+<li>执行客户端命令；</li>
+<li>将执行后的写命令追加到aof_buf（AOF缓冲区）；</li>
+<li>将执行后的写命令追加到AOF重写缓冲区；</li>
+</ul>
+<p>aof_buf（AOF缓冲区）会定期被写入、同步到AOF文件；而在AOF重写期间新的命令会写到AOF重写缓冲区。当AOF重写完成后，会向父进程发送一个信号，父进程收到信号后会<font color="red">阻塞当前服务</font>，进行如下操作：</p>
+<ul>
+<li>将AOF重写缓冲区中的写命令写入到新的AOF文件；（保证了新AOF文件数据库状态和当前数据库状态的一致）</li>
+<li>对新的AOF文件重命名、原子的覆盖旧的AOF；</li>
+</ul>
+<p>注：</p>
+<blockquote>
+<p>整个AOF重写中，只有信号处理是阻塞的；当信号处理完毕后父进程就可以接收命令请求了。</p>
+</blockquote>
+<p>4、如果redis开始基于rdb进行的持久化，之后通过appendonly  yes 打开了aof，这时重新启动redis后会根据aof进行载入，所以原来所有的数据无法加载到数据库中。</p>
 </span>
       
     </div>
@@ -284,7 +347,9 @@ code snippet<br>
       
         <div class="post-tags">
           
-            <a href="/tags/markdown/" rel="tag">#markdown</a>
+            <a href="/tags/nosql/" rel="tag">#nosql</a>
+          
+            <a href="/tags/redis/" rel="tag">#redis</a>
           
         </div>
       
@@ -293,13 +358,11 @@ code snippet<br>
         <div class="post-nav">
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2015/09/29/oracle-express-install/" rel="prev">Oracle Express Edition安装</a>
-            
           </div>
 
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2015/09/24/use-of-hexo-2/" rel="next">hexo使用心得（二）</a>
+              <a href="/2015/11/10/redis-anzhuang/" rel="next">redis安装、配置</a>
             
           </div>
         </div>
@@ -314,10 +377,10 @@ code snippet<br>
 
     <div class="post-spread">
       
-        <div class="ds-share flat" data-thread-key="2015/09/24/use-of-markdown-1/"
-     data-title="markdown 高亮代码"
+        <div class="ds-share flat" data-thread-key="2015/11/16/redis-chijiuhua/"
+     data-title="redis持久化——RDB、AOF"
      data-content=""
-     data-url="http://yoursite.com/2015/09/24/use-of-markdown-1/">
+     data-url="http://yoursite.com/2015/11/16/redis-chijiuhua/">
   <div class="ds-share-inline">
     <ul  class="ds-share-icons-16">
 
@@ -343,8 +406,8 @@ code snippet<br>
         
           <div class="comments" id="comments">
             
-              <div class="ds-thread" data-thread-key="2015/09/24/use-of-markdown-1/"
-                   data-title="markdown 高亮代码" data-url="http://yoursite.com/2015/09/24/use-of-markdown-1/">
+              <div class="ds-thread" data-thread-key="2015/11/16/redis-chijiuhua/"
+                   data-title="redis持久化——RDB、AOF" data-url="http://yoursite.com/2015/11/16/redis-chijiuhua/">
               </div>
             
           </div>
@@ -455,7 +518,7 @@ code snippet<br>
           <div class="post-toc">
             
             
-              <p class="post-toc-empty">此文章未包含目录</p>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#RDB"><span class="nav-number">1.</span> <span class="nav-text">RDB</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AOF"><span class="nav-number">2.</span> <span class="nav-text">AOF</span></a></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator"></div>
