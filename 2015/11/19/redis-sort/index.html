@@ -45,7 +45,7 @@
 <meta property="og:url" content="http://yoursite.com/2015/11/19/redis-sort/index.html">
 <meta property="og:site_name" content="晓的技术博客">
 <meta property="og:description" content="Redis中，使用sort命令可以对给定的链表、集合、有序集合中的元素进行排序。">
-<meta property="og:updated_time" content="2015-11-19T07:39:33.373Z">
+<meta property="og:updated_time" content="2015-11-20T06:52:26.476Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="redis 排序">
 <meta name="twitter:description" content="Redis中，使用sort命令可以对给定的链表、集合、有序集合中的元素进行排序。">
@@ -259,7 +259,15 @@
 <li>redis默认将要排序的元素看作数字，封装成双精度的浮点数进行比较、排序</li>
 <li>redis内部使用快速排序算法进行排序；</li>
 </ul>
-<h2 id="sort实现：">sort实现：</h2><h2 id="一般用法：">一般用法：</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">127.0</span>.0.1:<span class="number">6379</span>&gt; lrange list1 <span class="number">0</span> -<span class="number">1</span></span><br><span class="line"><span class="number">1</span>) <span class="string">"3"</span></span><br><span class="line"><span class="number">2</span>) <span class="string">"6"</span></span><br><span class="line"><span class="number">3</span>) <span class="string">"1"</span></span><br><span class="line"><span class="number">4</span>) <span class="string">"9"</span></span><br><span class="line"></span><br><span class="line"><span class="number">127.0</span>.0.1:<span class="number">6379</span>&gt; sort list1</span><br><span class="line"><span class="number">1</span>) <span class="string">"1"</span></span><br><span class="line"><span class="number">2</span>) <span class="string">"3"</span></span><br><span class="line"><span class="number">3</span>) <span class="string">"6"</span></span><br><span class="line"><span class="number">4</span>) <span class="string">"9"</span></span><br></pre></td></tr></table></figure>
+<h2 id="sort实现：">sort实现：</h2><ul>
+<li>服务器执行sort members命令的详细步骤:</li>
+<li>创建一个和members长度相同的数组，该数组的每个项都是一个redisSortObject结构；</li>
+<li>遍历数组，将各个数组项的obj指针分别指向members列表的各个项，构成obj指针和列表项之间的一对一关系；</li>
+<li>遍历数组，将各个obj指针所指向的列表项转成一个double浮点数（或根据选项转成字符串），并将其保存在相应数组项的score属性中；</li>
+<li>根据score属性，对数组进行排序；</li>
+<li>遍历数组，将各个obj指针所指向的列表向作为排序结果返回给客户端；</li>
+</ul>
+<h2 id="一般用法：">一般用法：</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">127.0</span>.0.1:<span class="number">6379</span>&gt; lrange list1 <span class="number">0</span> -<span class="number">1</span></span><br><span class="line"><span class="number">1</span>) <span class="string">"3"</span></span><br><span class="line"><span class="number">2</span>) <span class="string">"6"</span></span><br><span class="line"><span class="number">3</span>) <span class="string">"1"</span></span><br><span class="line"><span class="number">4</span>) <span class="string">"9"</span></span><br><span class="line"></span><br><span class="line"><span class="number">127.0</span>.0.1:<span class="number">6379</span>&gt; sort list1</span><br><span class="line"><span class="number">1</span>) <span class="string">"1"</span></span><br><span class="line"><span class="number">2</span>) <span class="string">"3"</span></span><br><span class="line"><span class="number">3</span>) <span class="string">"6"</span></span><br><span class="line"><span class="number">4</span>) <span class="string">"9"</span></span><br></pre></td></tr></table></figure>
 <p>1）使用alpha选项，对字符串进行排序：<br>默认情况下，redis是按照数字进行排序的，通过alpha选项可以按照字符串排序。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">127.0</span>.0.1:<span class="number">6379</span>&gt; sort list2 alpha</span><br><span class="line"><span class="number">1</span>) <span class="string">"a"</span></span><br><span class="line"><span class="number">2</span>) <span class="string">"g"</span></span><br><span class="line"><span class="number">3</span>) <span class="string">"y"</span></span><br><span class="line"><span class="number">4</span>) <span class="string">"z"</span></span><br></pre></td></tr></table></figure></p>
 <p>2）使用asc、desc选项，进行升序、降序排序：<br>默认情况下， redis是按照升序排的，可以指定desc选项进行降序排列。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">127.0</span>.0.1:<span class="number">6379</span>&gt; sort list1 desc</span><br><span class="line"><span class="number">1</span>) <span class="string">"9"</span></span><br><span class="line"><span class="number">2</span>) <span class="string">"6"</span></span><br><span class="line"><span class="number">3</span>) <span class="string">"3"</span></span><br><span class="line"><span class="number">4</span>) <span class="string">"1"</span></span><br></pre></td></tr></table></figure></p>
 <h2 id="使用limit分页显示排序结果：">使用limit分页显示排序结果：</h2><p>用法：sort key limit offset count</p>
@@ -269,7 +277,38 @@
 </li>
 </ul>
 <p>##by选项，使用外部key进行排序：</p>
-<p>在默认情况下， sort命令使用被排序键包含的元素作为排序权重，即：元素本身决定了元素在排序之后所处的位置。<font color="red">通过by选项，sort命令可以指定某些字符串键、hash键的某些域作为元素的权重，进行排序。</font><br>| uid | user<em>name</em>{id} | user<em>level</em>{id} |<br>| ——|————- | ——- |<br>|1|admin|999|<br>|2|jack|10|<br>|3|peter|25|<br>|4|mary|70|</p>
+<p>在默认情况下， sort命令使用被排序键包含的元素作为排序权重，即：元素本身决定了元素在排序之后所处的位置。<font color="red">通过by选项，sort命令可以指定某些字符串键、hash键的某些域作为元素的权重，进行排序。</font></p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">uid</th>
+<th style="text-align:center">user<em>name</em>{id}</th>
+<th>user<em>level</em>{id}</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">1</td>
+<td style="text-align:center">admin</td>
+<td>999</td>
+</tr>
+<tr>
+<td style="text-align:center">2</td>
+<td style="text-align:center">jack</td>
+<td>10</td>
+</tr>
+<tr>
+<td style="text-align:center">3</td>
+<td style="text-align:center">peter</td>
+<td>25</td>
+</tr>
+<tr>
+<td style="text-align:center">4</td>
+<td style="text-align:center">mary</td>
+<td>70</td>
+</tr>
+</tbody>
+</table>
 <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">把uid 加入到一个链表</span><br><span class="line">redis 127.0.0.1:6379&gt; lpush uid 1 2  3  4</span><br><span class="line">(integer) 4</span><br><span class="line"></span><br><span class="line">admin</span><br><span class="line">redis 127.0.0.1:6379&gt; set user_name_1 admin</span><br><span class="line">ok</span><br><span class="line">redis 127.0.0.1:6379&gt; set user_level_1 9999</span><br><span class="line">ok</span><br><span class="line"></span><br><span class="line">jack</span><br><span class="line">redis 127.0.0.1:6379&gt; set user_name_2 jack</span><br><span class="line">ok</span><br><span class="line">redis 127.0.0.1:6379&gt; set user_level_2 10</span><br><span class="line">ok</span><br><span class="line"></span><br><span class="line">peter</span><br><span class="line">redis 127.0.0.1:6379&gt; set user_name_3 peter</span><br><span class="line">ok</span><br><span class="line">redis 127.0.0.1:6379&gt; set user_level_3 25</span><br><span class="line">ok</span><br><span class="line"></span><br><span class="line">mary</span><br><span class="line">redis 127.0.0.1:6379&gt; set user_name_4 mary</span><br><span class="line">ok</span><br><span class="line">redis 127.0.0.1:6379&gt; set user_level_4 70</span><br><span class="line">ok</span><br><span class="line"></span><br><span class="line">redis 127.0.0.1:6379&gt; sort uid</span><br><span class="line">1) "1" # admin</span><br><span class="line">2) "2" # jack</span><br><span class="line">3) "3" # peter</span><br><span class="line">4) "4" # mary</span><br><span class="line"></span><br><span class="line">redis 127.0.0.1:6379&gt; sort uid by user_level_*</span><br><span class="line">1) "2" # jack , level = 10</span><br><span class="line">2) "3" # peter, level = 25</span><br><span class="line">3) "4" # mary, level = 70</span><br><span class="line">4) "1" # admin, level = 9999</span><br></pre></td></tr></table></figure>
 <font color="red">user<em>level</em>*是一个占位符，它先取出uid中的值，然后再用这个值来查找相应的键。</font>
 
@@ -287,30 +326,30 @@
 <h2 id="将hash表作为get或by的值：">将hash表作为get或by的值：</h2><table>
 <thead>
 <tr>
-<th>uid</th>
-<th>user<em>name</em>{id}</th>
+<th style="text-align:center">uid</th>
+<th style="text-align:center">user<em>name</em>{id}</th>
 <th>user<em>level</em>{id}</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>1</td>
-<td>admin</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">admin</td>
 <td>999</td>
 </tr>
 <tr>
-<td>2</td>
-<td>jack</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">jack</td>
 <td>10</td>
 </tr>
 <tr>
-<td>3</td>
-<td>peter</td>
+<td style="text-align:center">3</td>
+<td style="text-align:center">peter</td>
 <td>25</td>
 </tr>
 <tr>
-<td>4</td>
-<td>mary</td>
+<td style="text-align:center">4</td>
+<td style="text-align:center">mary</td>
 <td>70</td>
 </tr>
 </tbody>
