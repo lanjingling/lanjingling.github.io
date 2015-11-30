@@ -39,16 +39,16 @@
   <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.1" />
 
 
-<meta name="description" content="Nginx (&quot;engine x&quot;) 是一个高性能的 HTTP 和 反向代理 服务器，也是一个 IMAP/POP3/SMTP 代理服务器，在高连接并发的情况下Nginx 是 Apache 服务器不错的替代品.其特点是占有内存少，并发能力强。">
+<meta name="description" content="nginx_upstream_jvm_route是一个nginx的扩展模块，用来实现基于 Cookie 的 Session Sticky （粘性会话）的功能。简单来说，它是基于cookie中的JSESSIONID来决定将请求发送给后端的哪个server。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="nginx安装、配置（linux下）">
-<meta property="og:url" content="http://yoursite.com/2015/10/28/nginx-install-config/index.html">
+<meta property="og:title" content="nginx之 nginx_upstream_jvm_route模块">
+<meta property="og:url" content="http://yoursite.com/2015/11/30/nginx-m-router/index.html">
 <meta property="og:site_name" content="晓的技术博客">
-<meta property="og:description" content="Nginx (&quot;engine x&quot;) 是一个高性能的 HTTP 和 反向代理 服务器，也是一个 IMAP/POP3/SMTP 代理服务器，在高连接并发的情况下Nginx 是 Apache 服务器不错的替代品.其特点是占有内存少，并发能力强。">
-<meta property="og:updated_time" content="2015-10-28T03:11:49.831Z">
+<meta property="og:description" content="nginx_upstream_jvm_route是一个nginx的扩展模块，用来实现基于 Cookie 的 Session Sticky （粘性会话）的功能。简单来说，它是基于cookie中的JSESSIONID来决定将请求发送给后端的哪个server。">
+<meta property="og:updated_time" content="2015-11-30T05:57:40.377Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="nginx安装、配置（linux下）">
-<meta name="twitter:description" content="Nginx (&quot;engine x&quot;) 是一个高性能的 HTTP 和 反向代理 服务器，也是一个 IMAP/POP3/SMTP 代理服务器，在高连接并发的情况下Nginx 是 Apache 服务器不错的替代品.其特点是占有内存少，并发能力强。">
+<meta name="twitter:title" content="nginx之 nginx_upstream_jvm_route模块">
+<meta name="twitter:description" content="nginx_upstream_jvm_route是一个nginx的扩展模块，用来实现基于 Cookie 的 Session Sticky （粘性会话）的功能。简单来说，它是基于cookie中的JSESSIONID来决定将请求发送给后端的哪个server。">
 
 
 <script type="text/javascript" id="hexo.configuration">
@@ -58,7 +58,7 @@
   };
 </script>
 
-  <title> nginx安装、配置（linux下） | 晓的技术博客 </title>
+  <title> nginx之 nginx_upstream_jvm_route模块 | 晓的技术博客 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -204,7 +204,7 @@
           
           
             
-              nginx安装、配置（linux下）
+              nginx之 nginx_upstream_jvm_route模块
             
           
         </h1>
@@ -213,8 +213,8 @@
       <div class="post-meta">
         <span class="post-time">
           发表于
-          <time itemprop="dateCreated" datetime="2015-10-28T10:45:07+08:00" content="2015-10-28">
-            2015-10-28
+          <time itemprop="dateCreated" datetime="2015-11-30T13:37:56+08:00" content="2015-11-30">
+            2015-11-30
           </time>
         </span>
 
@@ -239,8 +239,8 @@
           
             <span class="post-comments-count">
               &nbsp; | &nbsp;
-              <a href="/2015/10/28/nginx-install-config/#comments" itemprop="discussionUrl">
-                <span class="post-comments-count ds-thread-count" data-thread-key="2015/10/28/nginx-install-config/" itemprop="commentsCount"></span>
+              <a href="/2015/11/30/nginx-m-router/#comments" itemprop="discussionUrl">
+                <span class="post-comments-count ds-thread-count" data-thread-key="2015/11/30/nginx-m-router/" itemprop="commentsCount"></span>
               </a>
             </span>
           
@@ -254,94 +254,51 @@
       
 
       
-        <span itemprop="articleBody"><p>Nginx (“engine x”) 是一个高性能的 HTTP 和 反向代理 服务器，也是一个 IMAP/POP3/SMTP 代理服务器，在高连接并发的情况下Nginx 是 Apache 服务器不错的替代品.其特点是占有内存少，并发能力强。</p>
-<h2 id="安装">安装</h2><p>1）下载nginx，在官网<a href="http://nginx.org/download/" target="_blank" rel="external">http://nginx.org/download/</a>  上下载相应的版本  </p>
-<blockquote>
-<p>wget <a href="http://nginx.org/download/nginx-1.5.9.tar.gz" target="_blank" rel="external">http://nginx.org/download/nginx-1.5.9.tar.gz</a></p>
-</blockquote>
-<p>2）解压：</p>
-<blockquote>
-<p>tar -xvzf nginx-1.7.5.tar.gz</p>
-</blockquote>
-<p> 3）编译：<br> 编译 （make）的过程是把各种语言写的源码文件，变成可执行文件和各种库文件。</p>
-<blockquote>
-<p>cd nginx-1.7.5<br>./configure –prefix=/usr/local/nginx</p>
-</blockquote>
-<p><em>注：</em> –prefix表示要安装的目录，可以不指定、直接默认安装。</p>
-<p>4）安装 ：<br>安装（make install）是把这些编译出来的可执行文件和库文件复制到合适的地方</p>
-<blockquote>
-<p>make install </p>
-</blockquote>
-<p>5）在configure的时候可能有如下错误<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">checking for PCRE library in /opt/local/ ... not found</span><br><span class="line"></span><br><span class="line">./configure: error: the HTTP rewrite module requires the PCRE library.</span><br><span class="line">You can either disable the module by using --without-http_rewrite_module</span><br><span class="line">option, or install the PCRE library into the system, or build the PCRE library</span><br><span class="line">statically from the source with nginx by using --with-pcre=<span class="tag">&lt;<span class="title">path</span>&gt;</span> option.</span><br></pre></td></tr></table></figure></p>
-<p>安装pcre-devel解决问题</p>
-<blockquote>
-<p>yum -y install pcre-devel</p>
-</blockquote>
-<p>也有可能遇到下面问题，<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">./configure: error: the HTTP cache module requires md5 functions</span><br><span class="line">from OpenSSL library.   You can either disable the module by using</span><br><span class="line">--without-http-cache option, or install the OpenSSL library into the system,</span><br><span class="line">or build the OpenSSL library statically from the source with nginx by using</span><br><span class="line">--with-http_ssl_module --with-openssl=<span class="tag">&lt;<span class="title">path</span>&gt;</span> options.</span><br></pre></td></tr></table></figure></p>
-<p>安装openssl 解决问题</p>
-<blockquote>
-<p>yum -y install openssl openssl-devel</p>
-</blockquote>
-<p>6）启动</p>
+        <span itemprop="articleBody"><p>在前面一篇博客中介绍了【Nginx+tomcat 负载均衡、动静分离】，这种架构对于有状态的应用来说会存在一定问题：由于nginx采用round bin算法（轮训调度），固每次刷新页面nginx都会将请求分发到不同的tomcat服务器上，且每次的JSESSIONID都是不一样的。于是，对于有状态的应用来说，同一用户的请求调度到不同后端tomcat服务器，导致session信息丢失。</p>
+<p><em>注：</em></p>
 <ul>
-<li><p>启动:</p>
-<blockquote>
-<p>cd /usr/local/nginx/sbin<br>./nginx</p>
-</blockquote>
-</li>
-<li><p>修改了配置文件后最好先检查一下修改过的配置文件是否正确：</p>
-<blockquote>
-<p>/usr/nginx/sbin/nginx -t</p>
-</blockquote>
-</li>
-<li><p>平滑重启:</p>
-<blockquote>
-<p>/usr/nginx/sbin/nginx -s reload</p>
-</blockquote>
-</li>
+<li>如果应用是无状态的，那么这种架构还是可行的；</li>
+<li>如果后端只有一个tomcat服务器，使用nginx仅为了实现动静分离，这种架构也是可行的；</li>
 </ul>
-<h2 id="配置">配置</h2><p>Nginx 就一个配置文件，位于/usr/local/nginx/conf 下nginx.conf</p>
-<p>1、Nginx 的 Location 配置指令块：</p>
-<p>Nginx 允许用户定义 Location block ，并指定一个匹配模式（pattern）匹配特定的 URI。除了简单的字符串（比如文件系统路径），还允许使用更为复杂的匹配模式（pattern）。Location 配置项在http &gt; server 里面。</p>
-<p>1）Location block 的基本语法形式是：</p>
-<blockquote>
-<p>location [=|~|~*|^~|@] pattern { … }</p>
-</blockquote>
-<p>[=|~|~*|^~|@] 被称作 location modifier ，这会定义 Nginx 如何去匹配其后的 pattern ，以及该 pattern 的最基本的属性（简单字符串或正则表达式）。</p>
-<p>2）关于 location modifier：</p>
+<p>对于有状态应用来说，这个问题可以通过粘性session的方式来解决。在nginx中，可以通过nginx_upstream_jvm_route（推荐）和ip_hash两种技术实现。</p>
+<h2 id="nginx_upstream_jvm_route技术：">nginx_upstream_jvm_route技术：</h2><p>1、nginx_upstream_jvm_route简介：</p>
+<p>1）nginx_upstream_jvm_route是一个nginx的扩展模块，用来实现基于 Cookie 的 Session Sticky （粘性会话）的功能。简单来说，它是基于cookie中的JSESSIONID来决定将请求发送给后端的哪个server。原理：</p>
 <ul>
-<li>=<br>这会完全匹配指定的 pattern ，且这里的 pattern 被限制成简单的字符串，也就是说这里不能使用正则表达式。</li>
+<li>一开始请求过来，没有带session信息，jvm_route就根据round robin的算法，发到一台tomcat上面。</li>
+<li>将响应的server标识绑定到cookie中的JSESSIONID中，并返回给客户。</li>
+<li>nginx会根据JSESSIONID来决定由哪个后端server来处理。</li>
 </ul>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    server_name website.com;</span><br><span class="line">    location = /abcd &#123;</span><br><span class="line">    […]</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>匹配情况：<br>    <a href="http://website.com/abcd" target="_blank" rel="external">http://website.com/abcd</a>        # 正好完全匹配<br>    <a href="http://website.com/ABCD" target="_blank" rel="external">http://website.com/ABCD</a>        # 如果运行 Nginx server 的系统本身对大小写不敏感，比如 Windows ，那么也匹配<br>    <a href="http://website.com/abcd?param1¶m2" target="_blank" rel="external">http://website.com/abcd?param1¶m2</a>    # 忽略查询串参数（query string arguments），这里就是 /abcd 后面的 ?param1¶m2<br>    <a href="http://website.com/abcd/" target="_blank" rel="external">http://website.com/abcd/</a>    # 不匹配，因为末尾存在反斜杠（trailing slash），Nginx 不认为这种情况是完全匹配<br>    <a href="http://website.com/abcde" target="_blank" rel="external">http://website.com/abcde</a>    # 不匹配，因为不是完全匹配</p>
-<ul>
-<li>(None)<br>可以不写 location modifier ，Nginx 仍然能去匹配 pattern 。这种情况下，匹配那些以指定的 patern 开头的 URI，注意这里的 URI 只能是普通字符串，不能使用正则表达式。</li>
-</ul>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    server_name website.com;</span><br><span class="line">    location /abcd &#123;</span><br><span class="line">    […]</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>匹配情况：<br>    <a href="http://website.com/abcd" target="_blank" rel="external">http://website.com/abcd</a>        # 正好完全匹配<br>    <a href="http://website.com/ABCD" target="_blank" rel="external">http://website.com/ABCD</a>        # 如果运行 Nginx server 的系统本身对大小写不敏感，比如 Windows ，那么也匹配<br>    <a href="http://website.com/abcd?param1¶m2" target="_blank" rel="external">http://website.com/abcd?param1¶m2</a>    # 忽略查询串参数（query string arguments），这里就是 /abcd 后面的 ?param1¶m2<br>    <a href="http://website.com/abcd/" target="_blank" rel="external">http://website.com/abcd/</a>    # 末尾存在反斜杠（trailing slash）也属于匹配范围内<br>    <a href="http://website.com/abcde" target="_blank" rel="external">http://website.com/abcde</a>    # 仍然匹配，因为 URI 是以 pattern 开头的</p>
-<ul>
-<li>~<br>这个 location modifier 对大小写敏感，且 pattern 须是正则表达式</li>
-</ul>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    server_name website.com;</span><br><span class="line">    location ~ ^/abcd$ &#123;</span><br><span class="line">    […]</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>匹配情况：<br>    <a href="http://website.com/abcd" target="_blank" rel="external">http://website.com/abcd</a>        # 完全匹配<br>    <a href="http://website.com/ABCD" target="_blank" rel="external">http://website.com/ABCD</a>        # 不匹配，~ 对大小写是敏感的<br>    <a href="http://website.com/abcd?param1¶m2" target="_blank" rel="external">http://website.com/abcd?param1¶m2</a>    # 忽略查询串参数（query string arguments），这里就是 /abcd 后面的 ?param1¶m2<br>    <a href="http://website.com/abcd/" target="_blank" rel="external">http://website.com/abcd/</a>    # 不匹配，因为末尾存在反斜杠（trailing slash），并不匹配正则表达式 ^/abcd$<br>    <a href="http://website.com/abcde" target="_blank" rel="external">http://website.com/abcde</a>    # 不匹配正则表达式 ^/abcd$</p>
-<p><em>注意：对于一些对大小写不敏感的系统，比如 Windows ，~ 和 ~</em> 都是不起作用的，这主要是操作系统的原因。*</p>
-<ul>
-<li>~*<br>与 ~ 类似，但这个 location modifier 不区分大小写，pattern 须是正则表达式</li>
-</ul>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    server_name website.com;</span><br><span class="line">    location ~* ^/abcd$ &#123;</span><br><span class="line">    […]</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>匹配情况：<br>    <a href="http://website.com/abcd" target="_blank" rel="external">http://website.com/abcd</a>        # 完全匹配<br>    <a href="http://website.com/ABCD" target="_blank" rel="external">http://website.com/ABCD</a>        # 匹配，这就是它不区分大小写的特性<br>    <a href="http://website.com/abcd?param1¶m2" target="_blank" rel="external">http://website.com/abcd?param1¶m2</a>    # 忽略查询串参数（query string arguments），这里就是 /abcd 后面的 ?param1¶m2<br>    <a href="http://website.com/abcd/" target="_blank" rel="external">http://website.com/abcd/</a>    # 不匹配，因为末尾存在反斜杠（trailing slash），并不匹配正则表达式 ^/abcd$<br>    <a href="http://website.com/abcde" target="_blank" rel="external">http://website.com/abcde</a>    # 不匹配正则表达式 ^/abcd$</p>
-<ul>
-<li><p>^~<br>匹配情况类似 2. (None) 的情况，以指定匹配模式开头的 URI 被匹配，不同的是，一旦匹配成功，那么 Nginx 就停止去寻找其他的 Location 块进行匹配了（与 Location 匹配顺序有关）</p>
-</li>
-<li><p>@<br>用于定义一个 Location 块，且该块不能被外部 Client 所访问，只能被 Nginx 内部配置指令所访问，比如 try_files or error_page</p>
-</li>
-</ul>
-<p>3）搜索顺序以及生效优先级：</p>
-<p>因为可以定义多个 Location 块，每个 Location 块可以有各自的 pattern 。因此就需要明白（不管是 Nginx 还是你），当 Nginx 收到一个请求时，它是如何去匹配 URI 并找到合适的 Location 的。<br>要注意的是，写在配置文件中每个 Server 块中的 Location 块的次序是不重要的，Nginx 会按 location modifier 的优先级来依次用 URI 去匹配 pattern ，顺序如下：</p>
+<p>2）缺点：<br>暂时jvm_route模块还不支持默认fair的模式。jvm_route的工作模式和fair是冲突的。对于某个特定用户，当一直为他服务的tomcat宕机后，默认情况下它会重试max_fails的次数，如果还是失败，就重新启用round robin的方式将请求分发到其他tomcat服务器上，而这种情况下就会导致用户的session丢失。</p>
 <blockquote>
-<p>1、 =<br>2、 (None)    如果 pattern 完全匹配 URI（不是只匹配 URI 的头部）<br>3、 ^~<br>4、 ~ 或 ~*<br>5、 (None)    pattern 匹配 URI 的头部</p>
+<p>总的说来，jvm_route是通过session_cookie这种方式来实现session粘性，将特定会话附属到特定tomcat上,从而解决session不同步问题，但无法解决宕机后会话转移问题。</p>
 </blockquote>
-<p>2、nginx 一些全局配置项含义：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">#配置用户和用户组</span><br><span class="line">user www www;</span><br><span class="line">#工作进程数，建议设置为CPU的总核数</span><br><span class="line">worker_processes  2;</span><br><span class="line">#全局错误日志定义类型，日志等级从低到高依次为： debug | info | notice | warn | error | crit</span><br><span class="line">error_log  logs/error.log  info;</span><br><span class="line">#记录主进程ID的文件</span><br><span class="line">pid  /usr/local/nginx/nginx.pid;</span><br><span class="line">#一个进程能打开的文件描述符最大值，理论上该值因该是最多能打开的文件数除以进程数。但是由于nginx负载并不是完全均衡的，</span><br><span class="line">#所以这个值最好等于最多能打开的文件数。执行 sysctl -a | grep fs.file 可以看到linux文件描述符。</span><br><span class="line">worker_rlimit_nofile 65535;</span><br><span class="line">#工作模式与连接数上限</span><br><span class="line">events &#123;</span><br><span class="line">    #工作模式，linux2.6版本以上用epoll</span><br><span class="line">    use epoll;</span><br><span class="line">    #单个进程允许的最大连接数</span><br><span class="line">    worker_connections  65535;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>2、nginx_upstream_jvm_route 模块安装：</p>
+<p>1）下载</p>
+<blockquote>
+<p>wget <a href="http://nginx-upstream-jvm-route.googlecode.com/files/nginx-upstream-jvm-route-0.1.tar.gz" target="_blank" rel="external">http://nginx-upstream-jvm-route.googlecode.com/files/nginx-upstream-jvm-route-0.1.tar.gz</a></p>
+</blockquote>
+<p>在googlecode上nginx_upstream_jvm_route就一个下载地址，是2009年的0.1版本；对于比较新的nginx（1.6以后的）使用这个版本的模块安装在patch –p0 &lt; /path/to/jvm_route.patch 时会报错。解决办法：</p>
+<ul>
+<li>使用svn在googlecode上去下载最新的版本（2011年有修改）：svn checkout <a href="http://nginx-upstream-jvm-route.googlecode.com/svn/trunk/" target="_blank" rel="external">http://nginx-upstream-jvm-route.googlecode.com/svn/trunk/</a></li>
+<li>或者到github上下载；</li>
+</ul>
+<p><em>注：</em><br>由于版本兼容的问题，本例采用nginx-1.6.0（<a href="http://nginx.org/download/nginx-1.6.0.tar.gz）和github上的nginx_upstream_jvm_route（https://github.com/nulab/nginx-upstream-jvm-route/archive/master.zip）" target="_blank" rel="external">http://nginx.org/download/nginx-1.6.0.tar.gz）和github上的nginx_upstream_jvm_route（https://github.com/nulab/nginx-upstream-jvm-route/archive/master.zip）</a></p>
+<p>2）打补丁：<br>解压nginx-1.6.0文件，然后进入到nginx-1.6.0目录中，执行下面命令：</p>
+<blockquote>
+<p>[root@centOS1 nginx-1.6.0]# patch -p0 &lt; /usr/local/nginx-upstream-jvm-route-master/jvm_route.patch </p>
+</blockquote>
+<p>3）编译、安装：</p>
+<blockquote>
+<p>[root@centOS1 nginx-1.6.0]# ./configure –prefix=/usr/local/nginx  –add-module=/usr/local/nginx-upstream-jvm-route-master/<br>[root@centOS1 nginx-1.6.0]# make<br>[root@centOS1 nginx-1.6.0]# make  install</p>
+</blockquote>
+<p>3、nginx_upstream_jvm_route配置：</p>
+<p>1）修改nginx配置文件中tomcat负载均衡的部分：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">upstream  tomcats_jvm_route  </span><br><span class="line">        &#123;  </span><br><span class="line">             # ip_hash;   </span><br><span class="line">              server   192.168.33.10:8090 srun_id=tomcat01;   </span><br><span class="line">              server   192.168.33.11:8090 srun_id=tomcat02;  </span><br><span class="line">              jvm_route $cookie_JSESSIONID|sessionid reverse;  </span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure></p>
+<p>2）修改所有tomcat中server.xml文件：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">将  </span><br><span class="line"><span class="tag">&lt;<span class="title">Engine name="Catalina" defaultHost="localhost" </span>&gt;</span>  </span><br><span class="line">修改为：  </span><br><span class="line"><span class="tag">&lt;<span class="title">Engine name="Catalina" defaultHost="localhost" jvmRoute="tomcat01"</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>3）测试：<br>在tomcat01和tomcat02的webapps下，ROOT目录中建立a.jsp，内容如下（输出sessionID信息）：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="title">%@</span> <span class="attribute">page</span> <span class="attribute">language</span>=<span class="value">"java"</span> <span class="attribute">import</span>=<span class="value">"java.util.*"</span> <span class="attribute">pageEncoding</span>=<span class="value">"UTF-8"</span><span class="value">%</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">html</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="title">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">body</span>&gt;</span></span><br><span class="line">     tomcat01服务器<span class="tag">&lt;<span class="title">br</span>/&gt;</span></span><br><span class="line">      ID：<span class="tag">&lt;<span class="title">%=session.getId()</span> %&gt;</span><span class="tag">&lt;<span class="title">br</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="title">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">html</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>我们在浏览器中输入127.0.0.1/a.jsp 就可以看到输出， 并且可以观察到无论刷新多少次，输出结果不变（nginx把用户请求粘到了某一个tomcat上）。通过浏览器F12查看网络信息，可以看到cookie中的jsesisonID值326257DA6DB76F8D2E38F2C4540D1DEA.tomcat1，即带上了某台tomcat的粘性。<br>参考：<a href="http://hanqunfeng.iteye.com/blog/1920994" target="_blank" rel="external">http://hanqunfeng.iteye.com/blog/1920994</a></p>
+<h2 id="ip_hash技术：">ip_hash技术：</h2><p>nginx中的ip_hash技术能够将某个ip的请求定向到同一台后端，这样一来这个ip下的某个客户端和某个后端就能建立起稳固的session，ip_hash是在upstream配置中定义的：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">upstream backend &#123;   </span><br><span class="line">    server 127.0.0.1:8080 ;   </span><br><span class="line">    server 127.0.0.1:9090 ;   </span><br><span class="line">    ip_hash;   </span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure><br>尽量不要使用这种方式，因为：</p>
+<p>1）nginx不是最前端的服务器：<br>   ip_hash要求nginx一定是最前端的服务器，否则nginx得不到正确ip，就不能根据ip作hash。譬如使用的是squid为最前端，那么nginx取ip时只能得到squid的服务器ip地址，用这个地址来作分流是肯定错乱的。<br>2）nginx的后端还有其它方式的负载均衡：<br>   假如nginx后端又有其它负载均衡，将请求又通过另外的方式分流了，那么某个客户端的请求肯定不能定位到同一台session应用服务器上。<br>3）多个外网出口：<br>    很多公司上网有多个出口，多个ip地址，用户访问互联网时候自动切换ip。而且这种情况不在少数。使用 ip_hash 的话对这种情况的用户无效，无法将某个用户绑定在固定的tomcat上 。</p>
 </span>
       
     </div>
@@ -359,13 +316,11 @@
         <div class="post-nav">
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2015/10/28/nginx-visual-server/" rel="prev">nginx虚拟主机搭建</a>
-            
           </div>
 
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2015/10/26/mysql-replication-master-master/" rel="next">Mysql 主主复制</a>
+              <a href="/2015/11/25/suibi-zhiyejianyi/" rel="next">最佳职业生涯7个建议（转）</a>
             
           </div>
         </div>
@@ -380,10 +335,10 @@
 
     <div class="post-spread">
       
-        <div class="ds-share flat" data-thread-key="2015/10/28/nginx-install-config/"
-     data-title="nginx安装、配置（linux下）"
+        <div class="ds-share flat" data-thread-key="2015/11/30/nginx-m-router/"
+     data-title="nginx之 nginx_upstream_jvm_route模块"
      data-content=""
-     data-url="http://yoursite.com/2015/10/28/nginx-install-config/">
+     data-url="http://yoursite.com/2015/11/30/nginx-m-router/">
   <div class="ds-share-inline">
     <ul  class="ds-share-icons-16">
 
@@ -409,8 +364,8 @@
         
           <div class="comments" id="comments">
             
-              <div class="ds-thread" data-thread-key="2015/10/28/nginx-install-config/"
-                   data-title="nginx安装、配置（linux下）" data-url="http://yoursite.com/2015/10/28/nginx-install-config/">
+              <div class="ds-thread" data-thread-key="2015/11/30/nginx-m-router/"
+                   data-title="nginx之 nginx_upstream_jvm_route模块" data-url="http://yoursite.com/2015/11/30/nginx-m-router/">
               </div>
             
           </div>
@@ -521,7 +476,7 @@
           <div class="post-toc">
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#安装"><span class="nav-number">1.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置"><span class="nav-number">2.</span> <span class="nav-text">配置</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#nginx_upstream_jvm_route技术："><span class="nav-number">1.</span> <span class="nav-text">nginx_upstream_jvm_route技术：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ip_hash技术："><span class="nav-number">2.</span> <span class="nav-text">ip_hash技术：</span></a></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator"></div>
