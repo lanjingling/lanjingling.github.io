@@ -39,17 +39,17 @@
   <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.1" />
 
 
-<meta name="description" content="发布订阅(pub/sub)是一">
+<meta name="description" content="本文介绍了一种分布式web服务架构，使用redis作为session共享存储，nginx负载均衡后端多个tomcat。每个tomcat从redis中获取session信息。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Nginx+Redis+Tomcat实现session共享的集群">
 <meta property="og:url" content="http://yoursite.com/2015/12/15/tomcat-redis-session/index.html">
 <meta property="og:site_name" content="晓的技术博客">
-<meta property="og:description" content="发布订阅(pub/sub)是一">
+<meta property="og:description" content="本文介绍了一种分布式web服务架构，使用redis作为session共享存储，nginx负载均衡后端多个tomcat。每个tomcat从redis中获取session信息。">
 <meta property="og:image" content="http://ww1.sinaimg.cn/mw690/72c913fbjw1ez039bhdxhj20go043t8s.jpg">
-<meta property="og:updated_time" content="2015-12-15T01:43:01.279Z">
+<meta property="og:updated_time" content="2015-12-15T01:48:28.225Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Nginx+Redis+Tomcat实现session共享的集群">
-<meta name="twitter:description" content="发布订阅(pub/sub)是一">
+<meta name="twitter:description" content="本文介绍了一种分布式web服务架构，使用redis作为session共享存储，nginx负载均衡后端多个tomcat。每个tomcat从redis中获取session信息。">
 
 
 <script type="text/javascript" id="hexo.configuration">
@@ -258,7 +258,7 @@
         <span itemprop="articleBody"><p><a href="http://lanjingling.github.io/2015/11/30/nginx-m-router/" target="_blank" rel="external">上篇</a>  介绍了nginx+tomcat使用粘性会话搭建的集群，这种方案确实可以解决nginx+tomcat进行负载均衡时，对于有状态的应用每次轮询造成session信息丢失的问题。但是，这种解决方案还是有一定的缺陷：<em>当绑定会话的那个后端tomcat倒了，和该tomcat粘连的用户就无法正确获取服务（有可能出现session信息丢失）</em>。</p>
 <p>下面，我们研究一种更加稳固的解决方案：session共享（如下图）<br><img src="http://ww1.sinaimg.cn/mw690/72c913fbjw1ez039bhdxhj20go043t8s.jpg" alt=""></p>
 <h2 id="配置过程">配置过程</h2><p>0、实验环境介绍：<br>Centos6、nginx-1.6.0、apache-tomcat-7.0.27（两台）、redis_version:2.8.23</p>
-<p>1、安装nginx、tomcat、redis服务；<br>|<strong>** | </strong>version<strong>| </strong>ip:port**|<br>|:—:|:—:|:—:|<br>|Nginx|1.6.0|192.168.137.122：84|<br>|Redis|2.8|192.168.137.122：6379|<br>|Tomcat_1|7.0.27|192.168.137.122：8080|<br>|Tomcat_2|7.0.27|192.168.137.101：8080|</p>
+<p>1、安装nginx、tomcat、redis服务；<br>|<strong>软件</strong> | <strong>version</strong>| <strong>ip:port</strong>|<br>|:—:|:—:|:—:|<br>|Nginx|1.6.0|192.168.137.122：84|<br>|Redis|2.8|192.168.137.122：6379|<br>|Tomcat_1|7.0.27|192.168.137.122：8080|<br>|Tomcat_2|7.0.27|192.168.137.101：8080|</p>
 <p>2、测试：</p>
 <ul>
 <li>为tomcat_1编写测试页面（a.jsp），显示 “ response from tomcat_1 ”，同时页面提供按钮显示当前session值（&lt;%=session.getId() %&gt;），放到tomcat_1 服务器的webapps/ROOT目录下；</li>
