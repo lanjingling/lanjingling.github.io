@@ -30,7 +30,7 @@
 
 
 
-  <meta name="keywords" content="nosql,redis," />
+  <meta name="keywords" content="nginx,redis,tomcat,集群," />
 
 
 
@@ -39,16 +39,17 @@
   <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.1" />
 
 
-<meta name="description" content="Redis中，用户可以使用slaveof命令或者slaveof配置项，让一个服务器去复制另一个服务器。进行复制中的主从服务器双方的数据库将保存相同的数据（一致性）。">
+<meta name="description" content="发布订阅(pub/sub)是一">
 <meta property="og:type" content="article">
-<meta property="og:title" content="redis 主从复制">
-<meta property="og:url" content="http://yoursite.com/2015/11/17/redis-mast-slaveof/index.html">
+<meta property="og:title" content="Nginx+Redis+Tomcat实现session共享的集群">
+<meta property="og:url" content="http://yoursite.com/2015/12/15/tomcat-redis-session/index.html">
 <meta property="og:site_name" content="晓的技术博客">
-<meta property="og:description" content="Redis中，用户可以使用slaveof命令或者slaveof配置项，让一个服务器去复制另一个服务器。进行复制中的主从服务器双方的数据库将保存相同的数据（一致性）。">
-<meta property="og:updated_time" content="2015-11-17T08:39:05.657Z">
+<meta property="og:description" content="发布订阅(pub/sub)是一">
+<meta property="og:image" content="http://ww1.sinaimg.cn/mw690/72c913fbjw1ez039bhdxhj20go043t8s.jpg">
+<meta property="og:updated_time" content="2015-12-15T01:43:01.279Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="redis 主从复制">
-<meta name="twitter:description" content="Redis中，用户可以使用slaveof命令或者slaveof配置项，让一个服务器去复制另一个服务器。进行复制中的主从服务器双方的数据库将保存相同的数据（一致性）。">
+<meta name="twitter:title" content="Nginx+Redis+Tomcat实现session共享的集群">
+<meta name="twitter:description" content="发布订阅(pub/sub)是一">
 
 
 <script type="text/javascript" id="hexo.configuration">
@@ -58,7 +59,7 @@
   };
 </script>
 
-  <title> redis 主从复制 | 晓的技术博客 </title>
+  <title> Nginx+Redis+Tomcat实现session共享的集群 | 晓的技术博客 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -204,7 +205,7 @@
           
           
             
-              redis 主从复制
+              Nginx+Redis+Tomcat实现session共享的集群
             
           
         </h1>
@@ -213,8 +214,8 @@
       <div class="post-meta">
         <span class="post-time">
           发表于
-          <time itemprop="dateCreated" datetime="2015-11-17T11:43:18+08:00" content="2015-11-17">
-            2015-11-17
+          <time itemprop="dateCreated" datetime="2015-12-15T09:25:19+08:00" content="2015-12-15">
+            2015-12-15
           </time>
         </span>
 
@@ -223,8 +224,8 @@
             &nbsp; | &nbsp; 分类于
             
               <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                <a href="/categories/redis/" itemprop="url" rel="index">
-                  <span itemprop="name">redis</span>
+                <a href="/categories/集群/" itemprop="url" rel="index">
+                  <span itemprop="name">集群</span>
                 </a>
               </span>
 
@@ -239,8 +240,8 @@
           
             <span class="post-comments-count">
               &nbsp; | &nbsp;
-              <a href="/2015/11/17/redis-mast-slaveof/#comments" itemprop="discussionUrl">
-                <span class="post-comments-count ds-thread-count" data-thread-key="2015/11/17/redis-mast-slaveof/" itemprop="commentsCount"></span>
+              <a href="/2015/12/15/tomcat-redis-session/#comments" itemprop="discussionUrl">
+                <span class="post-comments-count ds-thread-count" data-thread-key="2015/12/15/tomcat-redis-session/" itemprop="commentsCount"></span>
               </a>
             </span>
           
@@ -254,59 +255,38 @@
       
 
       
-        <span itemprop="articleBody"><p>Redis中，用户可以使用slaveof命令或者slaveof配置项，让一个服务器去复制另一个服务器。进行复制中的主从服务器双方的数据库将保存相同的数据（一致性）。<br>1）通过命令：<br>127.0.0.1:6380&gt; slaveof 127.0.0.2 6379<br>上面的命令表示：端口为6380的服务器 开始复制 端口为6379的服务器。</p>
-<p>2）通过配置文件：<br>主服务器不用做任何修改，在从服务器的配置文件中作如下修改：<br>slaveof 192.168.0.100 6379  (映射到主服务器上)<br>如果master设置了验证密码，还需配置masterauth。楼主的master设置了验证密码为admin，所以配置masterauth admin。配置完之后启动slave的Redis服务，OK，主从配置完成。</p>
-<p>在master和slave分别执行info命令，查看结果如下，<br>主服务器：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"># Replication</span><br><span class="line">role:master</span><br><span class="line">connected_slaves:1</span><br><span class="line">slave0:ip=127.0.0.2,port=6380,state=online,offset=10394,lag=0</span><br><span class="line">master_repl_offset:10394</span><br><span class="line">repl_backlog_active:1</span><br><span class="line">repl_backlog_size:1048576</span><br><span class="line">repl_backlog_first_byte_offset:2</span><br><span class="line">repl_backlog_histlen:10393</span><br></pre></td></tr></table></figure><br>从服务器：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"># Replication</span><br><span class="line">role:slave</span><br><span class="line">master_host:127.0.0.2</span><br><span class="line">master_port:6379</span><br><span class="line">master_link_status:up</span><br><span class="line">master_last_io_seconds_ago:3</span><br><span class="line">master_sync_in_progress:0</span><br><span class="line">slave_repl_offset:10436</span><br><span class="line">slave_priority:100</span><br><span class="line">slave_read_only:1</span><br><span class="line">connected_slaves:0</span><br><span class="line">master_repl_offset:0</span><br><span class="line">repl_backlog_active:0</span><br><span class="line">repl_backlog_size:1048576</span><br><span class="line">repl_backlog_first_byte_offset:0</span><br><span class="line">repl_backlog_histlen:0</span><br></pre></td></tr></table></figure></p>
-<p><em>注：</em></p>
-<blockquote>
-<p>当从服务器执行了slaveof命令后，从服务器中原来的数据将清空，重新加载主服务器中的数据。</p>
-</blockquote>
-<p>Redis2.8版本之前使用了旧版复制功能，2.8之后开始使用新版本的功能。</p>
-<h2 id="旧版复制：">旧版复制：</h2><p>1、旧版复制实现：<br>1）复制功能分为同步和命令传播两个步骤：</p>
+        <span itemprop="articleBody"><p><a href="http://lanjingling.github.io/2015/11/30/nginx-m-router/" target="_blank" rel="external">上篇</a>  介绍了nginx+tomcat使用粘性会话搭建的集群，这种方案确实可以解决nginx+tomcat进行负载均衡时，对于有状态的应用每次轮询造成session信息丢失的问题。但是，这种解决方案还是有一定的缺陷：<em>当绑定会话的那个后端tomcat倒了，和该tomcat粘连的用户就无法正确获取服务（有可能出现session信息丢失）</em>。</p>
+<p>下面，我们研究一种更加稳固的解决方案：session共享（如下图）<br><img src="http://ww1.sinaimg.cn/mw690/72c913fbjw1ez039bhdxhj20go043t8s.jpg" alt=""></p>
+<h2 id="配置过程">配置过程</h2><p>0、实验环境介绍：<br>Centos6、nginx-1.6.0、apache-tomcat-7.0.27（两台）、redis_version:2.8.23</p>
+<p>1、安装nginx、tomcat、redis服务；<br>|<strong>** | </strong>version<strong>| </strong>ip:port**|<br>|:—:|:—:|:—:|<br>|Nginx|1.6.0|192.168.137.122：84|<br>|Redis|2.8|192.168.137.122：6379|<br>|Tomcat_1|7.0.27|192.168.137.122：8080|<br>|Tomcat_2|7.0.27|192.168.137.101：8080|</p>
+<p>2、测试：</p>
 <ul>
-<li>同步：将从服务器的数据库状态更新成主服务器当前的数据库状态；</li>
-<li>命令传播：当主服务器的数据库状态被修改，导致主从服务器状态不一致，让主从服务器数据库状态重新回到一致状态；</li>
+<li>为tomcat_1编写测试页面（a.jsp），显示 “ response from tomcat_1 ”，同时页面提供按钮显示当前session值（&lt;%=session.getId() %&gt;），放到tomcat_1 服务器的webapps/ROOT目录下；</li>
+<li>为tomcat_2编写测试页面（a.jsp），显示 “ response from tomcat_2 ”，同时页面提供按钮显示当前session值（&lt;%=session.getId() %&gt;），放到tomcat_2 服务器的webapps/ROOT目录下；</li>
 </ul>
-<p>2）同步：<br>当客户端向从服务器发送slaveof命令后，要求从服务器复制主服务器时，从服务器首先要执行同步操作，具体为从服务器向主服务器发送SYNC命令，步骤如下：</p>
+<p>此时分别访问 <a href="http://192.168.137.122：8080" target="_blank" rel="external">http://192.168.137.122：8080</a>  和 <a href="http://192.168.137.101：8080" target="_blank" rel="external">http://192.168.137.101：8080</a> 地址，因为访问的是不同web服务器，所以各自显示不同的页面内容及session值肯定不同。</p>
+<p>3、配置tomcat的session管理（持久化到redis中）：</p>
 <ul>
-<li>从服务器向主服务器发送SYNC命令；</li>
-<li>收到SYNC命令的主服务器开始执行<font color="red">bgsave</font>，在后台生成一个rdb文件；并用一个<font color="red">缓冲区</font>记录从现在开始执行的所有写命令；</li>
-<li>主服务器bgsave执行完毕后，将rdb文件发送给从服务器；从服务器收到后载入该rdb文件，将从数据库状态更新成主服务器执行bgsave时的状态；</li>
-<li>主服务器将记录在缓冲区中的写命令发送给从服务器；从服务器执行这些命令，将其状态更新成主服务器当前的妆台；</li>
+<li>添加jedis-2.0.0.jar、tomcat-redis-session-manager-1.2-tomcat-7-java-7、commons-pool-1.3.jar 三个jar到tomcat的lib目录下；</li>
+<li>修改tomcat的conf/context.xml 文件；<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;Valve className=<span class="string">"com.radiadesign.catalina.session.RedisSessionHandlerValve"</span> /&gt;</span><br><span class="line">&lt;Manager className=<span class="string">"com.radiadesign.catalina.session.RedisSessionManager"</span></span><br><span class="line">             host=<span class="string">"192.168.137.122"</span> </span><br><span class="line">             port=<span class="string">"6379"</span> </span><br><span class="line">             database=<span class="string">"0"</span> </span><br><span class="line">             maxInactiveInterval=<span class="string">"60"</span>  /&gt;</span><br></pre></td></tr></table></figure></li>
+<li>重启tomcat；</li>
 </ul>
-<p>3）命令传播：<br>在同步操作完毕后，主从服务器达到了一致的状态，但这种状态不是一成不变的。当主服务器执行了写操作后，主服务器会对从服务器执行命令传播操作，将相应的写命令发送给从服务器，从服务器执行该命令，从而达到一致性。</p>
-<p>4）缺陷：<br>旧版复制过程中，如果主从服器出现断线，当从服务器重新连接上后，这时，由于主从服务器状态不一致，所以从服务器向主服务器发送SYNC命令。这时，主服务器会按照上面的步骤执行bgsave….操作。</p>
+<p>4、配置nginx进行负载均衡（upstream ）：</p>
+<p>在nginx的conf目录下新建conf.d目录，然后在其中新建tomcat.conf文件，内容如下：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">upstream tomcat &#123;</span><br><span class="line">    #ip_hash; </span><br><span class="line">    server 127.0.0.1:8080;</span><br><span class="line">    server 192.168.137.101:8080;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">server &#123;</span><br><span class="line">    listen       84;</span><br><span class="line">    server_name  localhost;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    #动态页面交给http://tdt_wugk，也即我们之前在nginx.conf定义的upstream tdt_wugk 均衡</span><br><span class="line">    location ~ .*\.(do|jsp|action)?$ &#123;</span><br><span class="line">        proxy_pass http://tomcat;</span><br><span class="line">        include proxy.conf;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    #配置Nginx动静分离，定义的静态页面直接从Nginx发布目录读取。</span><br><span class="line">    location ~ .*\.(html|htm|gif|jpg|jpeg|bmp|png|ico|txt|js|css)$ &#123;</span><br><span class="line">        root /data/;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    location / &#123;</span><br><span class="line">       # root   html;</span><br><span class="line">       # index  index.html index.htm;</span><br><span class="line">        proxy_pass http://tomcat;</span><br><span class="line">        include proxy.conf;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>5、验证：</p>
 <ul>
-<li>SYNC是一个比较耗资源的操作；</li>
-<li>断线期间，可能只有部分数据发生了修改；为了使这一部分数据达到一致性而执行SYNC，这种方式比较低效。</li>
+<li>访问  <a href="http://192.168.137.122：8080/a.jsp" target="_blank" rel="external">http://192.168.137.122：8080/a.jsp</a> 直接请求到tomcat_1服务器，显示 “ response from tomcat_1 ”， session 值为 ‘56E2FAE376A47F1C0961D722326B8423’；</li>
+<li>访问 <a href="http://192.168.137.101：8080/a.jsp" target="_blank" rel="external">http://192.168.137.101：8080/a.jsp</a> 直接请求到tomcat_2服务器，显示 “ response from tomcat_2 ”， session 值为 ‘56E2FAE376A47F1C0961D722326B8423’；</li>
+<li>访问 <a href="http://192.168.137.122：84/a.jsp" target="_blank" rel="external">http://192.168.137.122：84/a.jsp</a> 请求到 nginx 反向代理到指定Web服务器，由于默认使用轮询负载方式，反复刷新页面显示的内容在“ response from tomcat_1 ” 和 “ response from tomcat_2 ”之间切换，但 session 值保‘56E2FAE376A47F1C0961D722326B8423’；</li>
+<li>使用 redis-cli 连接 redis 服务器，查看会显示有 “56E2FAE376A47F1C0961D722326B8423” key的 session 数据，value为序列化数据。</li>
 </ul>
-<h2 id="新版复制：">新版复制：</h2><p>为了解决旧版复制的缺陷，2.8 以后使用PSYNC命令代替原来的SYNC命令。<font color="red">PSYNC</font>具有 完全同步和 部分同步两种模式。</p>
+<h2 id="总结">总结</h2><p>1、使用tomcat7搭建时，redis的客户端jedis版本不能太高，否则启动tomcat时会报错；我使用的是tomcat7.0.27、jedis-2.0.0.jar、tomcat-redis-session-manager-1.2-tomcat-7-java-7、commons-pool-1.3.jar </p>
+<p>2、Nginx+Redis+Tomcat集群实现session共享，配置过程简单如下：</p>
 <ul>
-<li>完全同步：用于处理初次复制情况，和SYNC执行步骤基本相同，发送RDB文件、执行缓冲区写命令；</li>
-<li>部分同步：用于处理断线后的重复制操作；从服务器重新连线后，如果条件允许，主服务器会将断线期间的写命令发送给从服务器，否则执行完全同步；</li>
+<li>首先搭建好单机版的tomcat将session持久化到redis中；</li>
+<li>然后配置nginx轮询tomcat（负载均衡）；</li>
 </ul>
-<p>1、部分同步功能由三部分构成：</p>
-<ul>
-<li>主服务器的复制偏移量、和从服务器的复制偏移量；</li>
-<li>主服务器的复制积压缓冲区；</li>
-<li>服务器的运行ID；</li>
-</ul>
-<p>1）偏移量：<br>主从服务器双方都会维护一个复制偏移量：</p>
-<ul>
-<li>主服务器每次向从服务器传播N个字节的数据时，就将自己的复制偏移量之加上N；</li>
-<li>从服务器收到主服务器传播来的N个字节数据时，就将自己的复制偏移量之加上N；<br>通过对比主从服务器的复制偏移量是否相同，就可以知道主从服务器是否处于一致性状态；</li>
-</ul>
-<p>2）复制积压缓冲区：</p>
-<font color="red">复制积压缓冲区</font> 是由主服务器维护的一个固定长度、先进先出（FIFO）队列，默认大小为1M。当进行命令传播时，主服务器不仅会将写命令发送给所有从服务器，同时将写命令放入积压缓冲区（队列）中。<br><br><font color="red">在积压缓冲区中，会为队列的每个字节记录相应的复制偏移量</font>。<br><br>在从服务器断线重新连接上后，<font color="red">从服务器通过PSYBC命令将自己的偏移量发给主服务器</font>，主服务器根据这两个量来判断执行何种同步操作：<br><br>- 如果偏移量后的数据存在复制积压缓冲区中，那么主服务器对从服务器执行部分操作；<br>- 如果偏移量后的数据不存在复制积压缓冲区中，那么主服务器对从服务器执行完整同步操作；<br><br><em>注：</em><br>&gt; 根据需要调整复制积压缓冲区大小，一般可根据公式 ：2 <em> 断线时间 </em> 主服务器每秒写命令数量；<br><br>3）运行ID：<br>无论主从服务器，redis都会有自己的运行ID。（由40个随机的十六位字符组成） 当从服务器对主服务器进行初次复制时，<font color="red">主服务器会将自己的ID发给从服务器，从服务器会将这个ID保存起来</font>。当从服务器重新连上一个主服务器时，会向当前主服务器发送之前保存的ID：<br><br>- 如果从服务器保存的ID和当前主服务器ID一样，说明从服务器断线之前复制的就是这个主服务器，主服务器可以尝试使用部分同步；<br>- 如果从服务器保存的ID和当前主服务器ID不一样，说明从服务器断线前复制的不是这个主服务器，这时主服务器对从服务器执行完整同步操作。<br><br>2、PSYNC实现：<br>1）PSYNC命令有以下两种调用方式：<br><br>- 如果从服务器以前没有复制过任何主服务器，或者执行过 slaveof no one 命令，那么从服务器开始向主服务器发送PSYNC ? -1 命令，主动请求主服务器进行完整同步；<br>- 如果从服务器复制过某个主服务器，那么从服务器开始向主服务器发送PSYNC <runid> <offset> ，其中runid是上次保存的主服务器运行ID，offset是自己的偏移量。<br><br>2）主服务器收到PSYNC命令后，根据实际情况会返回如下：<br><br>- +FULLRESYNC <runid> <offset> ，表示主服务器对从服务器执行完整同步；其中runid为主服务器运行ID，从服务器收到后会保存起来；offset为主服务器的当前复制偏移量，从服务器根据他初始化自己的偏移量；<br>- 返回+CONTINUE回复，表示主服务器对从服务器执行部分同步，这时从服务器等待主服务器发送的命令即可；<br>- 返回-ERR恢复，表示主服务器不识别PSYNC，从服务器将发送SYNC命令；<br><br><br>3、心跳检测：<br>1）在命令传播阶段，从服务器默认每秒1次的频率向主服务器发送命令：REPLCONF ACK <replication_offset><br>其中，replication_offset是从服务器的复制偏移量，发送该命令目的：<br><br>- 检测主从服务器的网络连接状况；<br>- 辅助实现min-slaves选项；<br>- 检测命令丢失；<br><br>2）检测网络状况：<br>如果主服务器1秒内没有收到从服务器发送的REPLCONF ACK 命令，那么主服务器认为主从之间连接出现问题了。<font color="red">通过在主服务器上执行info replication 在slave的lag一栏，可以看到从服务器最后一次向主服务器发送REPLCONF ACK 命令距离现在过了多少秒。正常情况下，lag在0和1之间跳动。</font>
-
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; info replication</span><br><span class="line"># Replication</span><br><span class="line">role:master</span><br><span class="line">connected_slaves:1</span><br><span class="line">slave0:ip=127.0.0.2,port=6380,state=online,offset=9652,lag=0</span><br><span class="line">master_repl_offset:9652</span><br><span class="line">repl_backlog_active:1</span><br><span class="line">repl_backlog_size:1048576</span><br><span class="line">repl_backlog_first_byte_offset:2</span><br><span class="line">repl_backlog_histlen:9651</span><br></pre></td></tr></table></figure>
-<p>3）实现min-slaves：</p>
-<font color="red">redis的min-slaves-to-write和min-slaves-max-lag两个选项，可以防止主服务器在不安全的情况系执行写命令。</font>
-
-<p>例如，主服务器设置：<br>min-slaves-to-write 3<br>min-slaves-max-lag 10<br>那么，从服务器数量少于3，或者3个从服务器的延时（lag）值都大于等于10秒时，主服务器将拒绝执行写命令。可以通过在主服务器上执行 info replication 命令查看lag值。</p>
-<p>4）检测命令丢失：</p>
-<p>如果因为网络，主服务器发送给从服务器的写命令半路丢失，那么当从服务器发送REPLCONF ACK命令时，主服务器将发现从服务器的偏移量少于自己的复制偏移量，然后主服务器会根据从服务器的复制偏移量从复制积压缓冲区中取出对应的写命令，重新发给从服务器。</p>
-</replication_offset></offset></runid></offset></runid></span>
+</span>
       
     </div>
 
@@ -314,9 +294,13 @@
       
         <div class="post-tags">
           
-            <a href="/tags/nosql/" rel="tag">#nosql</a>
+            <a href="/tags/nginx/" rel="tag">#nginx</a>
           
             <a href="/tags/redis/" rel="tag">#redis</a>
+          
+            <a href="/tags/tomcat/" rel="tag">#tomcat</a>
+          
+            <a href="/tags/集群/" rel="tag">#集群</a>
           
         </div>
       
@@ -325,13 +309,11 @@
         <div class="post-nav">
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2015/11/19/redis-sort/" rel="prev">redis 排序</a>
-            
           </div>
 
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2015/11/16/redis-chijiuhua/" rel="next">redis持久化——RDB、AOF</a>
+              <a href="/2015/11/30/nginx-m-router/" rel="next">nginx之 nginx_upstream_jvm_route模块</a>
             
           </div>
         </div>
@@ -346,10 +328,10 @@
 
     <div class="post-spread">
       
-        <div class="ds-share flat" data-thread-key="2015/11/17/redis-mast-slaveof/"
-     data-title="redis 主从复制"
+        <div class="ds-share flat" data-thread-key="2015/12/15/tomcat-redis-session/"
+     data-title="Nginx+Redis+Tomcat实现session共享的集群"
      data-content=""
-     data-url="http://yoursite.com/2015/11/17/redis-mast-slaveof/">
+     data-url="http://yoursite.com/2015/12/15/tomcat-redis-session/">
   <div class="ds-share-inline">
     <ul  class="ds-share-icons-16">
 
@@ -375,8 +357,8 @@
         
           <div class="comments" id="comments">
             
-              <div class="ds-thread" data-thread-key="2015/11/17/redis-mast-slaveof/"
-                   data-title="redis 主从复制" data-url="http://yoursite.com/2015/11/17/redis-mast-slaveof/">
+              <div class="ds-thread" data-thread-key="2015/12/15/tomcat-redis-session/"
+                   data-title="Nginx+Redis+Tomcat实现session共享的集群" data-url="http://yoursite.com/2015/12/15/tomcat-redis-session/">
               </div>
             
           </div>
@@ -487,7 +469,7 @@
           <div class="post-toc">
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#旧版复制："><span class="nav-number">1.</span> <span class="nav-text">旧版复制：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#新版复制："><span class="nav-number">2.</span> <span class="nav-text">新版复制：</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#配置过程"><span class="nav-number">1.</span> <span class="nav-text">配置过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">2.</span> <span class="nav-text">总结</span></a></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator"></div>
