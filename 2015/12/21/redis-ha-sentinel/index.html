@@ -1,0 +1,846 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.5.1"/>
+
+
+    <meta name="description" content="java程序员、爱开源、喜欢nodejs、前端js、oracle数据库、分布式技术...<br/>改变世界的是这么一群人,他们寻找梦想中的乐园,当他们找不到时,就亲手创造了她..." />
+
+
+
+  <meta name="keywords" content="nosql,redis,sentinel," />
+
+
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.1" />
+
+
+<meta name="description" content="sentinel 是Redis自带的一套高可用解决方案，它可以进行自动故障转移中。。。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="redis sentinel">
+<meta property="og:url" content="http://yoursite.com/2015/12/21/redis-ha-sentinel/index.html">
+<meta property="og:site_name" content="晓的技术博客">
+<meta property="og:description" content="sentinel 是Redis自带的一套高可用解决方案，它可以进行自动故障转移中。。。">
+<meta property="og:image" content="http://ww4.sinaimg.cn/mw690/72c913fbjw1ez70cb19dmj20bi095wf8.jpg">
+<meta property="og:image" content="http://ww3.sinaimg.cn/mw690/72c913fbjw1ez70cbezl0j20cc09awfc.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/mw690/72c913fbjw1ez70cboekij20ce096t9j.jpg">
+<meta property="og:image" content="http://ww1.sinaimg.cn/mw690/72c913fbjw1ez70cbzzxtj20dt0cgdhv.jpg">
+<meta property="og:updated_time" content="2015-12-21T02:23:33.996Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="redis sentinel">
+<meta name="twitter:description" content="sentinel 是Redis自带的一套高可用解决方案，它可以进行自动故障转移中。。。">
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'post'
+  };
+</script>
+
+  <title> redis sentinel | 晓的技术博客 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?93b1a723d246349c4cace650dee4a731";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand" rel="start">
+      <span class="logo">
+        <i class="icon-next-logo"></i>
+      </span>
+      <span class="site-title">晓的技术博客</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu menu-left">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            <i class="menu-item-icon icon-next-home"></i> <br />
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            <i class="menu-item-icon icon-next-archives"></i> <br />
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            <i class="menu-item-icon icon-next-categories"></i> <br />
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            <i class="menu-item-icon icon-next-tags"></i> <br />
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            <i class="menu-item-icon icon-next-about"></i> <br />
+            关于
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <form class="site-search-form">
+    <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+  </form>
+
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'iSunJWoZvxV9mKcJc6QU','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content"> 
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+
+      
+      
+        <h1 class="post-title" itemprop="name headline">
+          
+          
+            
+              redis sentinel
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于
+          <time itemprop="dateCreated" datetime="2015-12-21T09:06:10+08:00" content="2015-12-21">
+            2015-12-21
+          </time>
+        </span>
+
+        
+          <span class="post-category" >
+            &nbsp; | &nbsp; 分类于
+            
+              <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                <a href="/categories/redis/" itemprop="url" rel="index">
+                  <span itemprop="name">redis</span>
+                </a>
+              </span>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+            <span class="post-comments-count">
+              &nbsp; | &nbsp;
+              <a href="/2015/12/21/redis-ha-sentinel/#comments" itemprop="discussionUrl">
+                <span class="post-comments-count ds-thread-count" data-thread-key="2015/12/21/redis-ha-sentinel/" itemprop="commentsCount"></span>
+              </a>
+            </span>
+          
+        
+      </div>
+    </header>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><p>Sentinel（哨兵）是Redis的高可用（HA）解决方案：</p>
+<ol>
+<li>由一个或多个sentinel实例组成的sentinel系统，可以监控任意多个主服务器（master），以及其下属的从服务器（slavers）；</li>
+<li>当主服务器（master）下线时，自动将下线主服务器属下的某个从服务器升级成新的主服务器，由新的master代替下线master继续提供服务；</li>
+<li>sentinel系统会向下线主服务器所有从服务器发送新的复制指令，让他们成为新主服务器的从服务器；</li>
+<li>sentinel系统会继续监控下线的master，并在其上线时，将它设置为新master的从服务器；</li>
+</ol>
+<p>具体说明如下图：如图1，server1为master，server2-4为其slave；当sentinel系统察觉server1下线后，会进行故障转移（如图2），将server2升级为master，并设置server3-4为server2的slave；同时，sentinel会继续监控server1，当其上线后，将server1降级为server2的slave。<br><img src="http://ww4.sinaimg.cn/mw690/72c913fbjw1ez70cb19dmj20bi095wf8.jpg" alt=""></p>
+<p><img src="http://ww3.sinaimg.cn/mw690/72c913fbjw1ez70cbezl0j20cc09awfc.jpg" alt=""></p>
+<p><img src="http://ww1.sinaimg.cn/mw690/72c913fbjw1ez70cboekij20ce096t9j.jpg" alt=""></p>
+<h2 id="一、sentinel原理：">一、sentinel原理：</h2><p>1、启动并初始化sentinel：</p>
+<p>1）sentinel本质上是一个运行在特殊模式下的Redis服务器，可以使用下面两种方式启动sentinel服务：</p>
+<blockquote>
+<p>$ redis-sentinel /path/sentinel.conf<br> 或<br> $ redis-server /path/sentinel.conf –sentinel</p>
+</blockquote>
+<p>2）初始化sentinel服务：</p>
+<ol>
+<li>当sentinel服务启动后，会初始化一个sentinelState结构，其内部masters字典记录了所有被sentinel监视的主服务器（master）相关信息，这些信息一开始是通过sentinel.conf配置文件中读取的（后面会通过INFO命令的回复进行更新）；</li>
+<li>sentinel服务器会对所有监视的主服务器（master）创建两个异步网络连接：</li>
+</ol>
+<ul>
+<li>命令连接：用来向主服务器发送命令，并接受回复；（sentinel作为主服务器的客户端）</li>
+<li>订阅链接：用来订阅主服务器的<em>sentinel</em>:hello频道；</li>
+</ul>
+<p>2、sentinel获取主、从服务器信息：</p>
+<p>1）获取主服务器信息：<br>sentinel<font color="red">默认以<em>每10秒</em>一次的频率，通过命令连接向其监视的所有主服务器发送INFO命令</font>，并通过分析命令的回复来获取主、从服务器的信息：</p>
+<ul>
+<li>关于主服务器的信息，如：runID、role域记录等；</li>
+<li>关于主服务器下属的从服务器信息，包括：ip、port等；（<font color="red">sentinel无需用户在配置文件中提供从服务器的地址信息，就可以自动发现从服务器</font>）</li>
+</ul>
+<p>获取的主服务器信息，会更新到sentinelState结构内部的masters字典；对于主服务器下属的从服务器信息会被保存到sentinelRedisInstane结构的slaves字典中（如果从服务器已经存在，则更新；不存在则添加）。如下图<br><img src="http://ww1.sinaimg.cn/mw690/72c913fbjw1ez70cbzzxtj20dt0cgdhv.jpg" alt=""></p>
+<p><em>说明：</em></p>
+<ul>
+<li>主服务器的实例结构flags属性是SRI_MASTER，而从服务器的为SRI_SLAVE;</li>
+<li>主服务器实例结构的name属性是根据sentinel.conf中读取的；而从服务器实例结构的name属性值是ip:port自动设置的；</li>
+</ul>
+<p>2）获取从服务器信息：<br>当sentinel发现主服务器有新的从服务器时，sentinel除了会创建相应的从服务器实例结构外，还会创建从服务器的命令连接和订阅连接。同样，<font color="red">sentinel也会以以<em>每10秒</em>一次的频率，通过命令连接向从服务器发送INFO命令</font>，并分析其回复信息：</p>
+<ul>
+<li>从服务器run_id、role、优先级、从服务器的复制偏移量；</li>
+<li>主服务器ip、port信息；</li>
+</ul>
+<p>这些信息都会更新到从服务器实例结构中。</p>
+<p>3、sentinel向主、从服务器发送、接收信息：</p>
+<p>1）<font color="red">默认sentinel会以<em>每2秒</em>频率，通过命令连接向所有被监视的主、从服务器发送下面格式的命令</font>（向指定频道发布消息）：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Publish  _sentinel_:hello <span class="tag">&lt;<span class="title">s_ip</span>&gt;</span>,<span class="tag">&lt;<span class="title">s_port</span>&gt;</span>,<span class="tag">&lt;<span class="title">s_runid</span>&gt;</span>,<span class="tag">&lt;<span class="title">s_epoch</span>&gt;</span>,<span class="tag">&lt;<span class="title">m_name</span>&gt;</span>,<span class="tag">&lt;<span class="title">m_ip</span>&gt;</span>,<span class="tag">&lt;<span class="title">m_port</span>&gt;</span>,<span class="tag">&lt;<span class="title">m_epoch</span>&gt;</span></span><br></pre></td></tr></table></figure><br>其中，s<em>开头的是sentinel本身信息，m</em>开头的是主服务器信息；</p>
+<p>2）接收来自主、从服务器的频道信息：<br>当sentinel与一个主服务器或者从服务器建立起订阅连接后，sentinel就会通过订阅连接，向服务器发送：subscribe <em>sentinel</em>:hello 命令，该频道的订阅会一直持续到sentinel与服务器连接断开位置。也就是说，对于每个与sentinel连接的服务器，sentinel既通过命令连接向服务器的<em>sentinel</em>:hello频道发布消息；同时，又通过订阅连接从服务器的<em>sentinel</em>:hello频道接收信息。</p>
+<p>4、sentinel间通信：<br>1）对于监视同一个服务器的多个sentinel而言，一个sentinel发送的信息会被其他sentinel接收到，这些信息会被用于更新其他sentinel对于发送信息的sentinel的认知，也会被用于更细其他sentinel对被监视服务器的认知。</p>
+<p>假如：sentinel1、sentinel2、sentinel3同时监控一个主服务器，那么sentinel1向<em>sentinel</em>:hello频道发送一条信息（按上面的格式），所有订阅了<em>sentinel</em>:hello频道的sentinel（包括sentinel1自己）都会收到该信息。sentinel收到信息后，先取出sentinel ip、port，并检查sentinel ip、port和自己的是否一样：</p>
+<ul>
+<li>如果一样，则不处理（证明是自己发的）；</li>
+<li>如果不一样，说明是监视同一服务器的其他sentinel发送的，接收者从信息中取出主服务器信息，对相应主服务器实例结构进行更新。</li>
+</ul>
+<p>2）更新sentinel字典：</p>
+<p>sentinel为主服务器（MASTER）创建的实例结构中，sentinels字典保存除了sentinel本身之外，还保存了所有监视这个主服务器的其他sentinel信息。当一个sentinel接收到其他sentinel信息时（前者为目标sentinel，后者为员sentinel），目标sentinel会从信息中取出：</p>
+<ul>
+<li>与sentinel相关的信息：源sentinel的ip、port、run_id、配置元等；</li>
+<li>与主服务器相关信息：源sentinel监视的主服务器ip、port、配置元…；</li>
+</ul>
+<p>目标sentinel根据主服务器信息，会在自己的sentinelState结构的masters字典中查找对应的主服务器结构，然后根据信息的sentinel部分查找主服务器实例结构的sentinels字典中检查员sentinel是否存在：</p>
+<ul>
+<li>如果存在，则更新；</li>
+<li>不存在，创建；（说明源sentinel是刚刚开始监视主服务器的）</li>
+</ul>
+<p><em>说明</em>：因为一个sentinel可以通过分析接收到的频道信息来获知其他sentinel的存在，并通过发送频道信息让其他sentinel感知自己，<font color="red">所以用户在使用sentinel时并不需要提供各个sentinel配置信息，监视同一个主服务器的多个sentinel可以自动发现对方。</font></p>
+<p>3）创建连向其他sentinel的命令连接：</p>
+<p>当一个sentinel通过频道信息发现一个新的sentinel时，它不仅会为新的sentinel在主服务器的sentinels字典中创建对应结构外，还会创建一个连向新sentinel的命令连接；同样新的sentinel也会创建这个sentinel的命令连接。最终，<font color="red">监视同一个主服务器的多个sentinel会形成一个连接网。</font></p>
+<p><em>注：</em></p>
+<ul>
+<li>各个sentinel通过命令连接向其他sentinel发送命令请求，来进行信息交互；（<em>确认实例是否客观下线时需要用到</em>）；</li>
+<li>sentinel间不需要订阅连接；</li>
+</ul>
+<p>5、sentinel检测主观下线：</p>
+<p><font color="red">默认情况下，sentinel会以<em>每1秒</em>的频率，向所有与它创建了命令连接的实例（主服务器、从服务器、其他sentinel服务器）发送PING命令</font>，并通过回复信息判断实例是否在线。PING的回复分为：</p>
+<ul>
+<li>有效回复：实例返回+PING、-LOADING、-MASTERDOWN三种中的一种；</li>
+<li>无效回复：除了以上的回复；</li>
+</ul>
+<p>1）主观下线：</p>
+<p>在sentinel.conf配置文件中，down-after-milliseconds选项指定了sentinel判断实例进入主观下线的时间长度。如果在down-after-milliseconds指定毫秒内，实例连续返回无效回复，那么sentinel认为该实例主观下线，同时修改该实例结构中flags属性为SRI_S_DOWN。<br>注：down-after-milliseconds选项值可以作为主服务器（master）、从服务器（slaves）、其他sentinel主观下线的条件。</p>
+<p>2）多个sentinel设置的主观下线时间长度不等：</p>
+<p>对于监视同一个主服务器的多个sentinel来说，这些sentinel在配置文件中设置的down-after-milliseconds选项值可能不同，所以当一个sentinel判断某个实例主观下线后，其他sentinel可能认为该实例仍然在线。例如：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">sentinel1配置：</span><br><span class="line">sentinel monitor def_master 127.0.0.1 6379 2 </span><br><span class="line">sentinel down-after-milliseconds def_master 30000</span><br><span class="line">sentinel2配置：</span><br><span class="line">sentinel monitor def_master 127.0.0.1 6379 2 </span><br><span class="line">sentinel down-after-milliseconds def_master 50000</span><br></pre></td></tr></table></figure></p>
+<p>6、sentinel检测客观下线：</p>
+<p>当sentinel将一个主服务器判断为主观下线后，为了确认这个主服务器是否真的下线，他会向同样监视这个主服务器的其他sentinel进行询问，看它们是否认为该主服务器是否下线（主观或者客观）。当sentinel从其他sentinel那里接收到足够数量的已下线判断之后，sentinel就将主服务器判断为客观下线，并对主服务器进行故障转移（failover）。</p>
+<p>1）发送sentinel is-master-down-by-addr <s_ip> <s_port> <current_epoch> <runid> 命令：<br>sentinel通过命令连接，向其他sentinel发送sentinel is-master-down-by-addr <s_ip> <s_port> <current_epoch> <runid> 命令，其中：</runid></current_epoch></s_port></s_ip></runid></current_epoch></s_port></s_ip></p>
+<ul>
+<li>s_ip:被认为主观下线的主服务器ip；</li>
+<li>s_port:被认为主观下线的主服务器port；</li>
+<li>current_epoch：sentinel当前的配置元信息，用来选举领头sentinel；</li>
+<li>runid：可以为<em>或者sentinel的runid。当是</em>代表命令仅仅用于检测主服务器的客观下线状态；当为runid时，用来选举领头sentinel；</li>
+</ul>
+<p>2）回复sentinel is-master-down-by-addr <s_ip> <s_port> <current_epoch> <runid>命令：<br>当目标sentinel接收到sentinel is-master-down-by-addr 命令后，会取出主服务器的ip和port，检查其是否已下线，然后向源sentinel返回含有三个参数的Multi bulk回复：</runid></current_epoch></s_port></s_ip></p>
+<ul>
+<li>down_state：0或1，0代表主服务器下线，1代表在线；</li>
+<li>eader_runid：<em>或者目标sentinel的局部领头sentinel的runid；当是</em>代表命令仅仅用于检测主服务器的客观下线状态；当为runid时，用来选举领头sentinel；</li>
+<li>leader_epoch：目标sentinel的局部领头sentinel的配置元；只有在leader_runid不为*时有效，否则始终为0；</li>
+</ul>
+<p>3）客观下线：<br>源sentinel接收到sentinel is-master-down-by-addr <s_ip> <s_port> <current_epoch> <runid> 命令的回复后，会统计其他sentinel同意主服务器下线的数量，当这一数量达到sentinel.conf配置文件中指定的值时，sentinel会将主服务器实例结构flags属性设置为S_O_DOWN。例如：<br>sentinel monitor def_master 127.0.0.1 6379 2<br>只要两个sentinel认为主服务器已经下线，那么sentinel就认为该主服务器已经下线。</runid></current_epoch></s_port></s_ip></p>
+<p>4）不同sentinel判断客观下线的条件可能不同：<br>对于监视同一个主服务器的多个sentinel来说，这些sentinel在配置文件中设置的quorum肯能不一样，所以当一个sentinel认为主服务器客观下线，其他sentinel可能并不认为。</p>
+<h2 id="二、选举领头sentinel：">二、选举领头sentinel：</h2><p>当一个主服务器被判断成客观下线后，监视这个主服务器（master）的各个sentinel会进行协商，选举一个领头sentinel，并由领头sentinel对下线主服务器执行故障转移。</p>
+<p>1、领头sentinel选举算法：</p>
+<ul>
+<li>所有在线的sentinel都有资格被选为领头sentinel；</li>
+<li>每次进行领头选举之后，不论选举成功？失败，所有sentinel的配置元（config epoch）都会自增一次。配置元实际就是计数器；</li>
+<li>在一个配置元里，所有sentinel都有一次将某个sentinel设置为局部领头sentinel的机会，并且局部领头一旦设置，这个配置元里面就不能更改；</li>
+<li>每个发现主服务器客观下线的sentinel，都会要求其他sentinel将自己设置为局部领头sentinel；</li>
+<li>当一个源sentinel向一个目标sentinel发送sentinel is-master-down-by-addr <s_ip> <s_port> <current_epoch> <runid>命令，并且<current_epoch>不为*时（为源sentinel的runid），表示源sentinel要求目标sentinel将前者设置为局部领头sentinel；</current_epoch></runid></current_epoch></s_port></s_ip></li>
+<li>sentinel设置局部领头sentinel的规则是先到先得：<font color="red">最先向目标sentinel发送设置要求的源sentinel将成为目标sentinel的局部领头sentinel，而之后收到的所有设置都会被目标sentinel拒绝；</font></li>
+<li>目标sentinel在收到sentinel is-master-down-by-addr <s_ip> <s_port> <current_epoch> <runid>命令后，将回复一条带有三个参数的消息，其中leader_runid参数和leader_epoch分别是目标sentinel的局部领头sentinel的runid和配置元；</runid></current_epoch></s_port></s_ip></li>
+<li>源sentinel再接受到回复后，会检查回复中的leader_epoch参数和自己的进行对比，如果相同，再取出leader_runid，如果leader_runid和源sentinel一样，那么表示目标sentinel将源sentinel设置成了局部领头sentinel；</li>
+<li>如果某一个sentinel被半数以上的sentinel设置成了领头sentinel，那么这个sentinel就成为了领头sentinel；</li>
+<li>因为领头sentinel的产生需要半数以上sentinel支持，且每个sentinel在每个配置元中只能设置一次局部领头sentinel，所以一个配置元里只能出现一个领头sentinel；</li>
+<li>如果在指定时间里，没有一个sentinel被选为领头sentinel，那么各个sentinel将在一段时间后再次选举，知道选出为止。</li>
+</ul>
+<p>2、故障转移：<br>在选出了领头sentinel后，领头sentinel将对下线的主服务器进行故障转移，步骤：</p>
+<ol>
+<li>在已下线的主服务器属下的所有从服务器中，挑一个从服务器，并将其转换为主服务器；</li>
+<li>让已下线主服务器属下的所有从服务器更改为复制新的主服务器；（通过slave of命令实现）</li>
+<li>将已下线主服务器设置为新的主服务器的从服务器，当这个旧主服务器从新上线后，它就成为新主服务器的从服务器（<font color="red">因为旧主服务器已经下线，所以只能将slave of命令保存到sentinel系统的旧主服务器实例结构中，当旧主服务器重新上线后，sentinel就会向他发送slave of命令</font>）；</li>
+</ol>
+<p>3、选取新的主服务器：</p>
+<p>1）升级主服务器：<br>从已下线的主服务器属下中，挑一个状态良好、数据完整的从服务器，然后向其发送slave of no one命令，将这个从服务器升级为主服务器。在发送slave of on one后，领头sentinel会以每1秒的频率（平时是每10秒），向新的主服务器发送INFO命令，并观察回复中的role信息，当role从原来的slave变成master后，领头sentinel就认为从服务器已经升级成为主服务器了。</p>
+<p>2）选取新的主服务器规则:</p>
+<ul>
+<li>领头sentinel将已下线的主服务器的所有从服务器保存到一个列表中，然后按下面进行过滤：</li>
+<li>删除列表中所有处于下线或断线转发太的从服务器；</li>
+<li>删除列表中所有最近5s内没有回复过领头sentinel的INFO命令的从服务器；</li>
+<li>删除所有与已下线的主服务器连接断开超过down-after-millisecondes * 10毫秒的从服务器；</li>
+</ul>
+<p>之后，领头sentinel将根据从服务器的优先级排序（选出优先级最高的）；如果具有多个相同最高优先级的从服务器，那么再按照从服务器的复制偏移量排序（选出偏移量最大的）；如果还有相同的从服务器，那么按照runid进行排序，选出其中runid最小的。</p>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/nosql/" rel="tag">#nosql</a>
+          
+            <a href="/tags/redis/" rel="tag">#redis</a>
+          
+            <a href="/tags/sentinel/" rel="tag">#sentinel</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/12/15/tomcat-redis-session/" rel="next">Nginx+Redis+Tomcat实现session共享的集群</a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <div class="ds-share flat" data-thread-key="2015/12/21/redis-ha-sentinel/"
+     data-title="redis sentinel"
+     data-content=""
+     data-url="http://yoursite.com/2015/12/21/redis-ha-sentinel/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
+
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
+      
+    </div>
+  </div>
+
+ </div>
+
+        
+
+        
+          <div class="comments" id="comments">
+            
+              <div class="ds-thread" data-thread-key="2015/12/21/redis-ha-sentinel/"
+                   data-title="redis sentinel" data-url="http://yoursite.com/2015/12/21/redis-ha-sentinel/">
+              </div>
+            
+          </div>
+        
+      </div>
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="/images/lanjingling.jpg" alt="蓝精灵" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">蓝精灵</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">java程序员、爱开源、喜欢nodejs、前端js、oracle数据库、分布式技术...<br/>改变世界的是这么一群人,他们寻找梦想中的乐园,当他们找不到时,就亲手创造了她...</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">31</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">12</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">22</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/lanjingling" target="_blank">github</a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://blog.csdn.net/liuxiao723846" target="_blank">csdn</a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/1925780475" target="_blank">weibo</a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+            <p class="site-author-name">Links</p>
+            
+              <span class="links-of-author-item">
+              <a href="http://www.ruanyifeng.com/blog/" target="_blank">阮一峰</a>
+              </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://zipperary.com/" target="_blank">Zippera's Blog</a>
+              </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://wuchong.me/" target="_blank">Jark's Blog</a>
+              </span>
+            
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、sentinel原理："><span class="nav-number">1.</span> <span class="nav-text">一、sentinel原理：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、选举领头sentinel："><span class="nav-number">2.</span> <span class="nav-text">二、选举领头sentinel：</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner"> <div class="copyright" >
+  
+  &copy; &nbsp;  2014 - 
+  <span itemprop="copyrightYear">2015</span>
+  <span class="with-love">
+    <i class="icon-next-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">蓝精灵</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+ </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+  
+    
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"lanjingling"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+    
+     
+
+    
+  
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.1"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.1"></script>
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/js/motion_global.js?v=0.4.5.1" id="motion.global"></script>
+
+
+
+
+  <script type="text/javascript" src="/js/nav-toggle.js?v=0.4.5.1"></script>
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.1" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 0.4 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    var $tocContent = $('.post-toc-content');
+    if (isDesktop() && CONFIG.sidebar === 'post') {
+      if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+        displaySidebar();
+      }
+    }
+  });
+</script>
+
+
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      if (CONFIG.sidebar === 'always') {
+        displaySidebar();
+      }
+      if (isMobile()) {
+        FastClick.attach(document.body);
+      }
+    });
+  </script>
+
+  
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/lazyload.js"></script>
+  <script type="text/javascript">
+    $(function () {
+      $("#posts").find('img').lazyload({
+        placeholder: "/images/loading.gif",
+        effect: "fadeIn"
+      });
+    });
+  </script>
+</body>
+</html>
