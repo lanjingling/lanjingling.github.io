@@ -30,7 +30,7 @@
 
 
 
-  <meta name="keywords" content="oracle," />
+  <meta name="keywords" content="nosql,redis,集群," />
 
 
 
@@ -39,16 +39,16 @@
   <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.1" />
 
 
-<meta name="description" content="Oracle XE是 Oracle 数据库的免费版本，支持标准版的大部分功能，11g XE 提供 Windows 和 Linux 版本(有32位和64位之分)。 Oracle XE版本也称”快捷版本“，是给个人学习、熟悉Oracle的简化版，可能是由于标准版oracle的安装（在linux、unix下）非常复杂，所以，oracle公司在最近才发布了这个快捷版本。">
+<meta name="description" content="本文介绍了在linux上如何使用三个redis实例、三个sentinel实例搭建一个redis的HA集群；此外使用JedisSentinelPool进行了测试。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Oracle Express Edition安装">
-<meta property="og:url" content="http://yoursite.com/2015/09/29/oracle-express-install/index.html">
+<meta property="og:title" content="sentinel、JedisSentinelPool实战">
+<meta property="og:url" content="http://yoursite.com/2015/12/29/redis-sentinel-jedis-shizhan/index.html">
 <meta property="og:site_name" content="晓的技术博客">
-<meta property="og:description" content="Oracle XE是 Oracle 数据库的免费版本，支持标准版的大部分功能，11g XE 提供 Windows 和 Linux 版本(有32位和64位之分)。 Oracle XE版本也称”快捷版本“，是给个人学习、熟悉Oracle的简化版，可能是由于标准版oracle的安装（在linux、unix下）非常复杂，所以，oracle公司在最近才发布了这个快捷版本。">
-<meta property="og:updated_time" content="2015-09-29T10:34:53.151Z">
+<meta property="og:description" content="本文介绍了在linux上如何使用三个redis实例、三个sentinel实例搭建一个redis的HA集群；此外使用JedisSentinelPool进行了测试。">
+<meta property="og:updated_time" content="2015-12-29T09:26:45.314Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Oracle Express Edition安装">
-<meta name="twitter:description" content="Oracle XE是 Oracle 数据库的免费版本，支持标准版的大部分功能，11g XE 提供 Windows 和 Linux 版本(有32位和64位之分)。 Oracle XE版本也称”快捷版本“，是给个人学习、熟悉Oracle的简化版，可能是由于标准版oracle的安装（在linux、unix下）非常复杂，所以，oracle公司在最近才发布了这个快捷版本。">
+<meta name="twitter:title" content="sentinel、JedisSentinelPool实战">
+<meta name="twitter:description" content="本文介绍了在linux上如何使用三个redis实例、三个sentinel实例搭建一个redis的HA集群；此外使用JedisSentinelPool进行了测试。">
 
 
 <script type="text/javascript" id="hexo.configuration">
@@ -58,7 +58,7 @@
   };
 </script>
 
-  <title> Oracle Express Edition安装 | 晓的技术博客 </title>
+  <title> sentinel、JedisSentinelPool实战 | 晓的技术博客 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -204,7 +204,7 @@
           
           
             
-              Oracle Express Edition安装
+              sentinel、JedisSentinelPool实战
             
           
         </h1>
@@ -213,8 +213,8 @@
       <div class="post-meta">
         <span class="post-time">
           发表于
-          <time itemprop="dateCreated" datetime="2015-09-29T17:59:37+08:00" content="2015-09-29">
-            2015-09-29
+          <time itemprop="dateCreated" datetime="2015-12-29T17:07:10+08:00" content="2015-12-29">
+            2015-12-29
           </time>
         </span>
 
@@ -223,8 +223,8 @@
             &nbsp; | &nbsp; 分类于
             
               <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                <a href="/categories/oracle/" itemprop="url" rel="index">
-                  <span itemprop="name">oracle</span>
+                <a href="/categories/redis/" itemprop="url" rel="index">
+                  <span itemprop="name">redis</span>
                 </a>
               </span>
 
@@ -239,8 +239,8 @@
           
             <span class="post-comments-count">
               &nbsp; | &nbsp;
-              <a href="/2015/09/29/oracle-express-install/#comments" itemprop="discussionUrl">
-                <span class="post-comments-count ds-thread-count" data-thread-key="2015/09/29/oracle-express-install/" itemprop="commentsCount"></span>
+              <a href="/2015/12/29/redis-sentinel-jedis-shizhan/#comments" itemprop="discussionUrl">
+                <span class="post-comments-count ds-thread-count" data-thread-key="2015/12/29/redis-sentinel-jedis-shizhan/" itemprop="commentsCount"></span>
               </a>
             </span>
           
@@ -254,62 +254,58 @@
       
 
       
-        <span itemprop="articleBody"><p><a href="http://www.oracle.com/technetwork/cn/database/database-technologies/express-edition/downloads/index.html" target="_blank" rel="external">Oracle 11g XE</a> 是 Oracle 数据库的免费版本，支持标准版的大部分功能，11g XE 提供 Windows 和 Linux 版本(有32位和64位之分)。 Oracle XE版本也称”快捷版本“，是给个人学习、熟悉Oracle的简化版，可能是由于标准版oracle的安装（在linux、unix下）非常复杂，所以，oracle公司在最近才发布了这个快捷版本。</p>
-<p>Oracle XE做为免费的 Oracle 数据库版本， 主要的限制是： </p>
+        <span itemprop="articleBody"><h2 id="一、最小sentinel集群配置">一、最小sentinel集群配置</h2><p>Redis 2.8，其Sentinel版本称为Sentinel 2，是在Sentinel 1的基础上重写的。因为Sentinel 1已经废弃而且BUG太多，所以强烈建议将Redis和Sentinel均升级到2.8版本，本文中安装的版本为最新的2.8.23。</p>
+<p>1、环境：</p>
 <ul>
-<li>最大数据库大小为 11 GB；</li>
-<li>可使用的最大内存是 1G；</li>
-<li>一台机器上只能安装一个 XE 实例 ；</li>
-<li>XE 只能使用单 CPU</li>
+<li>centos主机的IP：172.30.37.73</li>
+<li>在centos上安装redis软件，然后添加配置文件，启动三个redis实例；再配置成一主两从的架构；</li>
+<li>添加配置文件，启动三个sentinel实例，让这三个sentinel实例共同监控主redis实例，当主redis实例发生宕机后，进行failover；</li>
 </ul>
-<p>接下来，介绍在centos6（64位）上如何安装Oracle XE。</p>
-<h2 id="一下载Oracle_XE">一下载Oracle XE</h2><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget http://download.oracle.com/otn/linux/oracle11g/xe/oracle-xe-11.2.0-1.0.x86_64.rpm.zip</span><br></pre></td></tr></table></figure>
-<h2 id="二安装依赖">二安装依赖</h2><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install libaio libaio-devel bc -y</span><br></pre></td></tr></table></figure>
-<h2 id="三安装">三安装</h2><p><font color="red">以下操作，都是用root</font></p>
-<h3 id="解压、检测">解压、检测</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">unzip oracle-xe-11.2.0-1.0.x86_64.rpm.zip  </span><br><span class="line">cd Disk1  </span><br><span class="line">rpm -ivh oracle-xe-11.2.0-1.0.x86_64.rpm</span><br></pre></td></tr></table></figure>
-<p>安装时会对系统进行检测，最好内存有1G，SWAP要求是内存的2倍。检测结果如下：</p>
-<blockquote>
-<p>[root@server01 Disk1]# rpm -ivh oracle-xe-11.2.0-1.0.x86_64.rpm<br>Preparing…                ########################################### [100%]<br>   1:oracle-xe              ########################################### [100%]<br>Executing post-install steps…</p>
-</blockquote>
-<p>You must run ‘/etc/init.d/oracle-xe configure’ as the root user to configure the database.</p>
-<h3 id="根据提示安装，但如果tmpfs小于2G，会报错：">根据提示安装，但如果tmpfs小于2G，会报错：</h3><blockquote>
-<p>Database Configuration failed. Look into /u01/app/oracle/product/11.2.0/xe/config/log for details</p>
-</blockquote>
-<p>1、修改/etc/fstab文件<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/fstab</span><br><span class="line">将：</span><br><span class="line">tmpfs        /dev/shm        tmpfs   defaults      0 0</span><br><span class="line">改为：</span><br><span class="line">tmpfs        /dev/shm        tmpfs   defaults,size=2048M      0 0</span><br></pre></td></tr></table></figure></p>
-<p>2、重新加载tmpfs<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">umount /dev/shm</span><br><span class="line">mount /dev/shm</span><br></pre></td></tr></table></figure></p>
-<p>3、检查<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">df -h /dev/shm</span><br><span class="line">Filesystem      Size  Used Avail Use% Mounted on</span><br><span class="line">none            2.0G  243M  1.8G  12% /dev/shm</span><br></pre></td></tr></table></figure></p>
-<h3 id="根据提示安装XE">根据提示安装XE</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@server01 Disk1]# /etc/init.d/oracle-xe configure</span><br></pre></td></tr></table></figure>
-<p>之后，会引导用户进行简单的几项设置：</p>
-<blockquote>
-<p>Oracle Database 11g Express Edition Configuration<br>-————————————————<br>This will configure on-boot properties of Oracle Database 11g Express<br>Edition.  The following questions will determine whether the database should<br>be starting upon system boot, the ports it will use, and the passwords that<br>will be used for database accounts.  Press  to accept the defaults.<br>Ctrl-C will abort.</p>
-<p>Specify the HTTP port that will be used for Oracle Application Express [8080]:8081</p>
-<p>Specify a port that will be used for the database listener [1521]:1521</p>
-<p>Specify a password to be used for database accounts.  Note that the same<br>password will be used for SYS and SYSTEM.  Oracle recommends the use of<br>different passwords for each database account.  This can be done after<br>initial configuration:<br>Confirm the password:</p>
-<p>Do you want Oracle Database 11g Express Edition to be started on boot (y/n) [y]:y</p>
-<p>Starting Oracle Net Listener…Done<br>Configuring database…Done<br>Starting Oracle Database 11g Express Edition instance…Done<br>Installation completed successfully.</p>
-</blockquote>
-<p>输入的四项内容是：</p>
+<p>2、redis实例、主从配置：</p>
+<p>1）在centos上安装redis软件，然后配制成多实例：</p>
 <ul>
-<li>http访问时的端口</li>
-<li>数据库的监听端口</li>
-<li>SYS和SYSTEM用户的密码</li>
-<li>是否开机启动（并没有开机启动，可能还有地方要设置）。</li>
+<li>安装redis软件；</li>
+<li>在/etc/redis目录中建立6379.conf、6380.conf和6381.conf配置文件，修改其中的port、pid路径、日志、数据文件路径（配置成多实例）；</li>
+<li>使用redis-server /etc/redis/<em>*</em>.conf 依次启动redis实例；</li>
 </ul>
-<p>安装完成后：</p>
+<p>2）主从配置（6379为Master，其余两个为Slave）：</p>
 <ul>
-<li>会自动建立一个名为oracle的用户，家目录/u01/app/oracle。</li>
-<li>会建立dba组，oracle用户属于这个组。</li>
-<li>会自动生成一个数据库实例，名为XE。/u01/app/oracle/product/11.2.0/xe/dbs/spfileXE.ora</li>
+<li>在6380和6381的配置文件中（从服务器配置文件）添加如下命令，slaveof 172.30.37.73 6379 这样重启从redis实例后就配置好了主从架构；</li>
+<li>配置Slave的slave-priority参数：6380实例该配置参数为50，6381实例该配置参数为100，<font color="red">这样当Master挂掉的时候Sentinel会优先选择slave-priority值较小的作为新的Master。（不同的slave其值一定要不一样，否则jedis测试时无法选取新的master）</font></li>
 </ul>
-<h3 id="设置oracle的环境变量">设置oracle的环境变量</h3><p><font color="red">使用oracle用户</font></p>
+<p><em>补充：slave-priority 100配置</em></p>
 <blockquote>
-<p>vim /etc/profile</p>
+<p>适用Sentinel模块(unstable,M-S集群管理和监控),需要额外的配置文件支持。slave的权重值,默认100.当master失效后,Sentinel将会从slave列表中找到权重值最低(&gt;0)的slave,并提升为master。如果权重值为0,表示此slave为”观察者”,不参与master选举</p>
 </blockquote>
-<p>加入：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">export ORACLE_BASE=/u01/app/oracle</span><br><span class="line">export ORACLE_HOME=/u01/app/oracle/product/11.2.0/xe</span><br><span class="line">export PATH=$PATH:$ORACLE_HOME/bin</span><br><span class="line">export ORACLE_SID=XE</span><br><span class="line">export NLS_LANG=`$ORACLE_HOME/bin/nls_lang.sh`</span><br></pre></td></tr></table></figure></p>
-<p>之后，注销用户，使用oracle用户重新登录，就可以用sqlplus登录oracle，进而操作。</p>
+<p>2、sentinel实例配置：</p>
+<p>1)分别在26379、26380和26381三个本地端口上启动三个Sentinel实例，这三个Sentinel实例用来监控上面已经启动的主Redis实例。</p>
+<ul>
+<li>sentinel实例本质也是redis实例，由于上一步安装好了redis服务软件，所以不需要再单独安装，只需要下面的配置即可；</li>
+<li>在/etc/redis目录下建立sentinel_26379.conf、sentinel_26380.conf、sentinel_26381.conf配置文件，其内容如下（sentinel的最小配置）；</li>
+<li>提前建立好sentinel的工作目录（/var/redis/sentinels/26379），然后使用命令启动sentinel实例：<blockquote>
+<p>  redis-sentinel /etc/redis/sentinel<em><em>*</em>.conf<br>  或<br>  redis-server /etc/redis/sentinel</em><em>*</em>.conf –sentinel</p>
+</blockquote>
+</li>
+</ul>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">port 26379  #端口</span><br><span class="line">dir /var/redis/sentinels/26379   #指定工作目录</span><br><span class="line">sentinel monitor mymaster 172.30.37.73 6379 2   </span><br><span class="line">sentinel down-after-milliseconds mymaster 5000   #表示如果5s内mymaster没响应，就认为SDOWN</span><br><span class="line">sentinel parallel-syncs mymaster 1</span><br><span class="line">sentinel failover-timeout mymaster 15000  #表示如果15秒后,mysater仍没活过来，则启动failover，从剩下的slave中选一个升级为master</span><br><span class="line">logfile "/var/redis/log/sentinel_26379.log"  #sentinel日志位置</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">port 26380</span><br><span class="line">dir /var/redis/sentinels/26380</span><br><span class="line">sentinel monitor mymaster 172.30.37.73 6379 2</span><br><span class="line">sentinel down-after-milliseconds mymaster 5000</span><br><span class="line">sentinel parallel-syncs mymaster 1</span><br><span class="line">sentinel failover-timeout mymaster 15000</span><br><span class="line">logfile "/var/redis/log/sentinel_26380.log"</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">port 26381</span><br><span class="line">dir /var/redis/sentinels/26381</span><br><span class="line">sentinel monitor mymaster 172.30.37.73 6379 2</span><br><span class="line">sentinel down-after-milliseconds mymaster 5000</span><br><span class="line">sentinel parallel-syncs mymaster 1</span><br><span class="line">sentinel failover-timeout mymaster 15000</span><br><span class="line">logfile "/var/redis/log/sentinel_26381.log"</span><br></pre></td></tr></table></figure>
+<p><em>说明：</em></p>
 <blockquote>
-<p>sqlplus / as sysdba</p>
+<p>第三行表示：监控master节点的ip和端口，最后一个数字表示投票需要的”最少法定人数”，比如有10个sentinal哨兵都在监控某一个master节点，如果需要至少6个哨兵发现master挂掉后，才认为master真正down掉，那么这里就配置为6，最小配置1台master，1台slave，在二个机器上都启动sentinal的情况下，哨兵数只有2个，如果一台机器物理挂掉，只剩一个sentinal能发现该问题，所以这里配置成1，至于mymaster只是一个名字，可以随便起，但要保证5-8行都使用同一个名字</p>
+<p>第五行：表示如果master重新选出来后，其它slave节点能同时并行从新master同步缓存的台数有多少个，显然该值越大，所有slave节点完成同步切换的整体速度越快，但如果此时正好有人在访问这些slave，可能造成读取失败，影响面会更广。最保定的设置为1，只同一时间，只能有一台干这件事，这样其它slave还能继续服务，但是所有slave全部完成缓存更新同步的进程将变慢。</p>
 </blockquote>
+<p>2）注意：</p>
+<ul>
+<li>一个sentinal可同时监控多个master，如果要一个sentinel监控多个master，只要把上面6行重复多段，加以修改即可。</li>
+<li>sentinel配置文件中，<font color="red">sentinel monitor mymaster 172.30.37.73 6379 2。 ，中的ip不能用localhost或127.0.0.1（虽然sentinel和redis实例在一台本地服务器上），否则使用jedis远程访问redis服务时就无法连接.</font></li>
+</ul>
+<p>3、分析：</p>
+<p>1）当启动了redis实例、sentinel实例后，<font color="red">各个Sentinel实例都会更新了自己的配置文件，以记录目前最新的配置信息</font>，此时每个Sentinel实例的配置文件内容与启动之前就大不相同了。</p>
+<p>2）当把master redis实例kill掉后，sentinel会选举一个新的master，<font color="red">这时redis实例的配置文件中slaveof信息也会发生变化；此外，sentinel的配置文件中sentinel monitor信息也会发生变化；</font></p>
+<h2 id="二、JedisSentinelPool使用：">二、JedisSentinelPool使用：</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RedisSentinelClient</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span><br><span class="line">	 * <span class="doctag">@param</span> args</span><br><span class="line">	 */</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">		Set sentinels = <span class="keyword">new</span> HashSet();</span><br><span class="line">        sentinels.add(<span class="keyword">new</span> HostAndPort(<span class="string">"172.30.37.73"</span>, <span class="number">26379</span>).toString());</span><br><span class="line">        sentinels.add(<span class="keyword">new</span> HostAndPort(<span class="string">"172.30.37.73"</span>, <span class="number">26380</span>).toString());</span><br><span class="line">        sentinels.add(<span class="keyword">new</span> HostAndPort(<span class="string">"172.30.37.73"</span>, <span class="number">26381</span>).toString());</span><br><span class="line">        JedisSentinelPool sentinelPool = <span class="keyword">new</span> JedisSentinelPool(<span class="string">"mymaster"</span>, sentinels);</span><br><span class="line">        System.out.println(<span class="string">"Current master: "</span> + sentinelPool.getCurrentHostMaster().toString());</span><br><span class="line">        </span><br><span class="line">        Jedis master = sentinelPool.getResource();</span><br><span class="line">        master.set(<span class="string">"username"</span>,<span class="string">"liangzhichao"</span>);</span><br><span class="line">        sentinelPool.returnResource(master);</span><br><span class="line">        </span><br><span class="line">        Jedis master2 = sentinelPool.getResource();</span><br><span class="line">        String value = master2.get(<span class="string">"username"</span>);</span><br><span class="line">        System.out.println(<span class="string">"username: "</span> + value);</span><br><span class="line">        master2.close();</span><br><span class="line">        sentinelPool.destroy();</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>日志如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">十二月 <span class="number">29</span>, <span class="number">2015</span> <span class="number">4</span>:<span class="number">12</span>:<span class="number">35</span> 下午 redis.clients.jedis.JedisSentinelPool initSentinels</span><br><span class="line">信息: Trying to find master from available Sentinels...</span><br><span class="line">十二月 <span class="number">29</span>, <span class="number">2015</span> <span class="number">4</span>:<span class="number">12</span>:<span class="number">35</span> 下午 redis.clients.jedis.JedisSentinelPool initSentinels</span><br><span class="line">信息: Redis master running at <span class="number">172.30</span>.37.73:<span class="number">6379</span>, starting Sentinel listeners...</span><br><span class="line">十二月 <span class="number">29</span>, <span class="number">2015</span> <span class="number">4</span>:<span class="number">12</span>:<span class="number">36</span> 下午 redis.clients.jedis.JedisSentinelPool initPool</span><br><span class="line">信息: Created JedisPool to master at <span class="number">172.30</span>.37.73:<span class="number">6379</span></span><br><span class="line">Current master: <span class="number">172.30</span>.37.73:<span class="number">6379</span></span><br><span class="line">username: liangzhichao</span><br></pre></td></tr></table></figure>
+<p>当把master redis实例kill掉后，再次运行程序：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">十二月 <span class="number">29</span>, <span class="number">2015</span> <span class="number">4</span>:<span class="number">53</span>:<span class="number">37</span> 下午 redis.clients.jedis.JedisSentinelPool initSentinels</span><br><span class="line">信息: Trying to find master from available Sentinels...</span><br><span class="line">十二月 <span class="number">29</span>, <span class="number">2015</span> <span class="number">4</span>:<span class="number">53</span>:<span class="number">38</span> 下午 redis.clients.jedis.JedisSentinelPool initSentinels</span><br><span class="line">信息: Redis master running at <span class="number">172.30</span>.37.73:<span class="number">6380</span>, starting Sentinel listeners...</span><br><span class="line">十二月 <span class="number">29</span>, <span class="number">2015</span> <span class="number">4</span>:<span class="number">53</span>:<span class="number">38</span> 下午 redis.clients.jedis.JedisSentinelPool initPool</span><br><span class="line">信息: Created JedisPool to master at <span class="number">172.30</span>.37.73:<span class="number">6380</span></span><br><span class="line">Current master: <span class="number">172.30</span>.37.73:<span class="number">6380</span></span><br><span class="line">username: liangzhichao</span><br></pre></td></tr></table></figure>
 </span>
       
     </div>
@@ -318,7 +314,11 @@
       
         <div class="post-tags">
           
-            <a href="/tags/oracle/" rel="tag">#oracle</a>
+            <a href="/tags/nosql/" rel="tag">#nosql</a>
+          
+            <a href="/tags/redis/" rel="tag">#redis</a>
+          
+            <a href="/tags/集群/" rel="tag">#集群</a>
           
         </div>
       
@@ -327,13 +327,11 @@
         <div class="post-nav">
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2015/10/07/shujujiegou-paixusuanfa/" rel="prev">数据结构之——经典排序算法</a>
-            
           </div>
 
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2015/09/24/use-of-markdown-1/" rel="next">markdown 高亮代码</a>
+              <a href="/2015/12/21/redis-ha-sentinel/" rel="next">redis sentinel</a>
             
           </div>
         </div>
@@ -348,10 +346,10 @@
 
     <div class="post-spread">
       
-        <div class="ds-share flat" data-thread-key="2015/09/29/oracle-express-install/"
-     data-title="Oracle Express Edition安装"
+        <div class="ds-share flat" data-thread-key="2015/12/29/redis-sentinel-jedis-shizhan/"
+     data-title="sentinel、JedisSentinelPool实战"
      data-content=""
-     data-url="http://yoursite.com/2015/09/29/oracle-express-install/">
+     data-url="http://yoursite.com/2015/12/29/redis-sentinel-jedis-shizhan/">
   <div class="ds-share-inline">
     <ul  class="ds-share-icons-16">
 
@@ -377,8 +375,8 @@
         
           <div class="comments" id="comments">
             
-              <div class="ds-thread" data-thread-key="2015/09/29/oracle-express-install/"
-                   data-title="Oracle Express Edition安装" data-url="http://yoursite.com/2015/09/29/oracle-express-install/">
+              <div class="ds-thread" data-thread-key="2015/12/29/redis-sentinel-jedis-shizhan/"
+                   data-title="sentinel、JedisSentinelPool实战" data-url="http://yoursite.com/2015/12/29/redis-sentinel-jedis-shizhan/">
               </div>
             
           </div>
@@ -489,7 +487,7 @@
           <div class="post-toc">
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#一下载Oracle_XE"><span class="nav-number">1.</span> <span class="nav-text">一下载Oracle XE</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二安装依赖"><span class="nav-number">2.</span> <span class="nav-text">二安装依赖</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三安装"><span class="nav-number">3.</span> <span class="nav-text">三安装</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#解压、检测"><span class="nav-number">3.1.</span> <span class="nav-text">解压、检测</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#根据提示安装，但如果tmpfs小于2G，会报错："><span class="nav-number">3.2.</span> <span class="nav-text">根据提示安装，但如果tmpfs小于2G，会报错：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#根据提示安装XE"><span class="nav-number">3.3.</span> <span class="nav-text">根据提示安装XE</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#设置oracle的环境变量"><span class="nav-number">3.4.</span> <span class="nav-text">设置oracle的环境变量</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、最小sentinel集群配置"><span class="nav-number">1.</span> <span class="nav-text">一、最小sentinel集群配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、JedisSentinelPool使用："><span class="nav-number">2.</span> <span class="nav-text">二、JedisSentinelPool使用：</span></a></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator"></div>
