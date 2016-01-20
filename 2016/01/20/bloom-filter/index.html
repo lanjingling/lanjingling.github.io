@@ -30,7 +30,7 @@
 
 
 
-  <meta name="keywords" content="nginx,redis,tomcat,集群," />
+  <meta name="keywords" content="bloom filter," />
 
 
 
@@ -39,17 +39,17 @@
   <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.1" />
 
 
-<meta name="description" content="本文介绍了一种分布式web服务架构，使用redis作为session共享存储，nginx负载均衡后端多个tomcat。每个tomcat从redis中获取session信息。">
+<meta name="description" content="Bloom Filter是由Bloom在1970年提出的一种多哈希函数映射的快速查找算法。通常应用在一些需要快速判断某个元素是否属于集合，但是并不严格要求100%正确的场合。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Nginx+Redis+Tomcat实现session共享的集群">
-<meta property="og:url" content="http://yoursite.com/2015/12/15/tomcat-redis-session/index.html">
+<meta property="og:title" content="bloom-filter">
+<meta property="og:url" content="http://yoursite.com/2016/01/20/bloom-filter/index.html">
 <meta property="og:site_name" content="晓的技术博客">
-<meta property="og:description" content="本文介绍了一种分布式web服务架构，使用redis作为session共享存储，nginx负载均衡后端多个tomcat。每个tomcat从redis中获取session信息。">
-<meta property="og:image" content="http://ww1.sinaimg.cn/mw690/72c913fbjw1ez039bhdxhj20go043t8s.jpg">
-<meta property="og:updated_time" content="2015-12-15T01:56:44.208Z">
+<meta property="og:description" content="Bloom Filter是由Bloom在1970年提出的一种多哈希函数映射的快速查找算法。通常应用在一些需要快速判断某个元素是否属于集合，但是并不严格要求100%正确的场合。">
+<meta property="og:image" content="http://ww3.sinaimg.cn/mw690/72c913fbjw1f063qevraaj20m807vwfd.jpg">
+<meta property="og:updated_time" content="2016-01-20T09:48:27.923Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Nginx+Redis+Tomcat实现session共享的集群">
-<meta name="twitter:description" content="本文介绍了一种分布式web服务架构，使用redis作为session共享存储，nginx负载均衡后端多个tomcat。每个tomcat从redis中获取session信息。">
+<meta name="twitter:title" content="bloom-filter">
+<meta name="twitter:description" content="Bloom Filter是由Bloom在1970年提出的一种多哈希函数映射的快速查找算法。通常应用在一些需要快速判断某个元素是否属于集合，但是并不严格要求100%正确的场合。">
 
 
 <script type="text/javascript" id="hexo.configuration">
@@ -59,7 +59,7 @@
   };
 </script>
 
-  <title> Nginx+Redis+Tomcat实现session共享的集群 | 晓的技术博客 </title>
+  <title> bloom-filter | 晓的技术博客 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -205,7 +205,7 @@
           
           
             
-              Nginx+Redis+Tomcat实现session共享的集群
+              bloom-filter
             
           
         </h1>
@@ -214,8 +214,8 @@
       <div class="post-meta">
         <span class="post-time">
           发表于
-          <time itemprop="dateCreated" datetime="2015-12-15T09:25:19+08:00" content="2015-12-15">
-            2015-12-15
+          <time itemprop="dateCreated" datetime="2016-01-20T17:29:54+08:00" content="2016-01-20">
+            2016-01-20
           </time>
         </span>
 
@@ -224,8 +224,8 @@
             &nbsp; | &nbsp; 分类于
             
               <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                <a href="/categories/集群/" itemprop="url" rel="index">
-                  <span itemprop="name">集群</span>
+                <a href="/categories/大数据/" itemprop="url" rel="index">
+                  <span itemprop="name">大数据</span>
                 </a>
               </span>
 
@@ -240,8 +240,8 @@
           
             <span class="post-comments-count">
               &nbsp; | &nbsp;
-              <a href="/2015/12/15/tomcat-redis-session/#comments" itemprop="discussionUrl">
-                <span class="post-comments-count ds-thread-count" data-thread-key="2015/12/15/tomcat-redis-session/" itemprop="commentsCount"></span>
+              <a href="/2016/01/20/bloom-filter/#comments" itemprop="discussionUrl">
+                <span class="post-comments-count ds-thread-count" data-thread-key="2016/01/20/bloom-filter/" itemprop="commentsCount"></span>
               </a>
             </span>
           
@@ -255,68 +255,34 @@
       
 
       
-        <span itemprop="articleBody"><p><a href="http://lanjingling.github.io/2015/11/30/nginx-m-router/" target="_blank" rel="external">上篇</a>  介绍了nginx+tomcat使用粘性会话搭建的集群，这种方案确实可以解决nginx+tomcat进行负载均衡时，对于有状态的应用每次轮询造成session信息丢失的问题。但是，这种解决方案还是有一定的缺陷：<em>当绑定会话的那个后端tomcat倒了，和该tomcat粘连的用户就无法正确获取服务（有可能出现session信息丢失）</em>。</p>
-<p>下面，我们研究一种更加稳固的解决方案：session共享（如下图）<br><img src="http://ww1.sinaimg.cn/mw690/72c913fbjw1ez039bhdxhj20go043t8s.jpg" alt=""></p>
-<h2 id="配置过程">配置过程</h2><p>0、实验环境介绍：<br>Centos6、nginx-1.6.0、apache-tomcat-7.0.27（两台）、redis_version:2.8.23</p>
-<p>1、安装nginx、tomcat、redis服务；</p>
-<table>
-<thead>
-<tr>
-<th><strong>软件</strong></th>
-<th style="text-align:center"><strong>version</strong></th>
-<th style="text-align:center"><strong>ip：port</strong> </th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Nginx</td>
-<td style="text-align:center">1.6.0</td>
-<td style="text-align:center">192.168.137.122：84 </td>
-</tr>
-<tr>
-<td>Redis</td>
-<td style="text-align:center">2.8</td>
-<td style="text-align:center">192.168.137.122：6379 </td>
-</tr>
-<tr>
-<td>Tomcat_1</td>
-<td style="text-align:center">7.0.27</td>
-<td style="text-align:center">192.168.137.122：8080 </td>
-</tr>
-<tr>
-<td>Tomcat_2</td>
-<td style="text-align:center">7.0.27</td>
-<td style="text-align:center">192.168.137.101：8080 </td>
-</tr>
-</tbody>
-</table>
-<p>2、测试：</p>
+        <span itemprop="articleBody"><p>Bloom Filter是由Bloom在1970年提出的一种多哈希函数映射的快速查找算法。通常应用在一些需要快速判断某个元素是否属于集合，但是并不严格要求100%正确的场合。</p>
+<h2 id="一-_实例">一. 实例</h2><p>为了说明Bloom Filter存在的重要意义，举一个实例：<br>假设要你写一个网络蜘蛛（web crawler）。由于网络间的链接错综复杂，蜘蛛在网络间爬行很可能会形成“环”。为了避免形成“环”，就需要知道蜘蛛已经访问过那些URL。给一个URL，怎样知道蜘蛛是否已经访问过呢？稍微想想，就会有如下几种方案：</p>
+<ol>
+<li>将访问过的URL保存到数据库。</li>
+<li>用HashSet将访问过的URL保存起来。那只需接近O(1)的代价就可以查到一个URL是否被访问过了。</li>
+<li>URL经过MD5或SHA-1等单向哈希后再保存到HashSet或数据库。</li>
+<li>Bit-Map方法。建立一个BitSet，将每个URL经过一个哈希函数映射到某一位。<br>方法1~3都是将访问过的URL完整保存，方法4则只标记URL的一个映射位。</li>
+</ol>
+<p>以上方法在数据量较小的情况下都能完美解决问题，但是当数据量变得非常庞大时问题就来了。</p>
 <ul>
-<li>为tomcat_1编写测试页面（a.jsp），显示 “ response from tomcat_1 ”，同时页面提供按钮显示当前session值（&lt;%=session.getId() %&gt;），放到tomcat_1 服务器的webapps/ROOT目录下；</li>
-<li>为tomcat_2编写测试页面（a.jsp），显示 “ response from tomcat_2 ”，同时页面提供按钮显示当前session值（&lt;%=session.getId() %&gt;），放到tomcat_2 服务器的webapps/ROOT目录下；</li>
+<li>方法1的缺点：数据量变得非常庞大后关系型数据库查询的效率会变得很低。而且每来一个URL就启动一次数据库查询是不是太小题大做了？</li>
+<li>方法2的缺点：太消耗内存。随着URL的增多，占用的内存会越来越多。就算只有1亿个URL，每个URL只算50个字符，就需要5GB内存。</li>
+<li>方法3：由于字符串经过MD5处理后的信息摘要长度只有128Bit，SHA-1处理后也只有160Bit，因此方法3比方法2节省了好几倍的内存。</li>
+<li>方法4消耗内存是相对较少的，但缺点是单一哈希函数发生冲突的概率太高。还记得数据结构课上学过的Hash表冲突的各种解决方法么？若要降低冲突发生的概率到1%，就要将BitSet的长度设置为URL个数的100倍。</li>
 </ul>
-<p>此时分别访问 <a href="http://192.168.137.122：8080" target="_blank" rel="external">http://192.168.137.122：8080</a>  和 <a href="http://192.168.137.101：8080" target="_blank" rel="external">http://192.168.137.101：8080</a> 地址，因为访问的是不同web服务器，所以各自显示不同的页面内容及session值肯定不同。</p>
-<p>3、配置tomcat的session管理（持久化到redis中）：</p>
-<ul>
-<li>添加jedis-2.0.0.jar、tomcat-redis-session-manager-1.2-tomcat-7-java-7、commons-pool-1.3.jar 三个jar到tomcat的lib目录下；</li>
-<li>修改tomcat的conf/context.xml 文件；<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;Valve className=<span class="string">"com.radiadesign.catalina.session.RedisSessionHandlerValve"</span> /&gt;</span><br><span class="line">&lt;Manager className=<span class="string">"com.radiadesign.catalina.session.RedisSessionManager"</span></span><br><span class="line">             host=<span class="string">"192.168.137.122"</span> </span><br><span class="line">             port=<span class="string">"6379"</span> </span><br><span class="line">             database=<span class="string">"0"</span> </span><br><span class="line">             maxInactiveInterval=<span class="string">"60"</span>  /&gt;</span><br></pre></td></tr></table></figure></li>
-<li>重启tomcat；</li>
-</ul>
-<p>4、配置nginx进行负载均衡（upstream ）：</p>
-<p>在nginx的conf目录下新建conf.d目录，然后在其中新建tomcat.conf文件，内容如下：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">upstream tomcat &#123;</span><br><span class="line">    #ip_hash; </span><br><span class="line">    server 127.0.0.1:8080;</span><br><span class="line">    server 192.168.137.101:8080;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">server &#123;</span><br><span class="line">    listen       84;</span><br><span class="line">    server_name  localhost;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    #动态页面交给http://tdt_wugk，也即我们之前在nginx.conf定义的upstream tdt_wugk 均衡</span><br><span class="line">    location ~ .*\.(do|jsp|action)?$ &#123;</span><br><span class="line">        proxy_pass http://tomcat;</span><br><span class="line">        include proxy.conf;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    #配置Nginx动静分离，定义的静态页面直接从Nginx发布目录读取。</span><br><span class="line">    location ~ .*\.(html|htm|gif|jpg|jpeg|bmp|png|ico|txt|js|css)$ &#123;</span><br><span class="line">        root /data/;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    location / &#123;</span><br><span class="line">       # root   html;</span><br><span class="line">       # index  index.html index.htm;</span><br><span class="line">        proxy_pass http://tomcat;</span><br><span class="line">        include proxy.conf;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>5、验证：</p>
-<ul>
-<li>访问  <a href="http://192.168.137.122：8080/a.jsp" target="_blank" rel="external">http://192.168.137.122：8080/a.jsp</a> 直接请求到tomcat_1服务器，显示 “ response from tomcat_1 ”， session 值为 ‘56E2FAE376A47F1C0961D722326B8423’；</li>
-<li>访问 <a href="http://192.168.137.101：8080/a.jsp" target="_blank" rel="external">http://192.168.137.101：8080/a.jsp</a> 直接请求到tomcat_2服务器，显示 “ response from tomcat_2 ”， session 值为 ‘56E2FAE376A47F1C0961D722326B8423’；</li>
-<li>访问 <a href="http://192.168.137.122：84/a.jsp" target="_blank" rel="external">http://192.168.137.122：84/a.jsp</a> 请求到 nginx 反向代理到指定Web服务器，由于默认使用轮询负载方式，反复刷新页面显示的内容在“ response from tomcat_1 ” 和 “ response from tomcat_2 ”之间切换，但 session 值保‘56E2FAE376A47F1C0961D722326B8423’；</li>
-<li>使用 redis-cli 连接 redis 服务器，查看会显示有 “56E2FAE376A47F1C0961D722326B8423” key的 session 数据，value为序列化数据。</li>
-</ul>
-<h2 id="总结">总结</h2><p>1、使用tomcat7搭建时，redis的客户端jedis版本不能太高，否则启动tomcat时会报错；我使用的是tomcat7.0.27、jedis-2.0.0.jar、tomcat-redis-session-manager-1.2-tomcat-7-java-7、commons-pool-1.3.jar </p>
-<p>2、Nginx+Redis+Tomcat集群实现session共享，配置过程简单如下：</p>
-<ul>
-<li>首先搭建好单机版的tomcat将session持久化到redis中；</li>
-<li>然后配置nginx轮询tomcat（负载均衡）；</li>
-</ul>
+<p>实质上上面的算法都忽略了一个重要的隐含条件：允许小概率的出错，不一定要100%准确！也就是说少量url实际上没有没网络蜘蛛访问，而将它们错判为已访问的代价是很小的——大不了少抓几个网页呗。 </p>
+<h2 id="二-_Bloom_Filter的算法">二. Bloom Filter的算法</h2><p>废话说到这里，下面引入本篇的主角——Bloom Filter。其实上面方法4的思想已经很接近Bloom Filter了。方法四的致命缺点是冲突概率高，为了降低冲突的概念，Bloom Filter使用了多个哈希函数，而不是一个。</p>
+<p>Bloom Filter算法如下：<br>  　 创建一个m位BitSet，先将所有位初始化为0，然后选择k个不同的哈希函数。第i个哈希函数对字符串str哈希的结果记为h（i，str），且h（i，str）的范围是0到m-1 。</p>
+<p>(1) 加入字符串过程<br>下面是每个字符串处理的过程，首先是将字符串str“记录”到BitSet中的过程：<br>对于字符串str，分别计算h（1，str），h（2，str）…… h（k，str）。然后将BitSet的第h（1，str）、h（2，str）…… h（k，str）位设为1。<br><img src="http://ww3.sinaimg.cn/mw690/72c913fbjw1f063qevraaj20m807vwfd.jpg" alt=""></p>
+<p>图1.Bloom Filter加入字符串过程<br>很简单吧？这样就将字符串str映射到BitSet中的k个二进制位了。</p>
+<p>(2) 检查字符串是否存在的过程<br>下面是检查字符串str是否被BitSet记录过的过程：<br>对于字符串str，分别计算h（1，str），h（2，str）…… h（k，str）。然后检查BitSet的第h（1，str）、h（2，str）…… h（k，str）位是否为1，若其中任何一位不为1则可以判定str一定没有被记录过。若全部位都是1，则“认为”字符串str存在。</p>
+<p>若一个字符串对应的Bit不全为1，则可以肯定该字符串一定没有被Bloom Filter记录过。（这是显然的，因为字符串被记录过，其对应的二进制位肯定全部被设为1了）<br>但是若一个字符串对应的Bit全为1，实际上是不能100%的肯定该字符串被Bloom Filter记录过的。（因为有可能该字符串的所有位都刚好是被其他字符串所对应）这种将该字符串划分错的情况，称为false positive 。</p>
+<p>(3) 删除字符串过程<br>   字符串加入了就被不能删除了，因为删除会影响到其他字符串。实在需要删除字符串的可以使用Counting bloomfilter(CBF)，这是一种基本Bloom Filter的变体，CBF将基本Bloom Filter每一个Bit改为一个计数器，这样就可以实现删除字符串的功能了。</p>
+<p>Bloom Filter跟单哈希函数Bit-Map不同之处在于：Bloom Filter使用了k个哈希函数，每个字符串跟k个bit对应。从而降低了冲突的概率。</p>
+<p>三. Bloom Filter参数选择 </p>
+<p>   (1)哈希函数选择<br>   　　哈希函数的选择对性能的影响应该是很大的，一个好的哈希函数要能近似等概率的将字符串映射到各个Bit。选择k个不同的哈希函数比较麻烦，一种简单的方法是选择一个哈希函数，然后送入k个不同的参数。<br>   (2)Bit数组大小选择<br>   　　哈希函数个数k、位数组大小m、加入的字符串数量n的关系可以参考参考文献1。该文献证明了对于给定的m、n，当 k = ln(2)* m/n 时出错的概率是最小的。<br>   　　同时该文献还给出特定的k，m，n的出错概率。例如：根据参考文献1，哈希函数个数k取10，位数组大小m设为字符串个数n的20倍时，false positive发生的概率是0.0000889 ，这个概率基本能满足网络爬虫的需求了。  </p>
+<p>四. Bloom Filter实现代码<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> cn.edu.nuc;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.BitSet;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span><br><span class="line"> * BitSet类,大小可动态改变, 取值为true或false的位集合。用于表示一组布尔标志。此类实现了一个按需增长的位向量</span><br><span class="line"> * <span class="doctag">@author</span> liuxiao</span><br><span class="line"> *</span><br><span class="line"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BloomFilter</span> </span>&#123;</span><br><span class="line">	<span class="comment">/* BitSet初始分配2^24个bit */</span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> DEFAULT_SIZE = <span class="number">1</span> &lt;&lt; <span class="number">25</span>;</span><br><span class="line">	<span class="comment">/* 不同哈希函数的种子，一般应取质数 */</span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span>[] seeds = <span class="keyword">new</span> <span class="keyword">int</span>[] &#123; <span class="number">5</span>, <span class="number">7</span>, <span class="number">11</span>, <span class="number">13</span>, <span class="number">31</span>, <span class="number">37</span>, <span class="number">61</span> &#125;;</span><br><span class="line">	<span class="keyword">private</span> BitSet bits = <span class="keyword">new</span> BitSet(DEFAULT_SIZE);</span><br><span class="line">	<span class="comment">/* 哈希函数对象 */</span></span><br><span class="line">	<span class="keyword">private</span> SimpleHash[] func = <span class="keyword">new</span> SimpleHash[seeds.length];</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">BloomFilter</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; seeds.length; i++) &#123;</span><br><span class="line">			func[i] = <span class="keyword">new</span> SimpleHash(DEFAULT_SIZE, seeds[i]);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 将字符串标记到bits中</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">add</span><span class="params">(String value)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">for</span> (SimpleHash f : func) &#123;</span><br><span class="line">			bits.set(f.hash(value), <span class="keyword">true</span>);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 判断字符串是否已经被bits标记</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">contains</span><span class="params">(String value)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">if</span> (value == <span class="keyword">null</span>) &#123;</span><br><span class="line">			<span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">boolean</span> ret = <span class="keyword">true</span>;</span><br><span class="line">		<span class="keyword">for</span> (SimpleHash f : func) &#123;</span><br><span class="line">			ret = ret &amp;&amp; bits.get(f.hash(value));</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> ret;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* 哈希函数类 */</span></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">SimpleHash</span> </span>&#123;</span><br><span class="line">		<span class="keyword">private</span> <span class="keyword">int</span> cap;</span><br><span class="line">		<span class="keyword">private</span> <span class="keyword">int</span> seed;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">SimpleHash</span><span class="params">(<span class="keyword">int</span> cap, <span class="keyword">int</span> seed)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.cap = cap;</span><br><span class="line">		<span class="keyword">this</span>.seed = seed;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// hash函数，采用简单的加权和hash</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">hash</span><span class="params">(String value)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">int</span> result = <span class="number">0</span>;</span><br><span class="line">		<span class="keyword">int</span> len = value.length();</span><br><span class="line">		<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; len; i++) &#123;</span><br><span class="line">			result = seed * result + value.charAt(i);</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> (cap - <span class="number">1</span>) &amp; result;</span><br><span class="line">	&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>本文转自：<a href="http://www.cnblogs.com/heaad/archive/2011/01/02/1924195.html" target="_blank" rel="external">http://www.cnblogs.com/heaad/archive/2011/01/02/1924195.html</a></p>
 </span>
       
     </div>
@@ -325,13 +291,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/nginx/" rel="tag">#nginx</a>
-          
-            <a href="/tags/redis/" rel="tag">#redis</a>
-          
-            <a href="/tags/tomcat/" rel="tag">#tomcat</a>
-          
-            <a href="/tags/集群/" rel="tag">#集群</a>
+            <a href="/tags/bloom-filter/" rel="tag">#bloom filter</a>
           
         </div>
       
@@ -340,13 +300,11 @@
         <div class="post-nav">
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2015/12/21/redis-ha-sentinel/" rel="prev">redis sentinel</a>
-            
           </div>
 
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2015/11/30/nginx-m-router/" rel="next">nginx之 nginx_upstream_jvm_route模块</a>
+              <a href="/2016/01/20/servlet3-new-furture/" rel="next">servlet3新特性——异步请求处理</a>
             
           </div>
         </div>
@@ -361,10 +319,10 @@
 
     <div class="post-spread">
       
-        <div class="ds-share flat" data-thread-key="2015/12/15/tomcat-redis-session/"
-     data-title="Nginx+Redis+Tomcat实现session共享的集群"
+        <div class="ds-share flat" data-thread-key="2016/01/20/bloom-filter/"
+     data-title="bloom-filter"
      data-content=""
-     data-url="http://yoursite.com/2015/12/15/tomcat-redis-session/">
+     data-url="http://yoursite.com/2016/01/20/bloom-filter/">
   <div class="ds-share-inline">
     <ul  class="ds-share-icons-16">
 
@@ -390,8 +348,8 @@
         
           <div class="comments" id="comments">
             
-              <div class="ds-thread" data-thread-key="2015/12/15/tomcat-redis-session/"
-                   data-title="Nginx+Redis+Tomcat实现session共享的集群" data-url="http://yoursite.com/2015/12/15/tomcat-redis-session/">
+              <div class="ds-thread" data-thread-key="2016/01/20/bloom-filter/"
+                   data-title="bloom-filter" data-url="http://yoursite.com/2016/01/20/bloom-filter/">
               </div>
             
           </div>
@@ -502,7 +460,7 @@
           <div class="post-toc">
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#配置过程"><span class="nav-number">1.</span> <span class="nav-text">配置过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">2.</span> <span class="nav-text">总结</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#一-_实例"><span class="nav-number">1.</span> <span class="nav-text">一. 实例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二-_Bloom_Filter的算法"><span class="nav-number">2.</span> <span class="nav-text">二. Bloom Filter的算法</span></a></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator"></div>
