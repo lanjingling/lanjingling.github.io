@@ -30,7 +30,7 @@
 
 
 
-  <meta name="keywords" content="oracle," />
+  <meta name="keywords" content="messagequeue,nosql,redis," />
 
 
 
@@ -39,16 +39,16 @@
   <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.1" />
 
 
-<meta name="description" content="Oracle XE是 Oracle 数据库的免费版本，支持标准版的大部分功能，11g XE 提供 Windows 和 Linux 版本(有32位和64位之分)。 Oracle XE版本也称”快捷版本“，是给个人学习、熟悉Oracle的简化版，可能是由于标准版oracle的安装（在linux、unix下）非常复杂，所以，oracle公司在最近才发布了这个快捷版本。">
+<meta name="description" content="消息队列是一个应用非常广的中间件，无论在传统行业还是互联网行业。本文讨论如何使用redis构建一个完善的消息队列服务器。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Oracle Express Edition安装">
-<meta property="og:url" content="http://yoursite.com/2015/09/29/oracle-express-install/index.html">
+<meta property="og:title" content="基于redis构建消息队列">
+<meta property="og:url" content="http://yoursite.com/2016/01/29/messagequeue-redis/index.html">
 <meta property="og:site_name" content="晓的技术博客">
-<meta property="og:description" content="Oracle XE是 Oracle 数据库的免费版本，支持标准版的大部分功能，11g XE 提供 Windows 和 Linux 版本(有32位和64位之分)。 Oracle XE版本也称”快捷版本“，是给个人学习、熟悉Oracle的简化版，可能是由于标准版oracle的安装（在linux、unix下）非常复杂，所以，oracle公司在最近才发布了这个快捷版本。">
-<meta property="og:updated_time" content="2015-09-29T10:34:53.151Z">
+<meta property="og:description" content="消息队列是一个应用非常广的中间件，无论在传统行业还是互联网行业。本文讨论如何使用redis构建一个完善的消息队列服务器。">
+<meta property="og:updated_time" content="2016-01-29T07:06:04.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Oracle Express Edition安装">
-<meta name="twitter:description" content="Oracle XE是 Oracle 数据库的免费版本，支持标准版的大部分功能，11g XE 提供 Windows 和 Linux 版本(有32位和64位之分)。 Oracle XE版本也称”快捷版本“，是给个人学习、熟悉Oracle的简化版，可能是由于标准版oracle的安装（在linux、unix下）非常复杂，所以，oracle公司在最近才发布了这个快捷版本。">
+<meta name="twitter:title" content="基于redis构建消息队列">
+<meta name="twitter:description" content="消息队列是一个应用非常广的中间件，无论在传统行业还是互联网行业。本文讨论如何使用redis构建一个完善的消息队列服务器。">
 
 
 <script type="text/javascript" id="hexo.configuration">
@@ -58,7 +58,7 @@
   };
 </script>
 
-  <title> Oracle Express Edition安装 | 晓的技术博客 </title>
+  <title> 基于redis构建消息队列 | 晓的技术博客 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -204,7 +204,7 @@
           
           
             
-              Oracle Express Edition安装
+              基于redis构建消息队列
             
           
         </h1>
@@ -213,8 +213,8 @@
       <div class="post-meta">
         <span class="post-time">
           发表于
-          <time itemprop="dateCreated" datetime="2015-09-29T17:59:37+08:00" content="2015-09-29">
-            2015-09-29
+          <time itemprop="dateCreated" datetime="2016-01-29T14:50:01+08:00" content="2016-01-29">
+            2016-01-29
           </time>
         </span>
 
@@ -223,8 +223,8 @@
             &nbsp; | &nbsp; 分类于
             
               <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                <a href="/categories/oracle/" itemprop="url" rel="index">
-                  <span itemprop="name">oracle</span>
+                <a href="/categories/redis/" itemprop="url" rel="index">
+                  <span itemprop="name">redis</span>
                 </a>
               </span>
 
@@ -239,8 +239,8 @@
           
             <span class="post-comments-count">
               &nbsp; | &nbsp;
-              <a href="/2015/09/29/oracle-express-install/#comments" itemprop="discussionUrl">
-                <span class="post-comments-count ds-thread-count" data-thread-key="2015/09/29/oracle-express-install/" itemprop="commentsCount"></span>
+              <a href="/2016/01/29/messagequeue-redis/#comments" itemprop="discussionUrl">
+                <span class="post-comments-count ds-thread-count" data-thread-key="2016/01/29/messagequeue-redis/" itemprop="commentsCount"></span>
               </a>
             </span>
           
@@ -254,62 +254,41 @@
       
 
       
-        <span itemprop="articleBody"><p><a href="http://www.oracle.com/technetwork/cn/database/database-technologies/express-edition/downloads/index.html" target="_blank" rel="external">Oracle 11g XE</a> 是 Oracle 数据库的免费版本，支持标准版的大部分功能，11g XE 提供 Windows 和 Linux 版本(有32位和64位之分)。 Oracle XE版本也称”快捷版本“，是给个人学习、熟悉Oracle的简化版，可能是由于标准版oracle的安装（在linux、unix下）非常复杂，所以，oracle公司在最近才发布了这个快捷版本。</p>
-<p>Oracle XE做为免费的 Oracle 数据库版本， 主要的限制是： </p>
+        <span itemprop="articleBody"><p>一般来说，消息队列有两种场景：一种是发布者订阅者模式；一种是生产者消费者模式。利用redis这两种场景的消息队列都能够实现。定义：</p>
 <ul>
-<li>最大数据库大小为 11 GB；</li>
-<li>可使用的最大内存是 1G；</li>
-<li>一台机器上只能安装一个 XE 实例 ；</li>
-<li>XE 只能使用单 CPU</li>
+<li>生产者消费者模式：生产者生产消息放到队列里，多个消费者同时监听队列，谁先抢到消息谁就会从队列中取走消息；即对于每个消息只能被最多一个消费者拥有。（常用于处理高并发写操作）</li>
+<li>发布者订阅者模式：发布者生产消息放到队列里，多个监听队列的消费者都会收到同一份消息；即正常情况下每个消费者收到的消息应该都是一样的。（常用来作为日志收集中一份原始数据对多个应用场景）</li>
 </ul>
-<p>接下来，介绍在centos6（64位）上如何安装Oracle XE。</p>
-<h2 id="一下载Oracle_XE">一下载Oracle XE</h2><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget http://download.oracle.com/otn/linux/oracle11g/xe/oracle-xe-11.2.0-1.0.x86_64.rpm.zip</span><br></pre></td></tr></table></figure>
-<h2 id="二安装依赖">二安装依赖</h2><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install libaio libaio-devel bc -y</span><br></pre></td></tr></table></figure>
-<h2 id="三安装">三安装</h2><p><font color="red">以下操作，都是用root</font></p>
-<h3 id="解压、检测">解压、检测</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">unzip oracle-xe-11.2.0-1.0.x86_64.rpm.zip  </span><br><span class="line">cd Disk1  </span><br><span class="line">rpm -ivh oracle-xe-11.2.0-1.0.x86_64.rpm</span><br></pre></td></tr></table></figure>
-<p>安装时会对系统进行检测，最好内存有1G，SWAP要求是内存的2倍。检测结果如下：</p>
-<blockquote>
-<p>[root@server01 Disk1]# rpm -ivh oracle-xe-11.2.0-1.0.x86_64.rpm<br>Preparing…                ########################################### [100%]<br>   1:oracle-xe              ########################################### [100%]<br>Executing post-install steps…</p>
-</blockquote>
-<p>You must run ‘/etc/init.d/oracle-xe configure’ as the root user to configure the database.</p>
-<h3 id="根据提示安装，但如果tmpfs小于2G，会报错：">根据提示安装，但如果tmpfs小于2G，会报错：</h3><blockquote>
-<p>Database Configuration failed. Look into /u01/app/oracle/product/11.2.0/xe/config/log for details</p>
-</blockquote>
-<p>1、修改/etc/fstab文件<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/fstab</span><br><span class="line">将：</span><br><span class="line">tmpfs        /dev/shm        tmpfs   defaults      0 0</span><br><span class="line">改为：</span><br><span class="line">tmpfs        /dev/shm        tmpfs   defaults,size=2048M      0 0</span><br></pre></td></tr></table></figure></p>
-<p>2、重新加载tmpfs<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">umount /dev/shm</span><br><span class="line">mount /dev/shm</span><br></pre></td></tr></table></figure></p>
-<p>3、检查<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">df -h /dev/shm</span><br><span class="line">Filesystem      Size  Used Avail Use% Mounted on</span><br><span class="line">none            2.0G  243M  1.8G  12% /dev/shm</span><br></pre></td></tr></table></figure></p>
-<h3 id="根据提示安装XE">根据提示安装XE</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@server01 Disk1]# /etc/init.d/oracle-xe configure</span><br></pre></td></tr></table></figure>
-<p>之后，会引导用户进行简单的几项设置：</p>
-<blockquote>
-<p>Oracle Database 11g Express Edition Configuration<br>-————————————————<br>This will configure on-boot properties of Oracle Database 11g Express<br>Edition.  The following questions will determine whether the database should<br>be starting upon system boot, the ports it will use, and the passwords that<br>will be used for database accounts.  Press  to accept the defaults.<br>Ctrl-C will abort.</p>
-<p>Specify the HTTP port that will be used for Oracle Application Express [8080]:8081</p>
-<p>Specify a port that will be used for the database listener [1521]:1521</p>
-<p>Specify a password to be used for database accounts.  Note that the same<br>password will be used for SYS and SYSTEM.  Oracle recommends the use of<br>different passwords for each database account.  This can be done after<br>initial configuration:<br>Confirm the password:</p>
-<p>Do you want Oracle Database 11g Express Edition to be started on boot (y/n) [y]:y</p>
-<p>Starting Oracle Net Listener…Done<br>Configuring database…Done<br>Starting Oracle Database 11g Express Edition instance…Done<br>Installation completed successfully.</p>
-</blockquote>
-<p>输入的四项内容是：</p>
+<h2 id="初步探究">初步探究</h2><p>1、redis作为消息中间件：<br>1）Producer/ConsumerMode:<br>该方式是借助redis的list结构实现的。Producer调用redis的lpush往特定key里塞入消息，Consumer调用<font color="red">brpop</font>（阻塞方法）去不断监听该key。<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">// producer code</span><br><span class="line">String key = "demo:mq:test";</span><br><span class="line">String msg = "hello world";</span><br><span class="line">redisDao.lpush(key, msg);</span><br><span class="line"></span><br><span class="line">// consumer code</span><br><span class="line">String key = "demo:mq:test";</span><br><span class="line">while (true) &#123;</span><br><span class="line">     // block invoke</span><br><span class="line">    List<span class="tag">&lt;<span class="title">String</span>&gt;</span> msgs = redisDao.brpop(BLOCK_TIMEOUT, listKey);</span><br><span class="line">    if (msgs == null) continue;</span><br><span class="line">    String jobMsg = msgs.get(1);</span><br><span class="line">    processMsg(jobMsg);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>2）PubSub Mode:<br>redis 从 2.0.0 版本开始支持 pub/sub 指令。实现思想很简单，Publisher调用redis的publish方法往特定的channel发送消息，Subscriber在初始化的时候要subscribe到该channel，一旦有消息就会立即接收，否则会阻塞。</p>
+<p><em>注</em>：这种订阅是非持久化的。但是可以通过把订阅的消息额外的保存到redis中来实现持久化。</p>
+<p>2、为什么采用单独的消息队列中间件？</p>
 <ul>
-<li>http访问时的端口</li>
-<li>数据库的监听端口</li>
-<li>SYS和SYSTEM用户的密码</li>
-<li>是否开机启动（并没有开机启动，可能还有地方要设置）。</li>
+<li>由于应用会部署到多个结点，所以无法直接采用java的BlockingQueue阻塞队列（在分布式环境下），所以采用redis提供的队列支持。</li>
+<li>如果要做到统计的绝对实时，最好采用大数据的实时计算的解决方案：kafka+storm 来实现</li>
 </ul>
-<p>安装完成后：</p>
+<p>3、实现阻塞队列原理：</p>
 <ul>
-<li>会自动建立一个名为oracle的用户，家目录/u01/app/oracle。</li>
-<li>会建立dba组，oracle用户属于这个组。</li>
-<li>会自动生成一个数据库实例，名为XE。/u01/app/oracle/product/11.2.0/xe/dbs/spfileXE.ora</li>
+<li>redis中有一个blpop、brpop的命令，阻塞的从列表（list）中取数据，当列表为空，则阻塞知道取到数据或超时。</li>
+<li>blpop命令后面参数中可以跟多个list的key，内部是按照顺序进行访问的，基于这个原理可以实现高优先级队列。</li>
 </ul>
-<h3 id="设置oracle的环境变量">设置oracle的环境变量</h3><p><font color="red">使用oracle用户</font></p>
-<blockquote>
-<p>vim /etc/profile</p>
-</blockquote>
-<p>加入：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">export ORACLE_BASE=/u01/app/oracle</span><br><span class="line">export ORACLE_HOME=/u01/app/oracle/product/11.2.0/xe</span><br><span class="line">export PATH=$PATH:$ORACLE_HOME/bin</span><br><span class="line">export ORACLE_SID=XE</span><br><span class="line">export NLS_LANG=`$ORACLE_HOME/bin/nls_lang.sh`</span><br></pre></td></tr></table></figure></p>
-<p>之后，注销用户，使用oracle用户重新登录，就可以用sqlplus登录oracle，进而操作。</p>
-<blockquote>
-<p>sqlplus / as sysdba</p>
-</blockquote>
+<h2 id="深入探究">深入探究</h2><p>1、使用redis怎么做消息队列</p>
+<ol>
+<li>首先redis它的设计是用来做缓存的，但是由于它自身的某种特性使得他可以用来做消息队列。它有几个阻塞式的API（brpop、Sub，他们都是阻塞版的）可以使用，正是这些阻塞式的API让他有做消息队列的能力。</li>
+<li>其次，消息队列的其他特性例如FIFO也很容易实现，只需要一个List对象从头取数据，从尾部塞数据即可实现。</li>
+</ol>
+<p>2、简单FIFO队列：<br>1）一些基础redis基础知识的说明<br>redis&gt; blpop tasklist 0<br>“im task 01”<br>这个例子使用blpop命令会阻塞方式地从tasklist列表中取头一个数据，最后一个参数就是等待超时的时间。如果设置为0则表示无限等 待。另外redis存放的数据都只能是string类型，所以在任务传递的时候只能是传递字符串。我们只需要简单的将负责数据序列化成json格式的字符串，然后消费者那边再转换一下即可。</p>
+<p>2）实现：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">import redis, time</span><br><span class="line"> </span><br><span class="line">def handle(task):</span><br><span class="line">    print task</span><br><span class="line">    time.sleep(4)</span><br><span class="line"> </span><br><span class="line">def main():</span><br><span class="line">    pool = redis.ConnectionPool(host='localhost', port=6379, db=0)</span><br><span class="line">    r = redis.Redis(connection_pool=pool)</span><br><span class="line">    while 1:</span><br><span class="line">        result = r.brpop('tasklist', 0)</span><br><span class="line">        handle(result[1])</span><br><span class="line"> </span><br><span class="line">if __name__ == "__main__":</span><br><span class="line">    main()</span><br></pre></td></tr></table></figure><br>上例子即使一个最简单的消费者，我们通过一个无限循环不断地从redis的队列中取数据。如果队列中没有数据则没有超时的阻塞在那里，有数据则取出往下执行。<br>一般情况取出来是个复杂的字符串，我们可能需要将其格式化后作为再传给处理函数,但是为了简单我们的例子就是一个普通字符串。另外例子中的处理函数不做任何处理，仅仅sleep 用来模拟耗时的操作。<br>我们另开一个redis的客户端来模拟生产者，自带的客户端就可以。多往tasklist 队列里面塞上一些数据。<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">redis&gt; lpush tasklist 'im task 01'</span><br><span class="line">redis&gt; lpush tasklist 'im task 02'</span><br><span class="line">redis&gt; lpush tasklist 'im task 03'</span><br><span class="line">redis&gt; lpush tasklist 'im task 04'</span><br><span class="line">redis&gt; lpush tasklist 'im task 05'</span><br></pre></td></tr></table></figure><br>随后在消费者端便会看到这些模拟出来的任务被挨个消费掉。</p>
+<p>3、简单优先级的队列：<br>假设一种简单的需求，只需要高优先级的比低优先级的任务率先处理掉。其他任务之间的顺序一概不管，这种我们只需要在在遇到高优先级任务的时候将它塞到队列的前头，而不是push到最后面即可。因为我们的队列是使用的redis的 list,所以很容易实现。遇到高优先级的使用rpush 遇到低优先级的使用lpush。<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">redis&gt; lpush tasklist 'im task 01'</span><br><span class="line">redis&gt; lpush tasklist 'im task 02'</span><br><span class="line">redis&gt; rpush tasklist 'im high task 01'</span><br><span class="line">redis&gt; rpush tasklist 'im high task 01'</span><br><span class="line">redis&gt; lpush tasklist 'im task 03'</span><br><span class="line">redis&gt; rpush tasklist 'im high task 03'</span><br></pre></td></tr></table></figure><br>随后会看到，高优先级的总是比低优先级的率先执行。但是这个方案的缺点是高优先级的任务之间的执行顺序是先进后出的。</p>
+<p>4、较完善的优先级队列：<br>1）弊端：<br>上例只是简单的将高优先级的任务塞到队列最前面，低优先级的塞到最后面。这样保证不了高优先级任务之间的顺序，假设当所有的任务都是高优先级的话，那么他们的执行顺序将是相反的。这样明显违背了队列的FIFO原则。<br>不过只要稍加改进就可以完善我们的队列。</p>
+<p>2）跟使用rabbitmq一样，我们设置两个队列，一个高优先级一个低优先级的队列。高优先级任务放到高队列中，低的放在低优先队列中。<font color="red">redis和rabbitmq不同的是它可以要求队列消费者从哪个队列里面先读。</font><br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">def main():</span><br><span class="line">    pool = redis.ConnectionPool(host='localhost', port=6379, db=0)</span><br><span class="line">    r = redis.Redis(connection_pool=pool)</span><br><span class="line">    while 1:</span><br><span class="line">        result = r.brpop(['high_task_queue', 'low_task_queue'], 0)</span><br><span class="line">        handle(result[1])</span><br></pre></td></tr></table></figure><br>上面的代码，会阻塞地从’high_task_queue’, ‘low_task_queue’这两个队列里面取数据，如果第一个没有再从第二个里面取。所以只需要将队列消费者做这样的改进便可以达到目的。<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">redis&gt; lpush low_task_queue low001</span><br><span class="line">redis&gt; lpush low_task_queue low002</span><br><span class="line">redis&gt; lpush low_task_queue low003</span><br><span class="line">redis&gt; lpush low_task_queue low004</span><br><span class="line">redis&gt; lpush high_task_queue low001</span><br><span class="line">redis&gt; lpush high_task_queue low002</span><br><span class="line">redis&gt; lpush high_task_queue low003</span><br><span class="line">redis&gt; lpush high_task_queue low004</span><br></pre></td></tr></table></figure><br>通过上面的测试看到，高优先级的会被率先执行，并且高优先级之间也是保证了FIFO的原则。这种方案我们可以支持不同阶段的优先级队列，例如高中低三个级别或者更多的级别都可以。</p>
+<p>5、优先级级别很多的情况<br>假设有个这样的需求，优先级不是简单的高中低或者0-10这些固定的级别。而是类似0-99999这么多级别。那么我们第三种方案将不太合适了。</p>
+<font color="red">虽然redis有sorted set这样的可以排序的数据类型，看是很可惜它没有阻塞版的接口。于是我们还是只能使用list类型通过其他方式来完成目的。</font>
+
+<p>有个简单的做法我们可以只设置一个队列，并保证它是按照优先级排序号的。然后通过二分查找法查找一个任务合适的位置，并通过 lset 命令插入到相应的位置。<br>例如队列里面包含着写优先级的任务[1, 3, 6, 8, 9, 14]，当有个优先级为7的任务过来，我们通过自己的二分算法一个个从队列里面取数据出来反和目标数据比对，计算出相应的位置然后插入到指定地点即可。</p>
+<p>因为二分查找是比较快的，并且redis本身也都在内存中，理论上速度是可以保证的。但是如果说数据量确实很大的话我们也可以通过一些方式来调优。</p>
+<p>回想我们第三种方案，把第三种方案结合起来就会很大程度上减少开销。例如数据量十万的队列，它们的优先级也是随机0-十万的区间。我们可以设置 10个或者100个不同的队列，0-一万的优先级任务投放到1号队列，一万-二万的任务投放到2号队列。这样将一个队列按不同等级拆分后它单个队列的数据 就减少许多，这样二分查找匹配的效率也会高一点。但是数据所占的资源基本是不变的，十万数据该占多少内存还是多少。只是系统里面多了一些队列而已。</p>
+<p>参考：<a href="http://www.cnblogs.com/happyday56/p/4142761.html" target="_blank" rel="external">http://www.cnblogs.com/happyday56/p/4142761.html</a></p>
 </span>
       
     </div>
@@ -318,7 +297,11 @@
       
         <div class="post-tags">
           
-            <a href="/tags/oracle/" rel="tag">#oracle</a>
+            <a href="/tags/messagequeue/" rel="tag">#messagequeue</a>
+          
+            <a href="/tags/nosql/" rel="tag">#nosql</a>
+          
+            <a href="/tags/redis/" rel="tag">#redis</a>
           
         </div>
       
@@ -327,13 +310,11 @@
         <div class="post-nav">
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2015/10/07/shujujiegou-paixusuanfa/" rel="prev">数据结构之——经典排序算法</a>
-            
           </div>
 
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2015/09/24/use-of-markdown-1/" rel="next">markdown 高亮代码</a>
+              <a href="/2016/01/20/bloom-filter/" rel="next">bloom-filter</a>
             
           </div>
         </div>
@@ -348,10 +329,10 @@
 
     <div class="post-spread">
       
-        <div class="ds-share flat" data-thread-key="2015/09/29/oracle-express-install/"
-     data-title="Oracle Express Edition安装"
+        <div class="ds-share flat" data-thread-key="2016/01/29/messagequeue-redis/"
+     data-title="基于redis构建消息队列"
      data-content=""
-     data-url="http://yoursite.com/2015/09/29/oracle-express-install/">
+     data-url="http://yoursite.com/2016/01/29/messagequeue-redis/">
   <div class="ds-share-inline">
     <ul  class="ds-share-icons-16">
 
@@ -377,8 +358,8 @@
         
           <div class="comments" id="comments">
             
-              <div class="ds-thread" data-thread-key="2015/09/29/oracle-express-install/"
-                   data-title="Oracle Express Edition安装" data-url="http://yoursite.com/2015/09/29/oracle-express-install/">
+              <div class="ds-thread" data-thread-key="2016/01/29/messagequeue-redis/"
+                   data-title="基于redis构建消息队列" data-url="http://yoursite.com/2016/01/29/messagequeue-redis/">
               </div>
             
           </div>
@@ -489,7 +470,7 @@
           <div class="post-toc">
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#一下载Oracle_XE"><span class="nav-number">1.</span> <span class="nav-text">一下载Oracle XE</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二安装依赖"><span class="nav-number">2.</span> <span class="nav-text">二安装依赖</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三安装"><span class="nav-number">3.</span> <span class="nav-text">三安装</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#解压、检测"><span class="nav-number">3.1.</span> <span class="nav-text">解压、检测</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#根据提示安装，但如果tmpfs小于2G，会报错："><span class="nav-number">3.2.</span> <span class="nav-text">根据提示安装，但如果tmpfs小于2G，会报错：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#根据提示安装XE"><span class="nav-number">3.3.</span> <span class="nav-text">根据提示安装XE</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#设置oracle的环境变量"><span class="nav-number">3.4.</span> <span class="nav-text">设置oracle的环境变量</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#初步探究"><span class="nav-number">1.</span> <span class="nav-text">初步探究</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#深入探究"><span class="nav-number">2.</span> <span class="nav-text">深入探究</span></a></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator"></div>
