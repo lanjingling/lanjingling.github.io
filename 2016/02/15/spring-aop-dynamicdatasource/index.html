@@ -1,0 +1,737 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.5.1"/>
+
+
+    <meta name="description" content="java程序员、爱开源、喜欢nodejs、前端js、oracle数据库、分布式技术...<br/>改变世界的是这么一群人,他们寻找梦想中的乐园,当他们找不到时,就亲手创造了她..." />
+
+
+
+  <meta name="keywords" content="javaEE,spring," />
+
+
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.1" />
+
+
+<meta name="description" content="项目中我们经常会遇到多数据源的问题，尤其是数据同步或定时任务等项目更是如此；又例如：读写分离数据库配置的系统。。。。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="基于spring的aop实现多数据源动态切换">
+<meta property="og:url" content="http://yoursite.com/2016/02/15/spring-aop-dynamicdatasource/index.html">
+<meta property="og:site_name" content="晓的技术博客">
+<meta property="og:description" content="项目中我们经常会遇到多数据源的问题，尤其是数据同步或定时任务等项目更是如此；又例如：读写分离数据库配置的系统。。。。">
+<meta property="og:updated_time" content="2016-02-15T02:20:24.985Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="基于spring的aop实现多数据源动态切换">
+<meta name="twitter:description" content="项目中我们经常会遇到多数据源的问题，尤其是数据同步或定时任务等项目更是如此；又例如：读写分离数据库配置的系统。。。。">
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'post'
+  };
+</script>
+
+  <title> 基于spring的aop实现多数据源动态切换 | 晓的技术博客 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?93b1a723d246349c4cace650dee4a731";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand" rel="start">
+      <span class="logo">
+        <i class="icon-next-logo"></i>
+      </span>
+      <span class="site-title">晓的技术博客</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu menu-left">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            <i class="menu-item-icon icon-next-home"></i> <br />
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            <i class="menu-item-icon icon-next-archives"></i> <br />
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            <i class="menu-item-icon icon-next-categories"></i> <br />
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            <i class="menu-item-icon icon-next-tags"></i> <br />
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            <i class="menu-item-icon icon-next-about"></i> <br />
+            关于
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <form class="site-search-form">
+    <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+  </form>
+
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'iSunJWoZvxV9mKcJc6QU','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content"> 
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+
+      
+      
+        <h1 class="post-title" itemprop="name headline">
+          
+          
+            
+              基于spring的aop实现多数据源动态切换
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于
+          <time itemprop="dateCreated" datetime="2016-02-15T09:52:21+08:00" content="2016-02-15">
+            2016-02-15
+          </time>
+        </span>
+
+        
+          <span class="post-category" >
+            &nbsp; | &nbsp; 分类于
+            
+              <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                <a href="/categories/spring/" itemprop="url" rel="index">
+                  <span itemprop="name">spring</span>
+                </a>
+              </span>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+            <span class="post-comments-count">
+              &nbsp; | &nbsp;
+              <a href="/2016/02/15/spring-aop-dynamicdatasource/#comments" itemprop="discussionUrl">
+                <span class="post-comments-count ds-thread-count" data-thread-key="2016/02/15/spring-aop-dynamicdatasource/" itemprop="commentsCount"></span>
+              </a>
+            </span>
+          
+        
+      </div>
+    </header>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><h2 id="一、多数据源动态切换原理">一、多数据源动态切换原理</h2><p>项目中我们经常会遇到多数据源的问题，尤其是数据同步或定时任务等项目更是如此；又例如：读写分离数据库配置的系统。</p>
+<p>1、多数据源设置：</p>
+<p>1）静态数据源切换：<br>一般情况下，我们可以配置多个数据源，然后为每个数据源写一套对应的sessionFactory和dao层代码(以hibernate为例，mybatis同理)，——我们称之为<em>静态数据源配置</em>。</p>
+<p>2）动态数据源切换：<br>可看出在Dao层代码中写死了两个SessionFactory，这样日后如果再多一个数据源，还要改代码添加一个SessionFactory，显然这并不符合开闭原则。比较好的做法是，配置多个数据源，只对应一套sessionFactory，数据源之间可以动态切换。</p>
+<p>2、动态数据源切换时，如何保证数据库的事务：</p>
+<p>目前事务最灵活的方式，是使用spring的声明式事务，本质是利用了spring的aop，在执行数据库操作前后，加上事务处理。</p>
+<p>spring的事务管理，是基于数据源的，所以如果要实现动态数据源切换，而且在同一个数据源中保证事务是起作用的话，就需要注意二者的顺序问题，即：<font color="red">在事物起作用之前就要把数据源切换回来。</font></p>
+<p>举一个例子：web开发常见是三层结构：controller、service、dao。一般事务都会在service层添加，如果使用spring的声明式事物管理，在调用service层代码之前，spring会通过aop的方式动态添加事务控制代码，所以如果要想保证事物是有效的，那么就必须在spring添加事务之前把数据源动态切换过来，也就是动态切换数据源的aop要至少在service上添加，而且要在spring声明式事物aop之前添加.根据上面分析:</p>
+<ul>
+<li>最简单的方式是把动态切换数据源的aop加到controller层，这样在controller层里面就可以确定下来数据源了。不过，这样有一个缺点就是，每一个controller绑定了一个数据源，不灵活。对于这种：一个请求，需要使用两个以上数据源中的数据完成的业务时，就无法实现了。</li>
+<li>针对上面的这种问题，可以考虑把动态切换数据源的aop放到service层，但要注意一定要在事务aop之前来完成。这样，对于一个需要多个数据源数据的请求，我们只需要在controller里面注入多个service实现即可。但这种做法的问题在于，controller层里面会涉及到一些不必要的业务代码，例如：合并两个数据源中的list…</li>
+<li>此外，针对上面的问题，还可以再考虑一种方案，就是把事务控制到dao层，然后在service层里面动态切换数据源。</li>
+</ul>
+<h2 id="二、实例1：">二、实例1：</h2><p>本例子中，<font color="red">对不同数据源分包（package）管理</font>，同一包下的代码使用了同一数据源。<br>1、写一个DynamicDataSource类继承<strong>AbstractRoutingDataSource</strong>，并实现<strong>determineCurrentLookupKey方法</strong>：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DynamicDataSource</span> <span class="keyword">extends</span> <span class="title">AbstractRoutingDataSource</span> </span>&#123;</span><br><span class="line">	<span class="annotation">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">protected</span> Object <span class="title">determineCurrentLookupKey</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> CustomerContextHolder.getCustomerType();</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>2、利用<strong>ThreadLocal</strong>解决线程安全问题：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CustomerContextHolder</span> </span>&#123;</span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String DATA_SOURCE_A = <span class="string">"dataSource"</span>;</span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String DATA_SOURCE_B = <span class="string">"dataSource2"</span>;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> ThreadLocal&lt;String&gt; contextHolder = <span class="keyword">new</span> ThreadLocal&lt;String&gt;();</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">setCustomerType</span><span class="params">(String customerType)</span> </span>&#123;</span><br><span class="line">		contextHolder.set(customerType);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> String <span class="title">getCustomerType</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> contextHolder.get();</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">clearCustomerType</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		contextHolder.remove();</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>3、定义一个<strong>数据源切面类</strong>，通过aop来控制数据源的切换：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.aspectj.lang.JoinPoint;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DataSourceInterceptor</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setdataSourceMysql</span><span class="params">(JoinPoint jp)</span> </span>&#123;</span><br><span class="line">		DatabaseContextHolder.setCustomerType(<span class="string">"dataSourceMySql"</span>);</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setdataSourceOracle</span><span class="params">(JoinPoint jp)</span> </span>&#123;</span><br><span class="line">		DatabaseContextHolder.setCustomerType(<span class="string">"dataSourceOracle"</span>);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>4、在spring的application.xml中配置多个dataSource：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 数据源1 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">bean</span> <span class="attribute">id</span>=<span class="value">"dataSource"</span> <span class="attribute">class</span>=<span class="value">"org.apache.commons.dbcp.BasicDataSource"</span>&gt;</span></span><br><span class="line">	       <span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"driverClassName"</span> <span class="attribute">value</span>=<span class="value">"net.sourceforge.jtds.jdbc.Driver"</span>&gt;</span><span class="tag">&lt;/<span class="title">property</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"url"</span> <span class="attribute">value</span>=<span class="value">"jdbc:jtds:sqlserver://10.82.81.51:1433;databaseName=standards"</span>&gt;</span><span class="tag">&lt;/<span class="title">property</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"username"</span> <span class="attribute">value</span>=<span class="value">"youguess"</span>&gt;</span><span class="tag">&lt;/<span class="title">property</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"password"</span> <span class="attribute">value</span>=<span class="value">"youguess"</span>&gt;</span><span class="tag">&lt;/<span class="title">property</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">bean</span>&gt;</span></span><br><span class="line"><span class="comment">&lt;!-- 数据源2 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">bean</span> <span class="attribute">id</span>=<span class="value">"dataSource2"</span> <span class="attribute">class</span>=<span class="value">"org.apache.commons.dbcp.BasicDataSource"</span>&gt;</span></span><br><span class="line">	       <span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"driverClassName"</span> <span class="attribute">value</span>=<span class="value">"net.sourceforge.jtds.jdbc.Driver"</span>&gt;</span><span class="tag">&lt;/<span class="title">property</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"url"</span> <span class="attribute">value</span>=<span class="value">"jdbc:jtds:sqlserver://10.82.81.52:1433;databaseName=standards"</span>&gt;</span><span class="tag">&lt;/<span class="title">property</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"username"</span> <span class="attribute">value</span>=<span class="value">"youguess"</span>&gt;</span><span class="tag">&lt;/<span class="title">property</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"password"</span> <span class="attribute">value</span>=<span class="value">"youguess"</span>&gt;</span><span class="tag">&lt;/<span class="title">property</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">bean</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="title">bean</span> <span class="attribute">id</span>=<span class="value">"dataSource"</span> <span class="attribute">class</span>=<span class="value">"com.core.DynamicDataSource"</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"targetDataSources"</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="title">map</span> <span class="attribute">key-type</span>=<span class="value">"java.lang.String"</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">entry</span> <span class="attribute">key</span>=<span class="value">"dataSourceMySql"</span> <span class="attribute">value-ref</span>=<span class="value">"dataSourceMySql"</span> /&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">entry</span> <span class="attribute">key</span>=<span class="value">"dataSourceOracle"</span> <span class="attribute">value-ref</span>=<span class="value">"dataSourceOracle"</span> /&gt;</span></span><br><span class="line">		<span class="tag">&lt;/<span class="title">map</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="title">property</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"defaultTargetDataSource"</span> <span class="attribute">ref</span>=<span class="value">"dataSourceMySql"</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">bean</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- 动态数据源切换aop 先与事务的aop  --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">bean</span> <span class="attribute">id</span>=<span class="value">"dataSourceInterceptor"</span> <span class="attribute">class</span>=<span class="value">"com.core.DataSourceInterceptor"</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">aop:config</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="title">aop:aspect</span> <span class="attribute">id</span>=<span class="value">"dataSourceAspect"</span> <span class="attribute">ref</span>=<span class="value">"dataSourceInterceptor"</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="title">aop:pointcut</span> <span class="attribute">id</span>=<span class="value">"dsMysql"</span> <span class="attribute">expression</span>=<span class="value">"execution(* com.service.mysql..*.*(..))"</span> /&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="title">aop:pointcut</span> <span class="attribute">id</span>=<span class="value">"dsOracle"</span> <span class="attribute">expression</span>=<span class="value">"execution(* com.service.oracle..*.*(..))"</span> /&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="title">aop:before</span> <span class="attribute">method</span>=<span class="value">"setdataSourceMysql"</span> <span class="attribute">pointcut-ref</span>=<span class="value">"dsMysql"</span>/&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="title">aop:before</span> <span class="attribute">method</span>=<span class="value">"setdataSourceOracle"</span> <span class="attribute">pointcut-ref</span>=<span class="value">"dsOracle"</span>/&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="title">aop:aspect</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">aop:config</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- 事物aop --&gt;</span></span><br><span class="line">。。。</span><br></pre></td></tr></table></figure></p>
+<h2 id="三、实例2：">三、实例2：</h2><p>该例子，实现了在业务逻辑层控制了mysql的读写分离。同样，使用了spring的aop来动态切换读和写的数据源。和上个例子不同之处在于：不同数据源没有按照包分类管理，而是使用了<font color="red">自定义注解</font>。</p>
+<p>1、首先配置mysql 的主从复制：<br>详情见，<a href="http://lanjingling.github.io/2015/10/26/mysql-replication-master-slave/" target="_blank" rel="external">这里。</a></p>
+<p>2、自定义注解：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.lang.annotation.ElementType;</span><br><span class="line"><span class="keyword">import</span> java.lang.annotation.Target;</span><br><span class="line"><span class="keyword">import</span> java.lang.annotation.Retention;</span><br><span class="line"><span class="keyword">import</span> java.lang.annotation.RetentionPolicy;</span><br><span class="line"><span class="comment">/**</span><br><span class="line"> * RUNTIME</span><br><span class="line"> * 编译器将把注释记录在类文件中，在运行时 VM 将保留注释，因此可以反射性地读取。</span><br><span class="line"> * <span class="doctag">@author</span> yangGuang</span><br><span class="line"> *</span><br><span class="line"> */</span></span><br><span class="line"><span class="annotation">@Retention</span>(RetentionPolicy.RUNTIME)</span><br><span class="line"><span class="annotation">@Target</span>(ElementType.METHOD)</span><br><span class="line"><span class="keyword">public</span> <span class="annotation">@interface</span> DataSource &#123;</span><br><span class="line">	<span class="function">String <span class="title">value</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>3、基于spring的aop实现多数据源（<em>读和写两个数据源</em>）：<br>1）写一个ChooseDataSource： 类继承<em>AbstractRoutingDataSource</em>，并实现<em>determineCurrentLookupKey方法</em>：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ChooseDataSource</span> <span class="keyword">extends</span> <span class="title">AbstractRoutingDataSource</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="annotation">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">protected</span> Object <span class="title">determineCurrentLookupKey</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> HandleDataSource.getDataSource();</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>2）利用ThreadLocal解决线程安全问题：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">HandleDataSource</span> </span>&#123;</span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> ThreadLocal&lt;String&gt; holder = <span class="keyword">new</span> ThreadLocal&lt;String&gt;();</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">putDataSource</span><span class="params">(String datasource)</span> </span>&#123;</span><br><span class="line">		holder.set(datasource);</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> String <span class="title">getDataSource</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> holder.get();</span><br><span class="line">	&#125;    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>3）定义一个数据源切面类，通过aop访问，获取方法上的自定义注解，然后根据注解内容尽情判断，动态设置数据源：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.lang.reflect.Method;</span><br><span class="line"><span class="keyword">import</span> org.aspectj.lang.JoinPoint;</span><br><span class="line"><span class="keyword">import</span> org.aspectj.lang.annotation.Aspect;</span><br><span class="line"><span class="keyword">import</span> org.aspectj.lang.annotation.Before;</span><br><span class="line"><span class="keyword">import</span> org.aspectj.lang.annotation.Pointcut;</span><br><span class="line"><span class="keyword">import</span> org.aspectj.lang.reflect.MethodSignature;</span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Component;</span><br><span class="line"><span class="comment">//@Aspect</span></span><br><span class="line"><span class="comment">//@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DataSourceAspect</span> </span>&#123;</span><br><span class="line">	<span class="comment">//@Pointcut("execution(* com.apc.cms.service.*.*(..))")  </span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">pointCut</span><span class="params">()</span></span>&#123;&#125;;  </span><br><span class="line">	</span><br><span class="line">  <span class="comment">//  @Before(value = "pointCut()")</span></span><br><span class="line">	 <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">before</span><span class="params">(JoinPoint point)</span></span><br><span class="line">		</span>&#123;</span><br><span class="line">			Object target = point.getTarget();</span><br><span class="line">			System.out.println(target.toString());</span><br><span class="line">			String method = point.getSignature().getName();</span><br><span class="line">			System.out.println(method);</span><br><span class="line">			Class&lt;?&gt;[] classz = target.getClass().getInterfaces();</span><br><span class="line">			Class&lt;?&gt;[] parameterTypes = ((MethodSignature) point.getSignature())</span><br><span class="line">				.getMethod().getParameterTypes();</span><br><span class="line">			<span class="keyword">try</span> &#123;</span><br><span class="line">				Method m = classz[<span class="number">0</span>].getMethod(method, parameterTypes);</span><br><span class="line">				System.out.println(m.getName());</span><br><span class="line">				<span class="keyword">if</span> (m != <span class="keyword">null</span> &amp;&amp; m.isAnnotationPresent(DataSource.class)) &#123;</span><br><span class="line">					DataSource data = m.getAnnotation(DataSource.class);</span><br><span class="line">					HandleDataSource.putDataSource(data.value());</span><br><span class="line">				&#125;</span><br><span class="line">				</span><br><span class="line">			&#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">				e.printStackTrace();</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>4）配置applicationContext.xml：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- 主库数据源 --&gt;</span><br><span class="line"> &lt;bean id="writeDataSource" class="com.jolbox.bonecp.BoneCPDataSource"  destroy-method="close"&gt;</span><br><span class="line">	&lt;property name="driverClass" value="com.mysql.jdbc.Driver"/&gt;</span><br><span class="line">	&lt;property name="jdbcUrl" value="jdbc:mysql://172.22.14.6:3306/cpp?autoReconnect=true"/&gt;</span><br><span class="line">	&lt;property name="username" value="root"/&gt;</span><br><span class="line">	&lt;property name="password" value="root"/&gt;</span><br><span class="line">	&lt;property name="partitionCount" value="4"/&gt;</span><br><span class="line">	&lt;property name="releaseHelperThreads" value="3"/&gt;</span><br><span class="line">	&lt;property name="acquireIncrement" value="2"/&gt;</span><br><span class="line">	&lt;property name="maxConnectionsPerPartition" value="40"/&gt;</span><br><span class="line">	&lt;property name="minConnectionsPerPartition" value="20"/&gt;</span><br><span class="line">	&lt;property name="idleMaxAgeInSeconds" value="60"/&gt;</span><br><span class="line">	&lt;property name="idleConnectionTestPeriodInSeconds" value="60"/&gt;</span><br><span class="line">	&lt;property name="poolAvailabilityThreshold" value="5"/&gt;</span><br><span class="line">&lt;/bean&gt;</span><br><span class="line"></span><br><span class="line">&lt;!-- 从库数据源 --&gt;</span><br><span class="line">&lt;bean id="readDataSource" class="com.jolbox.bonecp.BoneCPDataSource"  destroy-method="close"&gt;</span><br><span class="line">	&lt;property name="driverClass" value="com.mysql.jdbc.Driver"/&gt;</span><br><span class="line">	&lt;property name="jdbcUrl" value="jdbc:mysql://172.22.14.7:3306/cpp?autoReconnect=true"/&gt;</span><br><span class="line">	&lt;property name="username" value="root"/&gt;</span><br><span class="line">	&lt;property name="password" value="root"/&gt;</span><br><span class="line">	&lt;property name="partitionCount" value="4"/&gt;</span><br><span class="line">	&lt;property name="releaseHelperThreads" value="3"/&gt;</span><br><span class="line">	&lt;property name="acquireIncrement" value="2"/&gt;</span><br><span class="line">	&lt;property name="maxConnectionsPerPartition" value="40"/&gt;</span><br><span class="line">	&lt;property name="minConnectionsPerPartition" value="20"/&gt;</span><br><span class="line">	&lt;property name="idleMaxAgeInSeconds" value="60"/&gt;</span><br><span class="line">	&lt;property name="idleConnectionTestPeriodInSeconds" value="60"/&gt;</span><br><span class="line">	&lt;property name="poolAvailabilityThreshold" value="5"/&gt;</span><br><span class="line">&lt;/bean&gt;</span><br><span class="line"></span><br><span class="line">&lt;!-- transaction manager, 事务管理 --&gt;</span><br><span class="line">&lt;bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager"&gt;</span><br><span class="line">	&lt;property name="dataSource" ref="dataSource" /&gt;</span><br><span class="line">&lt;/bean&gt;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&lt;!-- 注解自动载入 --&gt;</span><br><span class="line">&lt;context:annotation-config /&gt;</span><br><span class="line"></span><br><span class="line">&lt;!--enale component scanning (beware that this does not enable mapper scanning!)--&gt;</span><br><span class="line">&lt;context:component-scan base-package="com.apc.cms.persistence.rdbms" /&gt;</span><br><span class="line">&lt;context:component-scan base-package="com.apc.cms.service"&gt;</span><br><span class="line"> &lt;context:include-filter type="annotation"  </span><br><span class="line">	expression="org.springframework.stereotype.Component" /&gt;  </span><br><span class="line">&lt;/context:component-scan&gt; </span><br><span class="line"></span><br><span class="line">&lt;context:component-scan base-package="com.apc.cms.auth" /&gt;</span><br><span class="line"></span><br><span class="line">&lt;!-- enable transaction demarcation with annotations --&gt;</span><br><span class="line">&lt;tx:annotation-driven /&gt;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&lt;!-- define the SqlSessionFactory --&gt;</span><br><span class="line">&lt;bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean"&gt;</span><br><span class="line">	&lt;property name="dataSource" ref="dataSource" /&gt;</span><br><span class="line">	&lt;property name="typeAliasesPackage" value="com.apc.cms.model.domain" /&gt;</span><br><span class="line">&lt;/bean&gt;</span><br><span class="line"></span><br><span class="line">&lt;!-- scan for mappers and let them be autowired --&gt;</span><br><span class="line">&lt;bean class="org.mybatis.spring.mapper.MapperScannerConfigurer"&gt;</span><br><span class="line">	&lt;property name="basePackage" value="com.apc.cms.persistence" /&gt;</span><br><span class="line">	&lt;property name="sqlSessionFactory" ref="sqlSessionFactory" /&gt;</span><br><span class="line">&lt;/bean&gt;</span><br><span class="line"></span><br><span class="line">&lt;bean id="dataSource" class="com.apc.cms.utils.ChooseDataSource"&gt;</span><br><span class="line">	&lt;property name="targetDataSources"&gt;  </span><br><span class="line">		  &lt;map key-type="java.lang.String"&gt;  </span><br><span class="line">			  &lt;!-- write --&gt;</span><br><span class="line">			 &lt;entry key="write" value-ref="writeDataSource"/&gt;  </span><br><span class="line">			 &lt;!-- read --&gt;</span><br><span class="line">			 &lt;entry key="read" value-ref="readDataSource"/&gt;  </span><br><span class="line">		  &lt;/map&gt;  </span><br><span class="line">		  </span><br><span class="line">	&lt;/property&gt;  </span><br><span class="line">	&lt;property name="defaultTargetDataSource" ref="writeDataSource"/&gt;  </span><br><span class="line">&lt;/bean&gt;</span><br><span class="line">  </span><br><span class="line">&lt;!-- 激活自动代理功能 --&gt;</span><br><span class="line">&lt;aop:aspectj-autoproxy proxy-target-class="true"/&gt;</span><br><span class="line"></span><br><span class="line">&lt;!-- 配置数据库注解aop --&gt;</span><br><span class="line">&lt;bean id="dataSourceAspect" class="com.apc.cms.utils.DataSourceAspect" /&gt;</span><br><span class="line">&lt;aop:config&gt;</span><br><span class="line">	&lt;aop:aspect id="c" ref="dataSourceAspect"&gt;</span><br><span class="line">		&lt;aop:pointcut id="tx" expression="execution(* com.apc.cms.service..*.*(..))"/&gt;</span><br><span class="line">		&lt;aop:before pointcut-ref="tx" method="before"/&gt;</span><br><span class="line">	&lt;/aop:aspect&gt;</span><br><span class="line">&lt;/aop:config&gt;</span><br><span class="line">&lt;!-- 配置数据库注解aop --&gt;</span><br></pre></td></tr></table></figure></p>
+<p>4、测试：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="annotation">@DataSource</span>(<span class="string">"write"</span>)  </span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">update</span><span class="params">(User user)</span> </span>&#123;  </span><br><span class="line">    userMapper.update(user);  </span><br><span class="line">&#125;  </span><br><span class="line">  </span><br><span class="line"><span class="annotation">@DataSource</span>(<span class="string">"read"</span>)  </span><br><span class="line"><span class="function"><span class="keyword">public</span> Document <span class="title">getDocById</span><span class="params">(<span class="keyword">long</span> id)</span> </span>&#123;  </span><br><span class="line">    <span class="keyword">return</span> documentMapper.getById(id);  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>测试写操作：可以通过应用修改数据，修改主库数据，发现从库的数据被同步更新了，所以定义的write操作都是走的写库</li>
+<li>测试读操作：  后台修改从库数据，查看主库的数据没有被修改，在应用页面中刷新，发现读的是从库的数据，说明读写分离ok。</li>
+</ul>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/javaEE/" rel="tag">#javaEE</a>
+          
+            <a href="/tags/spring/" rel="tag">#spring</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/01/29/messagequeue-redis/" rel="next">基于redis构建消息队列</a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <div class="ds-share flat" data-thread-key="2016/02/15/spring-aop-dynamicdatasource/"
+     data-title="基于spring的aop实现多数据源动态切换"
+     data-content=""
+     data-url="http://yoursite.com/2016/02/15/spring-aop-dynamicdatasource/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
+
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
+      
+    </div>
+  </div>
+
+ </div>
+
+        
+
+        
+          <div class="comments" id="comments">
+            
+              <div class="ds-thread" data-thread-key="2016/02/15/spring-aop-dynamicdatasource/"
+                   data-title="基于spring的aop实现多数据源动态切换" data-url="http://yoursite.com/2016/02/15/spring-aop-dynamicdatasource/">
+              </div>
+            
+          </div>
+        
+      </div>
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="/images/lanjingling.jpg" alt="蓝精灵" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">蓝精灵</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">java程序员、爱开源、喜欢nodejs、前端js、oracle数据库、分布式技术...<br/>改变世界的是这么一群人,他们寻找梦想中的乐园,当他们找不到时,就亲手创造了她...</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">36</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">14</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">24</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/lanjingling" target="_blank">github</a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://blog.csdn.net/liuxiao723846" target="_blank">csdn</a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/1925780475" target="_blank">weibo</a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+            <p class="site-author-name">Links</p>
+            
+              <span class="links-of-author-item">
+              <a href="http://www.ruanyifeng.com/blog/" target="_blank">阮一峰</a>
+              </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://zipperary.com/" target="_blank">Zippera's Blog</a>
+              </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://wuchong.me/" target="_blank">Jark's Blog</a>
+              </span>
+            
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、多数据源动态切换原理"><span class="nav-number">1.</span> <span class="nav-text">一、多数据源动态切换原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、实例1："><span class="nav-number">2.</span> <span class="nav-text">二、实例1：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三、实例2："><span class="nav-number">3.</span> <span class="nav-text">三、实例2：</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner"> <div class="copyright" >
+  
+  &copy; &nbsp;  2014 - 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="icon-next-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">蓝精灵</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+ </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+  
+    
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"lanjingling"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+    
+     
+
+    
+  
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.1"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.1"></script>
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/js/motion_global.js?v=0.4.5.1" id="motion.global"></script>
+
+
+
+
+  <script type="text/javascript" src="/js/nav-toggle.js?v=0.4.5.1"></script>
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.1" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 0.4 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    var $tocContent = $('.post-toc-content');
+    if (isDesktop() && CONFIG.sidebar === 'post') {
+      if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+        displaySidebar();
+      }
+    }
+  });
+</script>
+
+
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      if (CONFIG.sidebar === 'always') {
+        displaySidebar();
+      }
+      if (isMobile()) {
+        FastClick.attach(document.body);
+      }
+    });
+  </script>
+
+  
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/lazyload.js"></script>
+  <script type="text/javascript">
+    $(function () {
+      $("#posts").find('img').lazyload({
+        placeholder: "/images/loading.gif",
+        effect: "fadeIn"
+      });
+    });
+  </script>
+</body>
+</html>
