@@ -30,7 +30,7 @@
 
 
 
-  <meta name="keywords" content="oracle," />
+  <meta name="keywords" content="nginx,集群," />
 
 
 
@@ -39,16 +39,18 @@
   <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.1" />
 
 
-<meta name="description" content="Oracle XE是 Oracle 数据库的免费版本，支持标准版的大部分功能，11g XE 提供 Windows 和 Linux 版本(有32位和64位之分)。 Oracle XE版本也称”快捷版本“，是给个人学习、熟悉Oracle的简化版，可能是由于标准版oracle的安装（在linux、unix下）非常复杂，所以，oracle公司在最近才发布了这个快捷版本。">
+<meta name="description" content="Nginx反向代理tomcat，服务器两端（nginx端，tomcat端）经常会出现TIME_WAIT暴增现象，本文针对这种问题进行分析、优化。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Oracle Express Edition安装">
-<meta property="og:url" content="http://yoursite.com/2015/09/29/oracle-express-install/index.html">
+<meta property="og:title" content="Nginx反向代理tomcat，两端TIME_WAIT优化">
+<meta property="og:url" content="http://yoursite.com/2016/02/27/nginx-tomcat-time-wait/index.html">
 <meta property="og:site_name" content="晓的技术博客">
-<meta property="og:description" content="Oracle XE是 Oracle 数据库的免费版本，支持标准版的大部分功能，11g XE 提供 Windows 和 Linux 版本(有32位和64位之分)。 Oracle XE版本也称”快捷版本“，是给个人学习、熟悉Oracle的简化版，可能是由于标准版oracle的安装（在linux、unix下）非常复杂，所以，oracle公司在最近才发布了这个快捷版本。">
-<meta property="og:updated_time" content="2015-09-29T10:34:53.151Z">
+<meta property="og:description" content="Nginx反向代理tomcat，服务器两端（nginx端，tomcat端）经常会出现TIME_WAIT暴增现象，本文针对这种问题进行分析、优化。">
+<meta property="og:image" content="http://ww4.sinaimg.cn/mw690/72c913fbjw1f1dq3ga4b0j20g50en3zu.jpg">
+<meta property="og:image" content="http://ww4.sinaimg.cn/mw690/72c913fbjw1f1dq4482tvj20gi0f375y.jpg">
+<meta property="og:updated_time" content="2016-02-27T03:31:54.843Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Oracle Express Edition安装">
-<meta name="twitter:description" content="Oracle XE是 Oracle 数据库的免费版本，支持标准版的大部分功能，11g XE 提供 Windows 和 Linux 版本(有32位和64位之分)。 Oracle XE版本也称”快捷版本“，是给个人学习、熟悉Oracle的简化版，可能是由于标准版oracle的安装（在linux、unix下）非常复杂，所以，oracle公司在最近才发布了这个快捷版本。">
+<meta name="twitter:title" content="Nginx反向代理tomcat，两端TIME_WAIT优化">
+<meta name="twitter:description" content="Nginx反向代理tomcat，服务器两端（nginx端，tomcat端）经常会出现TIME_WAIT暴增现象，本文针对这种问题进行分析、优化。">
 
 
 <script type="text/javascript" id="hexo.configuration">
@@ -58,7 +60,7 @@
   };
 </script>
 
-  <title> Oracle Express Edition安装 | 晓的技术博客 </title>
+  <title> Nginx反向代理tomcat，两端TIME_WAIT优化 | 晓的技术博客 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -204,7 +206,7 @@
           
           
             
-              Oracle Express Edition安装
+              Nginx反向代理tomcat，两端TIME_WAIT优化
             
           
         </h1>
@@ -213,8 +215,8 @@
       <div class="post-meta">
         <span class="post-time">
           发表于
-          <time itemprop="dateCreated" datetime="2015-09-29T17:59:37+08:00" content="2015-09-29">
-            2015-09-29
+          <time itemprop="dateCreated" datetime="2016-02-27T10:40:26+08:00" content="2016-02-27">
+            2016-02-27
           </time>
         </span>
 
@@ -223,8 +225,8 @@
             &nbsp; | &nbsp; 分类于
             
               <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                <a href="/categories/oracle/" itemprop="url" rel="index">
-                  <span itemprop="name">oracle</span>
+                <a href="/categories/nginx/" itemprop="url" rel="index">
+                  <span itemprop="name">nginx</span>
                 </a>
               </span>
 
@@ -239,8 +241,8 @@
           
             <span class="post-comments-count">
               &nbsp; | &nbsp;
-              <a href="/2015/09/29/oracle-express-install/#comments" itemprop="discussionUrl">
-                <span class="post-comments-count ds-thread-count" data-thread-key="2015/09/29/oracle-express-install/" itemprop="commentsCount"></span>
+              <a href="/2016/02/27/nginx-tomcat-time-wait/#comments" itemprop="discussionUrl">
+                <span class="post-comments-count ds-thread-count" data-thread-key="2016/02/27/nginx-tomcat-time-wait/" itemprop="commentsCount"></span>
               </a>
             </span>
           
@@ -254,62 +256,27 @@
       
 
       
-        <span itemprop="articleBody"><p><a href="http://www.oracle.com/technetwork/cn/database/database-technologies/express-edition/downloads/index.html" target="_blank" rel="external">Oracle 11g XE</a> 是 Oracle 数据库的免费版本，支持标准版的大部分功能，11g XE 提供 Windows 和 Linux 版本(有32位和64位之分)。 Oracle XE版本也称”快捷版本“，是给个人学习、熟悉Oracle的简化版，可能是由于标准版oracle的安装（在linux、unix下）非常复杂，所以，oracle公司在最近才发布了这个快捷版本。</p>
-<p>Oracle XE做为免费的 Oracle 数据库版本， 主要的限制是： </p>
+        <span itemprop="articleBody"><h2 id="一、tcp三次握手和time_wait">一、tcp三次握手和time wait</h2><p>第一次握手：建立连接时，客户端发送syn包和一个随机序列号seq=x到服务器，并进入SYN_SEND状态，等待服务器进行确认。（syn，同 步序列编号）。第二次握手，服务器收到syn包，必须确认客户的SYN，然后服务器发送一个ACK=1, SYN=1, seq=y的随机数和ack=x+1的确认数的包发送回去。第三次握手是客户端收到服务器端的SYN+ACK包，然后向服务器端发送确认包 ack=y+1, seq=x+1, ACK=1,客户端和服务器端进入ESTABLISHED状态，完成三次握手。具体图示如下：<br><img src="http://ww4.sinaimg.cn/mw690/72c913fbjw1f1dq3ga4b0j20g50en3zu.jpg" alt=""><br>这里多说一点，既然提到了连接时的三次握手，就顺便把断开连接时的四次挥手也复习一下。首先客户端主动发送Fin=1，seq=u，它等于前面已传送过去的最后一个字节的序号加1，这是A进入FIN-WAIT-1状态，等待B的确认。B收到连接后立即发出确认，确认号是ack=u+1，而这个报文段 自己的序号是v，等于B前面已传送过的数据的最后一个字节的序号加1，然后B即进入CLOSE-WAIT状态。因而A到B的这个链接现在已经断开了，这时 的TCP连接处于半关闭状态，即A已经没有数据需要发送了。但B若发送数据，A还是要接受的。A收到来自B的确认之后就进入了FIN-WAIT-2状态等待B发出连接释放报文段。若B已经没有要向A发送数据，其应用进程就通知TCP释放连接。这时B发出的连接释放报文段必须使用FIN=1，现在假定B的序 号为w，B还必须重复上次已发送过的确认号ack=u+1，这时B就进入了LAST-ACK状态，等待A确认。A在收到B的连接释放之后必须对此发出确 认，<font color="red">在确认号中把ACK置1，确认号ack=w+1，而自己的序号是seq=u+1，接着A进入TIME-WAIT状态</font>。为了保证B可以收到确认释放报文 段。如下图：<br><img src="http://ww4.sinaimg.cn/mw690/72c913fbjw1f1dq4482tvj20gi0f375y.jpg" alt=""></p>
+<p>是不是所有执行主动关闭的socket都会进入TIME_WAIT状态呢？有没有什么情况使主动关闭的socket直接进入CLOSED状态呢？</p>
+<font color="red">主动关闭的一方在发送最后一个 ack 后就会进入 TIME_WAIT 状态</font> 停留2MSL（max segment lifetime）时间，这个是TCP/IP必不可少的，也就是“解决”不了的。也就是TCP/IP设计者本来是这么设计的，主要有两个原因：<br>    • 防止上一次连接中的包，迷路后重新出现，影响新连接（经过2MSL，上一次连接中所有的重复包都会消失）<br>    • 可靠的关闭TCP连接，在主动关闭方发送的最后一个 ack(fin) ，有可能丢失，这时被动方会重新发fin, 如果这时主动方处于 CLOSED 状态 ，就会响应 rst 而不是 ack。所以主动方要处于 TIME_WAIT 状态，而不能是 CLOSED 。<br><br><em>小结：</em><br><br>- 因为TCP连接是双向的，所以在关闭连接的时候，两个方向各自都需要关闭。先发FIN包的一方执行的是主动关闭；后发FIN包的一方执行的是被动关闭。主动关闭的一方会进入TIME_WAIT状态，并且在此状态停留两倍的MSL时长（指的是报文段的最大生存时间）。<br>- TIME_WAIT产生原因：为什么主动关闭的一端不直接进入closed状态，而是要先进入time_wait并且停留两倍的MSL时长呢？这是因为TCP是建立在不可靠网络上的可靠协议。如果主动关闭的一端收到被动关闭一端的发出的FIN包后，返回ACK包，同时进入TIME_WAIT，但是由于网络的原因，主动关闭一端发送的ACK包可能会延迟，从而触发被动关闭一方重传FIN包，这样一来一回极端情况正好是2MSL。如果主动关闭的一端直接close或者不到两倍MSL时间就关闭，那么被动关闭发出重传FIN包到达，可能出现的问题是：旧的连接不存在，系统只能返回RST包；新的TCP连接已经建立，延迟包可能会干扰新连接。这都可能导致TCP不可靠。<br>- 在生产过程中，如果服务器使用短连接，那么完成一次请求后会主动断开连接，就会造成大量time_wait状态。因此我们常常在系统中会采用长连接，减少建立连接的消耗，同时也减少TIME_WAIT的产生，但实际上即使使用长连接配置不当时，当TIME_WAIT的生产速度远大于其消耗速度时，系统仍然会累计大量的TIME_WAIT状态的连接。TIME_WAIT状态连接过多就会造成一些问题。<font color="red">如果客户端的TIME_WAIT连接过多，同时它还在不断产生，将会导致客户端端口耗尽，新的端口分配不出来，出现错误。如果服务器端的TIME_WAIT连接过多，可能会导致客户端的请求连接失败。</font>
+
+<h2 id="二、nginx反向代理应用服务器，导致后端应用服务器TIME_WAIT过多问题：">二、nginx反向代理应用服务器，导致后端应用服务器TIME_WAIT过多问题：</h2><p>1、使用下面命令可以查看服务器的连接情况：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">shell&gt; netstat -n | awk '/^tcp/ &#123;++state[$NF]&#125; END &#123;for(key in state) print key,"\t",state[key]&#125;'</span><br><span class="line">TIME_WAIT 250263</span><br><span class="line">CLOSE_WAIT 57</span><br><span class="line">FIN_WAIT2 3</span><br><span class="line">ESTABLISHED 2463</span><br><span class="line">SYN_RECV 8</span><br><span class="line">或者</span><br><span class="line">ss -ant | awk 'NR&gt;1 &#123;++s[$1]&#125; END &#123;for(k in s) print k,s[k]&#125;'</span><br></pre></td></tr></table></figure></p>
+<p>TIME_WAIT危害：</p>
 <ul>
-<li>最大数据库大小为 11 GB；</li>
-<li>可使用的最大内存是 1G；</li>
-<li>一台机器上只能安装一个 XE 实例 ；</li>
-<li>XE 只能使用单 CPU</li>
+<li>如果客户端的TIME_WAIT连接过多，同时它还在不断产生，将会导致客户端端口耗尽，新的端口分配不出来，出现错误；</li>
+<li>如果服务器端的TIME_WAIT连接过多，可能会导致客户端的请求连接失败。</li>
 </ul>
-<p>接下来，介绍在centos6（64位）上如何安装Oracle XE。</p>
-<h2 id="一下载Oracle_XE">一下载Oracle XE</h2><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget http://download.oracle.com/otn/linux/oracle11g/xe/oracle-xe-11.2.0-1.0.x86_64.rpm.zip</span><br></pre></td></tr></table></figure>
-<h2 id="二安装依赖">二安装依赖</h2><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install libaio libaio-devel bc -y</span><br></pre></td></tr></table></figure>
-<h2 id="三安装">三安装</h2><p><font color="red">以下操作，都是用root</font></p>
-<h3 id="解压、检测">解压、检测</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">unzip oracle-xe-11.2.0-1.0.x86_64.rpm.zip  </span><br><span class="line">cd Disk1  </span><br><span class="line">rpm -ivh oracle-xe-11.2.0-1.0.x86_64.rpm</span><br></pre></td></tr></table></figure>
-<p>安装时会对系统进行检测，最好内存有1G，SWAP要求是内存的2倍。检测结果如下：</p>
-<blockquote>
-<p>[root@server01 Disk1]# rpm -ivh oracle-xe-11.2.0-1.0.x86_64.rpm<br>Preparing…                ########################################### [100%]<br>   1:oracle-xe              ########################################### [100%]<br>Executing post-install steps…</p>
-</blockquote>
-<p>You must run ‘/etc/init.d/oracle-xe configure’ as the root user to configure the database.</p>
-<h3 id="根据提示安装，但如果tmpfs小于2G，会报错：">根据提示安装，但如果tmpfs小于2G，会报错：</h3><blockquote>
-<p>Database Configuration failed. Look into /u01/app/oracle/product/11.2.0/xe/config/log for details</p>
-</blockquote>
-<p>1、修改/etc/fstab文件<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/fstab</span><br><span class="line">将：</span><br><span class="line">tmpfs        /dev/shm        tmpfs   defaults      0 0</span><br><span class="line">改为：</span><br><span class="line">tmpfs        /dev/shm        tmpfs   defaults,size=2048M      0 0</span><br></pre></td></tr></table></figure></p>
-<p>2、重新加载tmpfs<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">umount /dev/shm</span><br><span class="line">mount /dev/shm</span><br></pre></td></tr></table></figure></p>
-<p>3、检查<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">df -h /dev/shm</span><br><span class="line">Filesystem      Size  Used Avail Use% Mounted on</span><br><span class="line">none            2.0G  243M  1.8G  12% /dev/shm</span><br></pre></td></tr></table></figure></p>
-<h3 id="根据提示安装XE">根据提示安装XE</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@server01 Disk1]# /etc/init.d/oracle-xe configure</span><br></pre></td></tr></table></figure>
-<p>之后，会引导用户进行简单的几项设置：</p>
-<blockquote>
-<p>Oracle Database 11g Express Edition Configuration<br>-————————————————<br>This will configure on-boot properties of Oracle Database 11g Express<br>Edition.  The following questions will determine whether the database should<br>be starting upon system boot, the ports it will use, and the passwords that<br>will be used for database accounts.  Press  to accept the defaults.<br>Ctrl-C will abort.</p>
-<p>Specify the HTTP port that will be used for Oracle Application Express [8080]:8081</p>
-<p>Specify a port that will be used for the database listener [1521]:1521</p>
-<p>Specify a password to be used for database accounts.  Note that the same<br>password will be used for SYS and SYSTEM.  Oracle recommends the use of<br>different passwords for each database account.  This can be done after<br>initial configuration:<br>Confirm the password:</p>
-<p>Do you want Oracle Database 11g Express Edition to be started on boot (y/n) [y]:y</p>
-<p>Starting Oracle Net Listener…Done<br>Configuring database…Done<br>Starting Oracle Database 11g Express Edition instance…Done<br>Installation completed successfully.</p>
-</blockquote>
-<p>输入的四项内容是：</p>
+<p>2、案例一：nginx端出现大量TIME_WAIT：</p>
+<p>将nginx作为反向代理时，后连tomcat等服务器。测试中不同并发压力下多次、反复出现nginx服务器端口资源耗尽的问题。表现为nginx服务器出现大量time_wait状态连接，端口资源耗尽（nginx报错：cannot assign requested address ）。首先检查nginx开启了长连接keepalive，但是系统仍然出现了大量的TIME_WAIT，这就和之前提到的当系统产生TIME_WAIT的速度大于其消耗速度时，就会累计TIME_WAIT。原因是：<font color="red">keepalive取配置太小</font>，将其增大后问题得以解决。(PS:nginx总的keepalive连接池大小 = keepalive取值 * nginx worker数）</p>
+<p><em>注：</em>从nginx 1.1.4 开始有了原生的ngx_http_upstream_keepalive 模块；</p>
+<p>2、案例二：tomcat端出现大量TIME_WAIT：<br>Nginx作为反向代理，长连接配置主要有三项，upstream中的keepalive设置单个worker最大请求数，参数proxy_http_version  1.1强制转换为http1.1协议(默认支持长连接)，proxy_set_header Connection将请求头部connection为空(http1.0请求默认connection头部为close)。如下<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">http &#123;</span><br><span class="line">    include       mime.types;</span><br><span class="line">    default_type  application/octet-stream;</span><br><span class="line"></span><br><span class="line">    sendfile        on;</span><br><span class="line">    #tcp_nopush     on;</span><br><span class="line">    #gzip  on;</span><br><span class="line"></span><br><span class="line">    keepalive_timeout  65;#默认0，长连接的持续时间</span><br><span class="line"></span><br><span class="line">    include conf.d/*.conf;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">upstream http_backend &#123;</span><br><span class="line">    server 127.0.0.1:8080;</span><br><span class="line"></span><br><span class="line">    keepalive 16;#连接池大小</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">server &#123;</span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line">    location /http/ &#123;</span><br><span class="line">        proxy_pass http://http_backend;</span><br><span class="line">        proxy_http_version 1.1;</span><br><span class="line">        proxy_set_header Connection "";</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>但是我们不禁会尝试疑问TIME_WAIT出现在Tomcat而不是在Nginx上？从抓包可以看出Nginx发送给Tomcat包头部Connection为close，所以Tomcat在处理完head请求后就主动关闭，所以TIME_WAIT出现在Tomcat服务器。 </p>
+<p>3、可以修改系统的/etc/sysctl.conf配置来减少TIME_WAIT的tcp连接：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">vi /etc/sysctl.conf</span><br><span class="line">net.ipv4.tcp_syncookies = 1  （某些情况下该参数已启用）</span><br><span class="line">net.ipv4.tcp_tw_reuse = 1</span><br><span class="line">net.ipv4.tcp_tw_recycle = 1</span><br><span class="line">net.ipv4.tcp_fin_timeout = 30</span><br></pre></td></tr></table></figure><br>然后执行/sbin/sysctl -p让参数生效。再用命令查看TIME_WAIT连接数 netstat -ae | grep “TIME_WAIT” |wc -l  发现大量的TIME_WAIT 已不存在。</p>
 <ul>
-<li>http访问时的端口</li>
-<li>数据库的监听端口</li>
-<li>SYS和SYSTEM用户的密码</li>
-<li>是否开机启动（并没有开机启动，可能还有地方要设置）。</li>
+<li>net.ipv4.tcp_syncookies = 1表示开启SYN Cookies。当出现SYN等待队列溢出时，启用cookies来处理，可防范少量SYN攻击，默认为0，表示关闭；</li>
+<li>net.ipv4.tcp_tw_reuse = 1表示开启重用。允许将TIME-WAIT sockets重新用于新的TCP连接，默认为0，表示关闭；</li>
+<li>net.ipv4.tcp_tw_recycle = 1表示开启TCP连接中TIME-WAIT sockets的快速回收，默认为0，表示关闭。</li>
+<li>net.ipv4.tcp_fin_timeout修改系統默认的TIMEOUT时间</li>
 </ul>
-<p>安装完成后：</p>
-<ul>
-<li>会自动建立一个名为oracle的用户，家目录/u01/app/oracle。</li>
-<li>会建立dba组，oracle用户属于这个组。</li>
-<li>会自动生成一个数据库实例，名为XE。/u01/app/oracle/product/11.2.0/xe/dbs/spfileXE.ora</li>
-</ul>
-<h3 id="设置oracle的环境变量">设置oracle的环境变量</h3><p><font color="red">使用oracle用户</font></p>
-<blockquote>
-<p>vim /etc/profile</p>
-</blockquote>
-<p>加入：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">export ORACLE_BASE=/u01/app/oracle</span><br><span class="line">export ORACLE_HOME=/u01/app/oracle/product/11.2.0/xe</span><br><span class="line">export PATH=$PATH:$ORACLE_HOME/bin</span><br><span class="line">export ORACLE_SID=XE</span><br><span class="line">export NLS_LANG=`$ORACLE_HOME/bin/nls_lang.sh`</span><br></pre></td></tr></table></figure></p>
-<p>之后，注销用户，使用oracle用户重新登录，就可以用sqlplus登录oracle，进而操作。</p>
-<blockquote>
-<p>sqlplus / as sysdba</p>
-</blockquote>
 </span>
       
     </div>
@@ -318,7 +285,9 @@
       
         <div class="post-tags">
           
-            <a href="/tags/oracle/" rel="tag">#oracle</a>
+            <a href="/tags/nginx/" rel="tag">#nginx</a>
+          
+            <a href="/tags/集群/" rel="tag">#集群</a>
           
         </div>
       
@@ -327,13 +296,11 @@
         <div class="post-nav">
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2015/10/07/shujujiegou-paixusuanfa/" rel="prev">数据结构之——经典排序算法</a>
-            
           </div>
 
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2015/09/24/use-of-markdown-1/" rel="next">markdown 高亮代码</a>
+              <a href="/2016/02/21/zookeeper-study1/" rel="next">zookeeper 学习（一）</a>
             
           </div>
         </div>
@@ -348,10 +315,10 @@
 
     <div class="post-spread">
       
-        <div class="ds-share flat" data-thread-key="2015/09/29/oracle-express-install/"
-     data-title="Oracle Express Edition安装"
+        <div class="ds-share flat" data-thread-key="2016/02/27/nginx-tomcat-time-wait/"
+     data-title="Nginx反向代理tomcat，两端TIME_WAIT优化"
      data-content=""
-     data-url="http://yoursite.com/2015/09/29/oracle-express-install/">
+     data-url="http://yoursite.com/2016/02/27/nginx-tomcat-time-wait/">
   <div class="ds-share-inline">
     <ul  class="ds-share-icons-16">
 
@@ -377,8 +344,8 @@
         
           <div class="comments" id="comments">
             
-              <div class="ds-thread" data-thread-key="2015/09/29/oracle-express-install/"
-                   data-title="Oracle Express Edition安装" data-url="http://yoursite.com/2015/09/29/oracle-express-install/">
+              <div class="ds-thread" data-thread-key="2016/02/27/nginx-tomcat-time-wait/"
+                   data-title="Nginx反向代理tomcat，两端TIME_WAIT优化" data-url="http://yoursite.com/2016/02/27/nginx-tomcat-time-wait/">
               </div>
             
           </div>
@@ -489,7 +456,7 @@
           <div class="post-toc">
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#一下载Oracle_XE"><span class="nav-number">1.</span> <span class="nav-text">一下载Oracle XE</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二安装依赖"><span class="nav-number">2.</span> <span class="nav-text">二安装依赖</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三安装"><span class="nav-number">3.</span> <span class="nav-text">三安装</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#解压、检测"><span class="nav-number">3.1.</span> <span class="nav-text">解压、检测</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#根据提示安装，但如果tmpfs小于2G，会报错："><span class="nav-number">3.2.</span> <span class="nav-text">根据提示安装，但如果tmpfs小于2G，会报错：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#根据提示安装XE"><span class="nav-number">3.3.</span> <span class="nav-text">根据提示安装XE</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#设置oracle的环境变量"><span class="nav-number">3.4.</span> <span class="nav-text">设置oracle的环境变量</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、tcp三次握手和time_wait"><span class="nav-number">1.</span> <span class="nav-text">一、tcp三次握手和time wait</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、nginx反向代理应用服务器，导致后端应用服务器TIME_WAIT过多问题："><span class="nav-number">2.</span> <span class="nav-text">二、nginx反向代理应用服务器，导致后端应用服务器TIME_WAIT过多问题：</span></a></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator"></div>
