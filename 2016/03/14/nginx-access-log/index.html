@@ -30,7 +30,7 @@
 
 
 
-  <meta name="keywords" content="bloom filter," />
+  <meta name="keywords" content="nginx," />
 
 
 
@@ -39,17 +39,17 @@
   <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.1" />
 
 
-<meta name="description" content="Bloom Filter是由Bloom在1970年提出的一种多哈希函数映射的快速查找算法。通常应用在一些需要快速判断某个元素是否属于集合，但是并不严格要求100%正确的场合。">
+<meta name="description" content="本文主要介绍nginx如何配置日志、日志的格式，以及nginx的日志切割。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="bloom-filter">
-<meta property="og:url" content="http://yoursite.com/2016/01/20/bloom-filter/index.html">
+<meta property="og:title" content="nginx access_log日志">
+<meta property="og:url" content="http://yoursite.com/2016/03/14/nginx-access-log/index.html">
 <meta property="og:site_name" content="晓的技术博客">
-<meta property="og:description" content="Bloom Filter是由Bloom在1970年提出的一种多哈希函数映射的快速查找算法。通常应用在一些需要快速判断某个元素是否属于集合，但是并不严格要求100%正确的场合。">
-<meta property="og:image" content="http://ww3.sinaimg.cn/mw690/72c913fbjw1f063qevraaj20m807vwfd.jpg">
-<meta property="og:updated_time" content="2016-01-20T09:48:27.923Z">
+<meta property="og:description" content="本文主要介绍nginx如何配置日志、日志的格式，以及nginx的日志切割。">
+<meta property="og:image" content="http://ww3.sinaimg.cn/large/72c913fbgw1f2l1htuh5yj20om0f3aac.jpg">
+<meta property="og:updated_time" content="2016-04-04T14:41:11.940Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="bloom-filter">
-<meta name="twitter:description" content="Bloom Filter是由Bloom在1970年提出的一种多哈希函数映射的快速查找算法。通常应用在一些需要快速判断某个元素是否属于集合，但是并不严格要求100%正确的场合。">
+<meta name="twitter:title" content="nginx access_log日志">
+<meta name="twitter:description" content="本文主要介绍nginx如何配置日志、日志的格式，以及nginx的日志切割。">
 
 
 <script type="text/javascript" id="hexo.configuration">
@@ -59,7 +59,7 @@
   };
 </script>
 
-  <title> bloom-filter | 晓的技术博客 </title>
+  <title> nginx access_log日志 | 晓的技术博客 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -205,7 +205,7 @@
           
           
             
-              bloom-filter
+              nginx access_log日志
             
           
         </h1>
@@ -214,8 +214,8 @@
       <div class="post-meta">
         <span class="post-time">
           发表于
-          <time itemprop="dateCreated" datetime="2016-01-20T17:29:54+08:00" content="2016-01-20">
-            2016-01-20
+          <time itemprop="dateCreated" datetime="2016-03-14T22:23:06+08:00" content="2016-03-14">
+            2016-03-14
           </time>
         </span>
 
@@ -224,8 +224,8 @@
             &nbsp; | &nbsp; 分类于
             
               <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                <a href="/categories/大数据/" itemprop="url" rel="index">
-                  <span itemprop="name">大数据</span>
+                <a href="/categories/nginx/" itemprop="url" rel="index">
+                  <span itemprop="name">nginx</span>
                 </a>
               </span>
 
@@ -240,8 +240,8 @@
           
             <span class="post-comments-count">
               &nbsp; | &nbsp;
-              <a href="/2016/01/20/bloom-filter/#comments" itemprop="discussionUrl">
-                <span class="post-comments-count ds-thread-count" data-thread-key="2016/01/20/bloom-filter/" itemprop="commentsCount"></span>
+              <a href="/2016/03/14/nginx-access-log/#comments" itemprop="discussionUrl">
+                <span class="post-comments-count ds-thread-count" data-thread-key="2016/03/14/nginx-access-log/" itemprop="commentsCount"></span>
               </a>
             </span>
           
@@ -255,34 +255,81 @@
       
 
       
-        <span itemprop="articleBody"><p>Bloom Filter是由Bloom在1970年提出的一种多哈希函数映射的快速查找算法。通常应用在一些需要快速判断某个元素是否属于集合，但是并不严格要求100%正确的场合。</p>
-<h2 id="一-_实例">一. 实例</h2><p>为了说明Bloom Filter存在的重要意义，举一个实例：<br>假设要你写一个网络蜘蛛（web crawler）。由于网络间的链接错综复杂，蜘蛛在网络间爬行很可能会形成“环”。为了避免形成“环”，就需要知道蜘蛛已经访问过那些URL。给一个URL，怎样知道蜘蛛是否已经访问过呢？稍微想想，就会有如下几种方案：</p>
-<ol>
-<li>将访问过的URL保存到数据库。</li>
-<li>用HashSet将访问过的URL保存起来。那只需接近O(1)的代价就可以查到一个URL是否被访问过了。</li>
-<li>URL经过MD5或SHA-1等单向哈希后再保存到HashSet或数据库。</li>
-<li>Bit-Map方法。建立一个BitSet，将每个URL经过一个哈希函数映射到某一位。<br>方法1~3都是将访问过的URL完整保存，方法4则只标记URL的一个映射位。</li>
-</ol>
-<p>以上方法在数据量较小的情况下都能完美解决问题，但是当数据量变得非常庞大时问题就来了。</p>
+        <span itemprop="articleBody"><p>nginx 日志主要有两条指令：</p>
 <ul>
-<li>方法1的缺点：数据量变得非常庞大后关系型数据库查询的效率会变得很低。而且每来一个URL就启动一次数据库查询是不是太小题大做了？</li>
-<li>方法2的缺点：太消耗内存。随着URL的增多，占用的内存会越来越多。就算只有1亿个URL，每个URL只算50个字符，就需要5GB内存。</li>
-<li>方法3：由于字符串经过MD5处理后的信息摘要长度只有128Bit，SHA-1处理后也只有160Bit，因此方法3比方法2节省了好几倍的内存。</li>
-<li>方法4消耗内存是相对较少的，但缺点是单一哈希函数发生冲突的概率太高。还记得数据结构课上学过的Hash表冲突的各种解决方法么？若要降低冲突发生的概率到1%，就要将BitSet的长度设置为URL个数的100倍。</li>
+<li>log_format：用来设置日志格式；</li>
+<li>access_log：用来指定日志文件的存放路径、格式（把定义的log_format 跟在后面）和缓存大小；如果不想启用日志则access_log off ;</li>
 </ul>
-<p>实质上上面的算法都忽略了一个重要的隐含条件：允许小概率的出错，不一定要100%准确！也就是说少量url实际上没有没网络蜘蛛访问，而将它们错判为已访问的代价是很小的——大不了少抓几个网页呗。 </p>
-<h2 id="二-_Bloom_Filter的算法">二. Bloom Filter的算法</h2><p>废话说到这里，下面引入本篇的主角——Bloom Filter。其实上面方法4的思想已经很接近Bloom Filter了。方法四的致命缺点是冲突概率高，为了降低冲突的概念，Bloom Filter使用了多个哈希函数，而不是一个。</p>
-<p>Bloom Filter算法如下：<br>  　 创建一个m位BitSet，先将所有位初始化为0，然后选择k个不同的哈希函数。第i个哈希函数对字符串str哈希的结果记为h（i，str），且h（i，str）的范围是0到m-1 。</p>
-<p>(1) 加入字符串过程<br>下面是每个字符串处理的过程，首先是将字符串str“记录”到BitSet中的过程：<br>对于字符串str，分别计算h（1，str），h（2，str）…… h（k，str）。然后将BitSet的第h（1，str）、h（2，str）…… h（k，str）位设为1。<br><img src="http://ww3.sinaimg.cn/mw690/72c913fbjw1f063qevraaj20m807vwfd.jpg" alt=""></p>
-<p>图1.Bloom Filter加入字符串过程<br>很简单吧？这样就将字符串str映射到BitSet中的k个二进制位了。</p>
-<p>(2) 检查字符串是否存在的过程<br>下面是检查字符串str是否被BitSet记录过的过程：<br>对于字符串str，分别计算h（1，str），h（2，str）…… h（k，str）。然后检查BitSet的第h（1，str）、h（2，str）…… h（k，str）位是否为1，若其中任何一位不为1则可以判定str一定没有被记录过。若全部位都是1，则“认为”字符串str存在。</p>
-<p>若一个字符串对应的Bit不全为1，则可以肯定该字符串一定没有被Bloom Filter记录过。（这是显然的，因为字符串被记录过，其对应的二进制位肯定全部被设为1了）<br>但是若一个字符串对应的Bit全为1，实际上是不能100%的肯定该字符串被Bloom Filter记录过的。（因为有可能该字符串的所有位都刚好是被其他字符串所对应）这种将该字符串划分错的情况，称为false positive 。</p>
-<p>(3) 删除字符串过程<br>   字符串加入了就被不能删除了，因为删除会影响到其他字符串。实在需要删除字符串的可以使用Counting bloomfilter(CBF)，这是一种基本Bloom Filter的变体，CBF将基本Bloom Filter每一个Bit改为一个计数器，这样就可以实现删除字符串的功能了。</p>
-<p>Bloom Filter跟单哈希函数Bit-Map不同之处在于：Bloom Filter使用了k个哈希函数，每个字符串跟k个bit对应。从而降低了冲突的概率。</p>
-<p>三. Bloom Filter参数选择 </p>
-<p>   (1)哈希函数选择<br>   　　哈希函数的选择对性能的影响应该是很大的，一个好的哈希函数要能近似等概率的将字符串映射到各个Bit。选择k个不同的哈希函数比较麻烦，一种简单的方法是选择一个哈希函数，然后送入k个不同的参数。<br>   (2)Bit数组大小选择<br>   　　哈希函数个数k、位数组大小m、加入的字符串数量n的关系可以参考参考文献1。该文献证明了对于给定的m、n，当 k = ln(2)* m/n 时出错的概率是最小的。<br>   　　同时该文献还给出特定的k，m，n的出错概率。例如：根据参考文献1，哈希函数个数k取10，位数组大小m设为字符串个数n的20倍时，false positive发生的概率是0.0000889 ，这个概率基本能满足网络爬虫的需求了。  </p>
-<p>四. Bloom Filter实现代码<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> cn.edu.nuc;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.BitSet;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span><br><span class="line"> * BitSet类,大小可动态改变, 取值为true或false的位集合。用于表示一组布尔标志。此类实现了一个按需增长的位向量</span><br><span class="line"> * <span class="doctag">@author</span> liuxiao</span><br><span class="line"> *</span><br><span class="line"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BloomFilter</span> </span>&#123;</span><br><span class="line">	<span class="comment">/* BitSet初始分配2^24个bit */</span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> DEFAULT_SIZE = <span class="number">1</span> &lt;&lt; <span class="number">25</span>;</span><br><span class="line">	<span class="comment">/* 不同哈希函数的种子，一般应取质数 */</span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span>[] seeds = <span class="keyword">new</span> <span class="keyword">int</span>[] &#123; <span class="number">5</span>, <span class="number">7</span>, <span class="number">11</span>, <span class="number">13</span>, <span class="number">31</span>, <span class="number">37</span>, <span class="number">61</span> &#125;;</span><br><span class="line">	<span class="keyword">private</span> BitSet bits = <span class="keyword">new</span> BitSet(DEFAULT_SIZE);</span><br><span class="line">	<span class="comment">/* 哈希函数对象 */</span></span><br><span class="line">	<span class="keyword">private</span> SimpleHash[] func = <span class="keyword">new</span> SimpleHash[seeds.length];</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">BloomFilter</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; seeds.length; i++) &#123;</span><br><span class="line">			func[i] = <span class="keyword">new</span> SimpleHash(DEFAULT_SIZE, seeds[i]);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 将字符串标记到bits中</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">add</span><span class="params">(String value)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">for</span> (SimpleHash f : func) &#123;</span><br><span class="line">			bits.set(f.hash(value), <span class="keyword">true</span>);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 判断字符串是否已经被bits标记</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">contains</span><span class="params">(String value)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">if</span> (value == <span class="keyword">null</span>) &#123;</span><br><span class="line">			<span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">boolean</span> ret = <span class="keyword">true</span>;</span><br><span class="line">		<span class="keyword">for</span> (SimpleHash f : func) &#123;</span><br><span class="line">			ret = ret &amp;&amp; bits.get(f.hash(value));</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> ret;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* 哈希函数类 */</span></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">SimpleHash</span> </span>&#123;</span><br><span class="line">		<span class="keyword">private</span> <span class="keyword">int</span> cap;</span><br><span class="line">		<span class="keyword">private</span> <span class="keyword">int</span> seed;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">SimpleHash</span><span class="params">(<span class="keyword">int</span> cap, <span class="keyword">int</span> seed)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.cap = cap;</span><br><span class="line">		<span class="keyword">this</span>.seed = seed;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// hash函数，采用简单的加权和hash</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">hash</span><span class="params">(String value)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">int</span> result = <span class="number">0</span>;</span><br><span class="line">		<span class="keyword">int</span> len = value.length();</span><br><span class="line">		<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; len; i++) &#123;</span><br><span class="line">			result = seed * result + value.charAt(i);</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> (cap - <span class="number">1</span>) &amp; result;</span><br><span class="line">	&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>本文转自：<a href="http://www.cnblogs.com/heaad/archive/2011/01/02/1924195.html" target="_blank" rel="external">http://www.cnblogs.com/heaad/archive/2011/01/02/1924195.html</a></p>
+<h2 id="log_format_日志格式">log_format 日志格式</h2><p>1、语法：<br>log_format  name（格式名字）  格式样式（即想要得到什么样的日志内容）<br>示例：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">log_format   main   </span><br><span class="line">'$remote_addr - $remote_user [$time_local] "$request" '</span><br><span class="line">'$status $body_bytes_s ent "$http_referer" '</span><br><span class="line">'"$http_user_agent" "$http_x_forwarded_for"'</span><br></pre></td></tr></table></figure></p>
+<p>2、具体可设置的参数格式及说明如下：<br><img src="http://ww3.sinaimg.cn/large/72c913fbgw1f2l1htuh5yj20om0f3aac.jpg" alt=""></p>
+<p>3、x_forwarded_for：</p>
+<p>通常web服务器放在反向代理的后面，这样就不能获取到客户的IP地址了，通过$remote_addr拿到的IP地址是反向代理服务器的iP地址。反向代理服务器在转发请求的http头信息中，可以增加x_forwarded_for信息，用以记录原有客户端的IP地址和原来客户端的请求的服务器地址。</p>
+<p><em>注</em>：在server中设置x_forwarded_for</p>
+<blockquote>
+<p>proxy_set_header  X-Forwarded-For $proxy_add_x_forwarded_for;</p>
+</blockquote>
+<h2 id="access_log">access_log</h2><p>用了log_format 指令设置了日志格式之后，需要用access_log指令指定日志文件的存放路径；<br>1、语法：<br>access_log   path(存放路径)     format (自定义日志名称)<br>示例:</p>
+<blockquote>
+<p>access_log             logs/access.log              main;</p>
+</blockquote>
+<p>2、设置刷盘策略：</p>
+<blockquote>
+<p>access_log /data/logs/nginx-access.log buffer=32k flush=5s;</p>
+</blockquote>
+<p>buffer 满 32k 才刷盘；假如 buffer 不满 5s 钟强制刷盘。</p>
+<p><em>注</em>：一般log_format在全局设置，可以设置多个。access_log 可以在全局设置，但往往是定义在虚拟主机（server）中的location中。<br>例如：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">http &#123;</span><br><span class="line">    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '</span><br><span class="line">                   '"$status" $body_bytes_sent "$http_referer" '</span><br><span class="line">                   '"$http_user_agent" "$http_x_forwarded_for" '</span><br><span class="line">                   '"$gzip_ratio" $request_time $bytes_sent $request_length';</span><br><span class="line">    log_format srcache_log '$remote_addr - $remote_user [$time_local] "$request" '</span><br><span class="line">                        '"$status" $body_bytes_sent $request_time $bytes_sent $request_length '</span><br><span class="line">                        '[$upstream_response_time] [$srcache_fetch_status] [$srcache_store_status] [$srcache_expire]';</span><br><span class="line"> open_log_file_cache max=1000 inactive=60s;</span><br><span class="line">    server &#123;</span><br><span class="line">        server_name ~^(www\.)?(.+)$;</span><br><span class="line">        access_log logs/$2-access.log main;</span><br><span class="line">        error_log logs/$2-error.log;</span><br><span class="line">        location /srcache &#123;</span><br><span class="line">            access_log logs/access-srcache.log srcache_log;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>3、其他：<br>1）error_log：<br>配置错误日志，例如上例。</p>
+<p>2）open_log_file_cache：<br>对于每一条日志记录，都将是先打开文件，再写入日志，然后关闭。可以使用open_log_file_cache来设置日志文件缓存(默认是off)。<br>语法: </p>
+<blockquote>
+<p>open_log_file_cache max=N [inactive=time] [min_uses=N] [valid=time];</p>
+</blockquote>
+<p>参数注释如下：</p>
+<ul>
+<li>max:设置缓存中的最大文件描述符数量，如果缓存被占满，采用LRU算法将描述符关闭。</li>
+<li>inactive:设置存活时间，默认是10s</li>
+<li>min_uses:设置在inactive时间段内，日志文件最少使用多少次后，该日志文件描述符记入缓存中，默认是1次</li>
+<li>valid:设置检查频率，默认60s</li>
+</ul>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">open_log_file_cache max=1000 inactive=20s valid=1m min_uses=2;</span><br></pre></td></tr></table></figure>
+<p>3）日志分析：<br>通过对日志格式的定义，就可以使用常见的 Linux 命令行工具进行分析了：</p>
+<p>查找访问频率最高的 URL 和次数：</p>
+<blockquote>
+<p>cat access.log | awk -F ‘^A’ ‘{print $10}’ | sort | uniq -c</p>
+</blockquote>
+<p>查找当前日志文件 500 错误的访问：</p>
+<blockquote>
+<p>cat access.log | awk -F ‘^A’ ‘{if($5 == 500) print $0}’</p>
+</blockquote>
+<p>查找当前日志文件 500 错误的数量：<br>cat access.log | awk -F ‘^A’ ‘{if($5 == 500) print $0}’ | wc -l</p>
+<p>查找某一分钟内 500 错误访问的数量:</p>
+<blockquote>
+<p>cat access.log | awk -F ‘^A’ ‘{if($5 == 500) print $0}’ | grep ’09:00’ | wc-l</p>
+</blockquote>
+<p>查找耗时超过 1s 的慢请求：</p>
+<blockquote>
+<p>tail -f access.log | awk -F ‘^A’ ‘{if($6&gt;1) print $0}’</p>
+</blockquote>
+<p>假如只想查看某些位：</p>
+<blockquote>
+<p>tail -f access.log | awk -F ‘^A’ ‘{if($6&gt;1) print $3″|”$4}’</p>
+</blockquote>
+<p>查找 502 错误最多的 URL：</p>
+<blockquote>
+<p>cat access.log | awk -F ‘^A’ ‘{if($5==502) print $11}’ | sort | uniq -c</p>
+</blockquote>
+<p>查找 200 空白页</p>
+<blockquote>
+<p>cat access.log | awk -F ‘^A’ ‘{if($5==200 &amp;&amp; $8 &lt; 100) print $3″|”$4″|”$11″|”$6}’</p>
+</blockquote>
+<h2 id="切割日志">切割日志</h2><p>Nginx 的日志都是写在一个文件当中的，不会自动地进行切割，如果访问量很大的话，将导致日志文件容量非常大，不便于管理和造成Nginx 日志写入效率低下等问题。所以，往往需要要对access_log、error_log日志进行切割。</p>
+<p>切割日志一般利用USR1信号让nginx产生新的日志。实例：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">#!/bin/bash</span><br><span class="line"></span><br><span class="line">logdir="/data/logs/nginx"</span><br><span class="line">pid=`cat $logdir/nginx.pid`</span><br><span class="line">DATE=`date -d "1 hours ago" +%Y%m%d%H`</span><br><span class="line">DATE_OLD=`date -d "7 days ago" +%Y%m%d`</span><br><span class="line">for i in `ls $logdir/*access.log`; do</span><br><span class="line">        mv $i $i.$DATE</span><br><span class="line">done</span><br><span class="line">for i in `ls $logdir/*error.log`; do</span><br><span class="line">        mv $i $i.$DATE</span><br><span class="line">done</span><br><span class="line">kill -s USR1 $pid</span><br><span class="line">rm -v $logdir"/access.log."$DATE_OLD*</span><br><span class="line"></span><br><span class="line">rm -v $logdir"/error.log."$DATE_OLD*</span><br></pre></td></tr></table></figure></p>
+<p>1、分析：</p>
+<ul>
+<li>将上面的脚本放到crontab中，每小时执行一次（0 <em> </em> <em> </em>），这样每小时会把当前日志重命名成一个新文件；然后发送USR1这个信号让Nginx 重新生成一个新的日志。（相当于备份日志）</li>
+<li>将前7天的日志删除；</li>
+</ul>
+<p>2、说明：<br>在没有执行kill -USR1 $pid之前，即便已经对文件执行了mv命令而改变了文件名称，nginx还是会向新命名的文件”*access.log.2016032623”照常写入日志数据的。原因在于：linux系统中，内核是根据文件描述符来找文件的。</p>
+<p>3、logrotates：<br>使用系统自带的logrotates，也可以实现nginx的日志分割，查看其bash源码，发现也是发送USR1这个信号。 </p>
 </span>
       
     </div>
@@ -291,7 +338,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/bloom-filter/" rel="tag">#bloom filter</a>
+            <a href="/tags/nginx/" rel="tag">#nginx</a>
           
         </div>
       
@@ -300,13 +347,11 @@
         <div class="post-nav">
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2016/01/29/messagequeue-redis/" rel="prev">基于redis构建消息队列</a>
-            
           </div>
 
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2016/01/20/servlet3-new-furture/" rel="next">servlet3新特性——异步请求处理</a>
+              <a href="/2016/02/27/nginx-tomcat-time-wait/" rel="next">Nginx反向代理tomcat，两端TIME_WAIT优化</a>
             
           </div>
         </div>
@@ -321,10 +366,10 @@
 
     <div class="post-spread">
       
-        <div class="ds-share flat" data-thread-key="2016/01/20/bloom-filter/"
-     data-title="bloom-filter"
+        <div class="ds-share flat" data-thread-key="2016/03/14/nginx-access-log/"
+     data-title="nginx access_log日志"
      data-content=""
-     data-url="http://yoursite.com/2016/01/20/bloom-filter/">
+     data-url="http://yoursite.com/2016/03/14/nginx-access-log/">
   <div class="ds-share-inline">
     <ul  class="ds-share-icons-16">
 
@@ -350,8 +395,8 @@
         
           <div class="comments" id="comments">
             
-              <div class="ds-thread" data-thread-key="2016/01/20/bloom-filter/"
-                   data-title="bloom-filter" data-url="http://yoursite.com/2016/01/20/bloom-filter/">
+              <div class="ds-thread" data-thread-key="2016/03/14/nginx-access-log/"
+                   data-title="nginx access_log日志" data-url="http://yoursite.com/2016/03/14/nginx-access-log/">
               </div>
             
           </div>
@@ -462,7 +507,7 @@
           <div class="post-toc">
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#一-_实例"><span class="nav-number">1.</span> <span class="nav-text">一. 实例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二-_Bloom_Filter的算法"><span class="nav-number">2.</span> <span class="nav-text">二. Bloom Filter的算法</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#log_format_日志格式"><span class="nav-number">1.</span> <span class="nav-text">log_format 日志格式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#access_log"><span class="nav-number">2.</span> <span class="nav-text">access_log</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#切割日志"><span class="nav-number">3.</span> <span class="nav-text">切割日志</span></a></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator"></div>
