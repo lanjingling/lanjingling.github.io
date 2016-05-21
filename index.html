@@ -205,6 +205,94 @@
           
           
             
+              <a class="post-title-link" href="/2016/03/26/mysql-pt-online-schema-change/" itemprop="url">
+                mysql在线修改表结构 pt-online-schema-change
+              </a>
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于
+          <time itemprop="dateCreated" datetime="2016-03-26T19:42:26+08:00" content="2016-03-26">
+            2016-03-26
+          </time>
+        </span>
+
+        
+          <span class="post-category" >
+            &nbsp; | &nbsp; 分类于
+            
+              <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                <a href="/categories/mysql/" itemprop="url" rel="index">
+                  <span itemprop="name">mysql</span>
+                </a>
+              </span>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+            <span class="post-comments-count">
+              &nbsp; | &nbsp;
+              <a href="/2016/03/26/mysql-pt-online-schema-change/#comments" itemprop="discussionUrl">
+                <span class="post-comments-count ds-thread-count" data-thread-key="2016/03/26/mysql-pt-online-schema-change/" itemprop="commentsCount"></span>
+              </a>
+            </span>
+          
+        
+      </div>
+    </header>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="description">在运维mysql数据库时，我们总会对数据表进行ddl 变更，修改添加字段或者索引，对于mysql 而已，ddl 显然是一个令所有MySQL dba 诟病的一个功能，因为在MySQL中在对表进行ddl时，会锁表，当表比较小比如小于1w上时，对前端影响较小，当时遇到千万级别的表 就会影响前端应用对表的写操作。通过pt-online-schema-change可以做到无锁修改表结构...</span>
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/03/26/mysql-pt-online-schema-change/">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+
+      
+      
+        <h1 class="post-title" itemprop="name headline">
+          
+          
+            
               <a class="post-title-link" href="/2016/03/14/nginx-access-log/" itemprop="url">
                 nginx access_log日志
               </a>
@@ -986,94 +1074,6 @@
 
 
     
-      
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      
-      
-        <h1 class="post-title" itemprop="name headline">
-          
-          
-            
-              <a class="post-title-link" href="/2015/12/15/tomcat-redis-session/" itemprop="url">
-                Nginx+Redis+Tomcat实现session共享的集群
-              </a>
-            
-          
-        </h1>
-      
-
-      <div class="post-meta">
-        <span class="post-time">
-          发表于
-          <time itemprop="dateCreated" datetime="2015-12-15T09:25:19+08:00" content="2015-12-15">
-            2015-12-15
-          </time>
-        </span>
-
-        
-          <span class="post-category" >
-            &nbsp; | &nbsp; 分类于
-            
-              <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                <a href="/categories/集群/" itemprop="url" rel="index">
-                  <span itemprop="name">集群</span>
-                </a>
-              </span>
-
-              
-              
-
-            
-          </span>
-        
-
-        
-          
-            <span class="post-comments-count">
-              &nbsp; | &nbsp;
-              <a href="/2015/12/15/tomcat-redis-session/#comments" itemprop="discussionUrl">
-                <span class="post-comments-count ds-thread-count" data-thread-key="2015/12/15/tomcat-redis-session/" itemprop="commentsCount"></span>
-              </a>
-            </span>
-          
-        
-      </div>
-    </header>
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <span itemprop="description">本文介绍了一种分布式web服务架构，使用redis作为session共享存储，nginx负载均衡后端多个tomcat。每个tomcat从redis中获取session信息。</span>
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2015/12/15/tomcat-redis-session/">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1112,7 +1112,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">39</span>
+              <span class="site-state-item-count">40</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>

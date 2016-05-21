@@ -1,0 +1,773 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.5.1"/>
+
+
+    <meta name="description" content="java程序员、爱开源、喜欢nodejs、前端js、oracle数据库、分布式技术...<br/>改变世界的是这么一群人,他们寻找梦想中的乐园,当他们找不到时,就亲手创造了她..." />
+
+
+
+  <meta name="keywords" content="mysql," />
+
+
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.1" />
+
+
+<meta name="description" content="在运维mysql数据库时，我们总会对数据表进行ddl 变更，修改添加字段或者索引，对于mysql 而已，ddl 显然是一个令所有MySQL dba 诟病的一个功能，因为在MySQL中在对表进行ddl时，会锁表，当表比较小比如小于1w上时，对前端影响较小，当时遇到千万级别的表 就会影响前端应用对表的写操作。通过pt-online-schema-change可以做到无锁修改表结构...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mysql在线修改表结构 pt-online-schema-change">
+<meta property="og:url" content="http://yoursite.com/2016/03/26/mysql-pt-online-schema-change/index.html">
+<meta property="og:site_name" content="晓的技术博客">
+<meta property="og:description" content="在运维mysql数据库时，我们总会对数据表进行ddl 变更，修改添加字段或者索引，对于mysql 而已，ddl 显然是一个令所有MySQL dba 诟病的一个功能，因为在MySQL中在对表进行ddl时，会锁表，当表比较小比如小于1w上时，对前端影响较小，当时遇到千万级别的表 就会影响前端应用对表的写操作。通过pt-online-schema-change可以做到无锁修改表结构...">
+<meta property="og:updated_time" content="2016-05-21T09:55:15.680Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="mysql在线修改表结构 pt-online-schema-change">
+<meta name="twitter:description" content="在运维mysql数据库时，我们总会对数据表进行ddl 变更，修改添加字段或者索引，对于mysql 而已，ddl 显然是一个令所有MySQL dba 诟病的一个功能，因为在MySQL中在对表进行ddl时，会锁表，当表比较小比如小于1w上时，对前端影响较小，当时遇到千万级别的表 就会影响前端应用对表的写操作。通过pt-online-schema-change可以做到无锁修改表结构...">
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'post'
+  };
+</script>
+
+  <title> mysql在线修改表结构 pt-online-schema-change | 晓的技术博客 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?93b1a723d246349c4cace650dee4a731";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand" rel="start">
+      <span class="logo">
+        <i class="icon-next-logo"></i>
+      </span>
+      <span class="site-title">晓的技术博客</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu menu-left">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            <i class="menu-item-icon icon-next-home"></i> <br />
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            <i class="menu-item-icon icon-next-archives"></i> <br />
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            <i class="menu-item-icon icon-next-categories"></i> <br />
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            <i class="menu-item-icon icon-next-tags"></i> <br />
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            <i class="menu-item-icon icon-next-about"></i> <br />
+            关于
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <form class="site-search-form">
+    <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+  </form>
+
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'iSunJWoZvxV9mKcJc6QU','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content"> 
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+
+      
+      
+        <h1 class="post-title" itemprop="name headline">
+          
+          
+            
+              mysql在线修改表结构 pt-online-schema-change
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于
+          <time itemprop="dateCreated" datetime="2016-03-26T19:42:26+08:00" content="2016-03-26">
+            2016-03-26
+          </time>
+        </span>
+
+        
+          <span class="post-category" >
+            &nbsp; | &nbsp; 分类于
+            
+              <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                <a href="/categories/mysql/" itemprop="url" rel="index">
+                  <span itemprop="name">mysql</span>
+                </a>
+              </span>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+            <span class="post-comments-count">
+              &nbsp; | &nbsp;
+              <a href="/2016/03/26/mysql-pt-online-schema-change/#comments" itemprop="discussionUrl">
+                <span class="post-comments-count ds-thread-count" data-thread-key="2016/03/26/mysql-pt-online-schema-change/" itemprop="commentsCount"></span>
+              </a>
+            </span>
+          
+        
+      </div>
+    </header>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><h2 id="percona-toolkit_介绍">percona-toolkit 介绍</h2><p>percona-toolkit源自Maatkit 和Aspersa工具，这两个工具是管理mysql的最有名的工具，但Maatkit已经不维护了，全部归并到percona-toolkit。Percona Toolkit 是一组高级的命令行工具，用来管理 MySQL 和系统任务，主要包括：    </p>
+<ol>
+<li>验证主节点和复制数据的一致性</li>
+<li>有效的对记录行进行归档</li>
+<li>找出重复的索引</li>
+<li>总结 MySQL 服务器</li>
+<li>从日志和 tcpdump 中分析查询</li>
+<li>问题发生时收集重要的系统信息</li>
+<li>在线修改表结构</li>
+</ol>
+<p>这里，主要介绍在线修改表结构功能。</p>
+<p>在运维mysql数据库时，我们总会对数据表进行ddl 变更，修改添加字段或者索引，对于mysql 而已，ddl 显然是一个令所有MySQL dba 诟病的一个功能，因为在MySQL中在对表进行ddl时，会锁表，当表比较小比如小于1w上时，对前端影响较小，当时遇到千万级别的表 就会影响前端应用对表的写操作。在5.1之前都是非常耗时耗力的，在5.1之后随着Plugin innodb的出现在线加索引的提高了很多，但是还会影响（时间缩短了）;不过5.6可以避免上面的情况。目前InnoDB引擎是通过以下步骤来进行DDL的：</p>
+<ul>
+<li>按照原始表（original_table）的表结构和DDL语句，新建一个不可见的临时表（tmp_table）</li>
+<li>在原表上加write lock，阻塞所有更新操作（insert、delete、update等）</li>
+<li>执行insert into tmp_table select * from original_table</li>
+<li>rename original_table和tmp_table，最后drop original_table</li>
+<li>释放 write lock。</li>
+</ul>
+<p>我们可以看见在InnoDB执行DDL的时候，原表是只能读不能写的。为此 perconal 推出一个工具 pt-online-schema-change ，其特点是修改过程中不会造成读写阻塞。<br><strong>注</strong>：mysql版本查看：mysql -V</p>
+<p><strong>补</strong>：Oracle从9i版本开始提供了在线重定义表功能，通过调用DBMS_REDEFINITION包，可以在修改表结构的同时允许DML操作。</p>
+<h2 id="pt-online-schema-change_工作原理">pt-online-schema-change 工作原理</h2><ol>
+<li>如果存在外键，根据alter-foreign-keys-method参数的值，检测外键相关的表，做相应设置的处理。没有使用 –alter-foreign-keys-method 指定特定的值，该工具不予执行</li>
+<li>创建一个新的空表，其命名规则是_+原表名+_new</li>
+<li>根据alter语句，更新新表的表结构；</li>
+<li>创建触发器，用于记录从拷贝数据开始之后，对源数据表继续进行数据修改的操作记录下来，用于数据拷贝结束后，执行这些操作，保证数据不会丢失。如果表中已经定义了触发器这个工具就不能工作了。</li>
+<li>拷贝数据，从源数据表中拷贝数据到新表中。</li>
+<li>修改外键相关的子表，根据修改后的数据，修改外键关联的子表。</li>
+<li>rename源数据表为old表，把新表rename为源表名，其通过一个RENAME TABLE同时处理两个表，实现原子操作。（RENAME TABLE dbteamdb.user TO dbteamdb._user_old, dbteamdb._user_new TO dbteamdb.user）</li>
+<li>将old表删除、删除触发器。</li>
+</ol>
+<h2 id="pt-online-schema-change_使用">pt-online-schema-change 使用</h2><blockquote>
+<p>pt-online-schema-change [OPTIONS] DSN</p>
+</blockquote>
+<p>OPTIONS参数说明：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">--user:</span></span><br><span class="line">-u，连接的用户名</span><br><span class="line"><span class="comment">--password：</span></span><br><span class="line">-p，连接的密码</span><br><span class="line"><span class="comment">--database：</span></span><br><span class="line">-D，连接的数据库</span><br><span class="line"><span class="comment">--port</span></span><br><span class="line">-P，连接数据库的端口</span><br><span class="line"><span class="comment">--host:</span></span><br><span class="line">-h，连接的主机地址</span><br><span class="line"><span class="comment">--socket:</span></span><br><span class="line">-S，连接的套接字文件</span><br><span class="line"><span class="comment">--ask-pass</span></span><br><span class="line">隐式输入连接MySQL的密码</span><br><span class="line"><span class="comment">--charset</span></span><br><span class="line">指定修改的字符集</span><br><span class="line"><span class="comment">--defaults-file</span></span><br><span class="line">-F，读取配置文件</span><br><span class="line"><span class="comment">--alter：</span></span><br><span class="line">结构变更语句，不需要<span class="operator"><span class="keyword">alter</span> <span class="keyword">table</span>关键字。可以指定多个更改，用逗号分隔。如下场景，需要注意：</span><br><span class="line">    不能用<span class="keyword">RENAME</span>来重命名表。        </span><br><span class="line">    列不能通过先删除，再添加的方式进行重命名，不会将数据拷贝到新列。</span><br><span class="line">    如果加入的列非空而且没有默认值，则工具会失败。即其不会为你设置一个默认值，必须显示指定。</span><br><span class="line">    删除外键(<span class="keyword">drop</span> foreign <span class="keyword">key</span> constrain_name)时，需要指定名称_constraint_name，而不是原始的constraint_name。</span><br><span class="line">    如：<span class="keyword">CONSTRAINT</span> <span class="string">`fk_foo`</span> FOREIGN <span class="keyword">KEY</span> (<span class="string">`foo_id`</span>) <span class="keyword">REFERENCES</span> <span class="string">`bar`</span> (<span class="string">`foo_id`</span>)，需要指定：<span class="comment">--alter "DROP FOREIGN KEY _fk_foo"</span></span><br><span class="line"><span class="comment">--alter-foreign-keys-method</span></span><br><span class="line">如何把外键引用到新表?需要特殊处理带有外键约束的表,以保证它们可以应用到新表.当重命名表的时候,外键关系会带到重命名后的表上。</span><br><span class="line">该工具有两种方法,可以自动找到子表,并修改约束关系。</span><br><span class="line"><span class="keyword">auto</span>： 在rebuild_constraints和drop_swap两种处理方式中选择一个。</span><br><span class="line">rebuild_constraints：使用 <span class="keyword">ALTER</span> <span class="keyword">TABLE</span>语句先删除外键约束,然后再添加.如果子表很大的话,会导致长时间的阻塞。</span><br><span class="line">drop_swap： 执行FOREIGN_KEY_CHECKS=<span class="number">0</span>,禁止外键约束,删除原表,再重命名新表。这种方式很快,也不会产生阻塞,但是有风险：</span><br><span class="line"><span class="number">1</span>, 在删除原表和重命名新表的短时间内,表是不存在的,程序会返回错误。</span><br><span class="line"><span class="number">2</span>, 如果重命名表出现错误,也不能回滚了.因为原表已经被删除。</span><br><span class="line"><span class="keyword">none</span>： 类似<span class="string">"drop_swap"</span>的处理方式,但是它不删除原表,并且外键关系会随着重命名转到老表上面。</span><br><span class="line"><span class="comment">--[no]check-alter</span></span><br><span class="line">默认yes，语法解析。配合<span class="comment">--dry-run 和 --print 一起运行，来检查是否有问题（change column，drop primary key）。</span></span><br><span class="line"><span class="comment">--max-lag</span></span><br><span class="line">默认<span class="number">1</span>s。每个<span class="keyword">chunk</span>拷贝完成后，会查看所有复制<span class="keyword">Slave</span>的延迟情况。要是延迟大于该值，则暂停复制数据，直到所有从的滞后小于这个值，使用Seconds_Behind_Master。如果有任何从滞后超过此选项的值，则该工具将睡眠<span class="comment">--check-interval指定的时间，再检查。如果从被停止，将会永远等待，直到从开始同步，并且延迟小于该值。如果指定--check-slave-lag，该工具只检查该服务器的延迟，而不是所有服务器。</span></span><br><span class="line"><span class="comment">--check-slave-lag</span></span><br><span class="line">指定一个从库的DSN连接地址,如果从库超过<span class="comment">--max-lag参数设置的值,就会暂停操作。</span></span><br><span class="line"><span class="comment">--recursion-method</span></span><br><span class="line">默认是<span class="keyword">show</span> <span class="keyword">processlist</span>，发现从的方法，也可以是host，但需要在从上指定report_host，通过<span class="keyword">show</span> <span class="keyword">slave</span> <span class="keyword">hosts</span>来找到，可以指定<span class="keyword">none</span>来不检查<span class="keyword">Slave</span>。</span><br><span class="line">METHOD       USES</span><br><span class="line">===========  ==================</span><br><span class="line"><span class="keyword">processlist</span>  <span class="keyword">SHOW</span> <span class="keyword">PROCESSLIST</span></span><br><span class="line"><span class="keyword">hosts</span>        <span class="keyword">SHOW</span> <span class="keyword">SLAVE</span> <span class="keyword">HOSTS</span></span><br><span class="line">dsn=DSN      DSNs <span class="keyword">from</span> a <span class="keyword">table</span></span><br><span class="line"><span class="keyword">none</span>         <span class="keyword">Do</span> <span class="keyword">not</span> find slaves</span><br><span class="line">指定<span class="keyword">none</span>则表示不在乎从的延迟。</span><br><span class="line"><span class="comment">--check-interval </span></span><br><span class="line">默认是<span class="number">1</span>。<span class="comment">--max-lag检查的睡眠时间。 </span></span><br><span class="line"></span><br><span class="line"><span class="comment">--[no]check-plan </span></span><br><span class="line">默认yes。检查查询执行计划的安全性。</span><br><span class="line"></span><br><span class="line"><span class="comment">--[no]check-replication-filters </span></span><br><span class="line">默认yes。如果工具检测到服务器选项中有任何复制相关的筛选，如指定binlog_ignore_db和replicate_do_db此类。发现有这样的筛选，工具会报错且退出。因为如果更新的表<span class="keyword">Master</span>上存在，而<span class="keyword">Slave</span>上不存在，会导致复制的失败。使用–<span class="keyword">no</span>-<span class="keyword">check</span>-<span class="keyword">replication</span>-filters选项来禁用该检查。 </span><br><span class="line"></span><br><span class="line"><span class="comment">--[no]swap-tables </span></span><br><span class="line">默认yes。交换原始表和新表，除非你禁止<span class="comment">--[no]drop-old-table。 </span></span><br><span class="line"></span><br><span class="line"><span class="comment">--[no]drop-triggers </span></span><br><span class="line">默认yes，删除原表上的触发器。 <span class="comment">--no-drop-triggers 会强制开启 --no-drop-old-table 即：不删除触发器就会强制不删除原表。 </span></span><br><span class="line"></span><br><span class="line"><span class="comment">--new-table-name </span></span><br><span class="line">复制创建新表的名称，默认%T_new。 </span><br><span class="line"></span><br><span class="line"><span class="comment">--[no]drop-new-table </span></span><br><span class="line">默认yes。删除新表，如果复制组织表失败。 </span><br><span class="line"></span><br><span class="line"><span class="comment">--[no]drop-old-table </span></span><br><span class="line">默认yes。复制数据完成重命名之后，删除原表。如果有错误则会保留原表。 </span><br><span class="line"></span><br><span class="line"><span class="comment">--max-load </span></span><br><span class="line">默认为Threads_running=<span class="number">25</span>。每个<span class="keyword">chunk</span>拷贝完后，会检查<span class="keyword">SHOW</span> <span class="keyword">GLOBAL</span> <span class="keyword">STATUS</span>的内容，检查指标是否超过了指定的阈值。如果超过，则先暂停。这里可以用逗号分隔，指定多个条件，每个条件格式： <span class="keyword">status</span>指标=MAX_VALUE或者<span class="keyword">status</span>指标:MAX_VALUE。如果不指定MAX_VALUE，那么工具会这只其为当前值的<span class="number">120</span>%。 </span><br><span class="line"></span><br><span class="line"><span class="comment">--critical-load </span></span><br><span class="line">默认为Threads_running=<span class="number">50</span>。用法基本与<span class="comment">--max-load类似，如果不指定MAX_VALUE，那么工具会这只其为当前值的200%。如果超过指定值，则工具直接退出，而不是暂停。 </span></span><br><span class="line"></span><br><span class="line"><span class="comment">--default-engine </span></span><br><span class="line">默认情况下，新的表与原始表是相同的存储引擎，所以如果原来的表使用<span class="keyword">InnoDB</span>的，那么新表将使用<span class="keyword">InnoDB</span>的。在涉及复制某些情况下，很可能主从的存储引擎不一样。使用该选项会默认使用默认的存储引擎。 </span><br><span class="line"></span><br><span class="line"><span class="comment">--set-vars </span></span><br><span class="line">设置MySQL变量，多个用逗号分割。默认该工具设置的是： wait_timeout=<span class="number">10000</span> innodb_lock_wait_timeout=<span class="number">1</span> lock_wait_timeout=<span class="number">60</span> </span><br><span class="line"></span><br><span class="line"><span class="comment">--chunk-size-limit</span></span><br><span class="line">当需要复制的块远大于设置的<span class="keyword">chunk</span>-<span class="keyword">size</span>大小,就不复制.默认值是<span class="number">4.0</span>，一个没有主键或唯一索引的表,块大小就是不确定的。</span><br><span class="line"></span><br><span class="line"><span class="comment">--chunk-time</span></span><br><span class="line">在<span class="keyword">chunk</span>-<span class="keyword">time</span>执行的时间内,动态调整<span class="keyword">chunk</span>-<span class="keyword">size</span>的大小,以适应服务器性能的变化，该参数设置为<span class="number">0</span>,或者指定<span class="keyword">chunk</span>-<span class="keyword">size</span>,都可以禁止动态调整。</span><br><span class="line"></span><br><span class="line"><span class="comment">--chunk-size</span></span><br><span class="line">指定块的大小,默认是<span class="number">1000</span>行,可以添加<span class="keyword">k</span>,<span class="keyword">M</span>,<span class="keyword">G</span>后缀.这个块的大小要尽量与<span class="comment">--chunk-time匹配，如果明确指定这个选项,那么每个块就会指定行数的大小.	</span></span><br><span class="line"></span><br><span class="line"><span class="comment">--[no]check-plan</span></span><br><span class="line">默认yes。为了安全,检查查询的执行计划.默认情况下,这个工具在执行查询之前会先<span class="keyword">EXPLAIN</span>,以获取一次少量的数据,如果是不好的<span class="keyword">EXPLAIN</span>,那么会获取一次大量的数据，这个工具会多次执行EXPALIN,如果<span class="keyword">EXPLAIN</span>不同的结果,那么就会认为这个查询是不安全的。	</span><br><span class="line"><span class="comment">--statistics</span></span><br><span class="line">打印出内部事件的数目，可以看到复制数据插入的数目。</span><br><span class="line"><span class="comment">--dry-run</span></span><br><span class="line">创建和修改新表，但不会创建触发器、复制数据、和替换原表。并不真正执行，可以看到生成的执行语句，了解其执行步骤与细节。<span class="comment">--dry-run与--execute必须指定一个，二者相互排斥。和--print配合最佳。</span></span><br><span class="line"><span class="comment">--execute</span></span><br><span class="line">确定修改表，则指定该参数。真正执行。<span class="comment">--dry-run与--execute必须指定一个，二者相互排斥。</span></span><br><span class="line"><span class="comment">--print</span></span><br><span class="line">打印<span class="keyword">SQL</span>语句到标准输出。指定此选项可以让你看到该工具所执行的语句，和<span class="comment">--dry-run配合最佳。</span></span><br><span class="line"><span class="comment">--progress</span></span><br><span class="line">复制数据的时候打印进度报告，二部分组成：第一部分是百分比，第二部分是时间。</span><br><span class="line"><span class="comment">--quiet</span></span><br><span class="line">-q，不把信息标准输出。</span></span><br></pre></td></tr></table></figure></p>
+<h2 id="实例一">实例一</h2><p>1、建立测试表：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="operator"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> <span class="string">`online_table`</span> (</span><br><span class="line">  <span class="string">`id`</span> <span class="built_in">int</span>(<span class="number">11</span>) primary <span class="keyword">key</span>,</span><br><span class="line">  <span class="string">`name`</span> <span class="built_in">varchar</span>(<span class="number">10</span>) <span class="keyword">DEFAULT</span> <span class="literal">NULL</span>,</span><br><span class="line">  <span class="string">`age`</span> <span class="built_in">int</span>(<span class="number">11</span>) <span class="keyword">DEFAULT</span> <span class="literal">NULL</span></span><br><span class="line">)<span class="keyword">engine</span> = <span class="keyword">innodb</span> <span class="keyword">default</span> <span class="keyword">charset</span> utf8;</span></span><br></pre></td></tr></table></figure></p>
+<p>2、 –dry-run 不真实执行：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pt-online-schema-<span class="operator"><span class="keyword">change</span> <span class="comment">--user=root --password=123456 --host=192.168.200.25  --alter "ADD COLUMN content text" D=test,t=online_table --print --dry-run</span></span></span><br></pre></td></tr></table></figure><br>3、 –execute 真实执行：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ pt-online-schema-<span class="operator"><span class="keyword">change</span> <span class="comment">--user=root --password=123456 --host=192.168.200.25  --alter "ADD COLUMN content text" D=test,t=online_table --print --execute</span></span></span><br></pre></td></tr></table></figure></p>
+<p>查看表结构：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">desc online_table;</span><br><span class="line">+<span class="comment">---------+-------------+------+-----+---------+----------------+</span></span><br><span class="line">| Field   | Type        | Null | Key | Default | Extra          |</span><br><span class="line">+<span class="comment">---------+-------------+------+-----+---------+----------------+</span></span><br><span class="line">| id      | int(11)     | NO   | PRI | NULL    | auto_increment |</span><br><span class="line">| name    | varchar(10) | YES  |     | NULL    |                |</span><br><span class="line">| age     | int(11)     | YES  |     | NULL    |                |</span><br><span class="line">| content | text        | YES  |     | NULL    |                |</span><br><span class="line">+<span class="comment">---------+-------------+------+-----+---------+----------------+</span></span><br><span class="line">4 rows in <span class="operator"><span class="keyword">set</span> (<span class="number">0.00</span> sec)</span></span><br></pre></td></tr></table></figure></p>
+<p>注：上面的执行可能会出现异常：<br>Error setting innodb_lock_wait_timeout: DBD::mysql::db do failed: Variable ‘innodb_lock_wait_timeout’ is a read only variable [for Statement “SET SESSION innodb_lock_wait_timeout=1”].  The current value for innodb_lock_wait_timeout is 50.  If the variable is read only (not dynamic), specify –set-vars innodb_lock_wait_timeout=50 to avoid this warning, else manually set the variable and restart MySQL.<br>根据提示（innodb_lock_wait_timeout是静态参数），加上–set-vars innodb_lock_wait_timeout=50 即可：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pt-online-schema-<span class="operator"><span class="keyword">change</span> <span class="comment">--user=root --passwor=root --host=localhost  --alter "ADD COLUMN content text" D=test,t=user --set-vars innodb_lock_wait_timeout=50 --print --execute</span></span></span><br></pre></td></tr></table></figure></p>
+<h2 id="实例二（主从）">实例二（主从）</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">desc tmp_test;</span><br><span class="line">+<span class="comment">-------+-------------+------+-----+---------+----------------+</span></span><br><span class="line">| Field | Type        | Null | Key | Default | Extra          |</span><br><span class="line">+<span class="comment">-------+-------------+------+-----+---------+----------------+</span></span><br><span class="line">| id    | int(11)     | NO   | PRI | NULL    | auto_increment |</span><br><span class="line">| name  | varchar(10) | YES  |     | NULL    |                |</span><br><span class="line">+<span class="comment">-------+-------------+------+-----+---------+----------------+</span></span><br></pre></td></tr></table></figure>
+<p>1、添加字段：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ pt-online-schema-<span class="operator"><span class="keyword">change</span> <span class="comment">--user=zjy --host=192.168.200.111  --alter "ADD COLUMN content text" D=crm_production,t=tmp_test --ask-pass  --print --execute</span></span><br><span class="line">Enter MySQL <span class="keyword">password</span>:</span></span><br></pre></td></tr></table></figure></p>
+<p>报错，因为该工具在检测到服务器选项中有任何复制相关的筛选会退出，需要指定：–no-check-replication-filters<br>Replication filters are set on these hosts:<br>  database2<br>    replicate_do_db = crm_production<br>Please read the –check-replication-filters documentation to learn how to solve this problem. at /usr/local/bin/pt-online-schema-change line 8015, <stdin> line 2.<br>2、加上参数：<font color="red">–no-check-replication-filters</font><br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ pt-online-schema-<span class="operator"><span class="keyword">change</span> <span class="comment">--user=zjy --host=192.168.200.111  --alter "ADD COLUMN content text" D=crm_production,t=tmp_test --ask-pass --no-check-replication-filters  --print --execute</span></span></span><br></pre></td></tr></table></figure></stdin></p>
+<p>3、除了add column，也可以modify column，drop column，对于change column 则需要指定：–no-check-alter</p>
+<h2 id="实例三（外键）">实例三（外键）</h2><p>1、测试表：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="operator"><span class="keyword">create</span> <span class="keyword">table</span> tt(<span class="keyword">id</span> <span class="built_in">int</span> <span class="keyword">not</span> <span class="literal">null</span> auto_increment,<span class="keyword">name</span> <span class="built_in">varchar</span>(<span class="number">10</span>),primary <span class="keyword">key</span>(<span class="keyword">id</span>))<span class="keyword">engine</span> =<span class="keyword">innodb</span> <span class="keyword">default</span> <span class="keyword">charset</span> utf8;</span></span><br><span class="line"><span class="operator"><span class="keyword">create</span> <span class="keyword">table</span> xx(<span class="keyword">id</span> <span class="built_in">int</span> <span class="keyword">not</span> <span class="literal">null</span> auto_increment,tt_id <span class="built_in">int</span> <span class="keyword">not</span> <span class="literal">null</span>,<span class="keyword">name</span> <span class="built_in">varchar</span>(<span class="number">10</span>),primary <span class="keyword">key</span>(<span class="keyword">id</span>))<span class="keyword">engine</span> =<span class="keyword">innodb</span> <span class="keyword">default</span> <span class="keyword">charset</span> utf8;</span></span><br><span class="line"><span class="operator"><span class="keyword">alter</span> <span class="keyword">table</span> xx <span class="keyword">add</span> foreign <span class="keyword">key</span> fk_xx_tt_id(tt_id) <span class="keyword">references</span> tt(<span class="keyword">id</span>);</span></span><br></pre></td></tr></table></figure></p>
+<p>2、添加字段：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ pt-online-schema-<span class="operator"><span class="keyword">change</span> <span class="comment">--user=root --password=123456 --host=192.168.200.25  --alter "ADD COLUMN content text" D=aaa,t=tt --no-check-replication-filters --print --execute</span></span></span><br></pre></td></tr></table></figure><br>执行错误退出，提示需要指定：–alter-foreign-keys-method 参数来操作有外键的表。要是没有外键而加了参数的话会出现：<br>No foreign keys reference <code>aaa</code>.<code>xx</code>; ignoring –alter-foreign-keys-method。</p>
+<p>3、使用<font color="red">–alter-foreign-keys-method</font><br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ pt-online-schema-<span class="operator"><span class="keyword">change</span> <span class="comment">--user=root --password=123456 --host=192.168.200.25  --alter "ADD COLUMN content text" D=aaa,t=tt --no-check-replication-filters --alter-foreign-keys-method auto --print --execute</span></span></span><br></pre></td></tr></table></figure></p>
+<p><em>注</em>：对可靠性要求不高可以用auto模式更新，要是可靠性要求高则需要用rebuild_constraints模式。即：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">--alter-foreign-keys-method rebuild_constraints</span></span><br></pre></td></tr></table></figure></p>
+<h2 id="综合实例">综合实例</h2><p>1、测试表：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="operator"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> <span class="string">`tmp_test`</span> (</span><br><span class="line">  <span class="string">`id`</span> <span class="built_in">int</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span> AUTO_INCREMENT,</span><br><span class="line">  <span class="string">`name`</span> <span class="built_in">varchar</span>(<span class="number">10</span>) <span class="keyword">DEFAULT</span> <span class="literal">NULL</span>,</span><br><span class="line">  <span class="string">`age`</span> <span class="built_in">int</span>(<span class="number">11</span>) <span class="keyword">DEFAULT</span> <span class="literal">NULL</span>,</span><br><span class="line">  PRIMARY <span class="keyword">KEY</span> (<span class="string">`id`</span>)</span><br><span class="line">) <span class="keyword">ENGINE</span>=<span class="keyword">InnoDB</span> <span class="keyword">DEFAULT</span> <span class="keyword">CHARSET</span>=utf8</span></span><br></pre></td></tr></table></figure></p>
+<p>2、增加字段：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pt-online-schema-<span class="operator"><span class="keyword">change</span> <span class="comment">--user=root --password=123456 --host=192.168.200.25  --alter "ADD COLUMN content text" D=aaa,t=tmp_test --no-check-replication-filters --alter-foreign-keys-method=auto --recursion-method=none --print --execute</span></span></span><br></pre></td></tr></table></figure></p>
+<p>3、删除字段：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pt-online-schema-<span class="operator"><span class="keyword">change</span> <span class="comment">--user=root --password=123456 --host=192.168.200.25  --alter "DROP COLUMN content " D=aaa,t=tmp_test --no-check-replication-filters --alter-foreign-keys-method=auto --recursion-method=none --quiet --execute</span></span></span><br></pre></td></tr></table></figure></p>
+<p>4、修改字段：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pt-online-schema-<span class="operator"><span class="keyword">change</span> <span class="comment">--user=root --password=123456 --host=192.168.200.25  --alter "MODIFY COLUMN age TINYINT NOT NULL DEFAULT 0" D=aaa,t=tmp_test --no-check-replication-filters --alter-foreign-keys-method=auto --recursion-method=none --quiet --execute</span></span></span><br></pre></td></tr></table></figure></p>
+<p>5、改名：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pt-online-schema-<span class="operator"><span class="keyword">change</span> <span class="comment">--user=root --password=123456 --host=192.168.200.25  --alter "CHANGE COLUMN age address varchar(30)" D=aaa,t=tmp_test --no-check-alter --no-check-replication-filters --alter-foreign-keys-method=auto --recursion-method=none --quiet --execut</span></span></span><br></pre></td></tr></table></figure></p>
+<p>6、索引：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pt-online-schema-<span class="operator"><span class="keyword">change</span> <span class="comment">--user=root --password=123456 --host=192.168.200.25  --alter "ADD INDEX idx_address(address)" D=aaa,t=tmp_test --no-check-alter --no-check-replication-filters --alter-foreign-keys-method=auto --recursion-method=none --print --execute</span></span></span><br></pre></td></tr></table></figure></p>
+<p>7、删除索引：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pt-online-schema-<span class="operator"><span class="keyword">change</span> <span class="comment">--user=root --password=123456 --host=192.168.200.25  --alter "DROP INDEX idx_address" D=aaa,t=tmp_test --no-check-alter --no-check-replication-filters --alter-foreign-keys-method=auto --recursion-method=none --print --execute</span></span></span><br></pre></td></tr></table></figure></p>
+<p>8、其他：<br>1）–no-drop-old-table：<br>上面的测试都是把原表删除了，要是不删除原表则： –no-drop-old-table，这样会让原表（_test_binlog_old）保留。<br> <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pt-online-schema-<span class="operator"><span class="keyword">change</span> <span class="comment">--user=root --password=123456 --host=192.168.200.25  --alter "ADD COLUMN a text" D=aaa,t=test_binlog --no-check-replication-filters --no-drop-old-table --print --execute</span></span></span><br></pre></td></tr></table></figure></p>
+<p>2）–max-load：<br>要是在线上环境上添加字段，但又不想影响到服务，可以用参数：–max-load 去执行该工具，默认是Threads_running=25，即当前有这么多线程在运行的时候就暂停数据的复制，等少于该值则继续复制数据到新表：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pt-online-schema-<span class="operator"><span class="keyword">change</span> <span class="comment">--user=root --password=123456 --host=192.168.200.25  --alter "add INDEX idx_address(address)" D=aaa,t=tmp_test --no-check-alter --no-check-replication-filters --alter-foreign-keys-method=auto --recursion-method=none --max-load=Threads_running=2 --statistics --print --execute</span></span></span><br></pre></td></tr></table></figure><br>暂停的时候标准输出里面会有：<br>Pausing because Threads_running=2。等到运行的线程数小于给定的值，则就继续复制数据，直到完成。</p>
+<p>9、总结：</p>
+<ol>
+<li>当业务量较大时，修改操作会等待没有数据修改后，执行最后的rename操作。因此，在修改表结构时，<font color="red">应该尽量选择在业务相对空闲时，至少修改表上的数据操作较低时，执行较为妥当。</font></li>
+<li>如果对外键表操作时，四种外键操作类型需要根据表的数据量和可靠程度，进行选择。<font color="red">处于可靠性的原因，尽量使用rebuild_constraints类型，如果没有可靠性要求，可以使用auto类型。</font></li>
+<li>由于可能存在一定的风险，在操作之前，建议对数据表进行备份，可以使得操作更安全、可靠。</li>
+<li>使用该工具的前提是处理的表需要有主键或则唯一索引。当处理有外键的表时，需要加–alter-foreign-keys-method参数，值可以根据情况设置。<font color="red">当是主从环境，不在乎从的延迟，则需要加–recursion-method=none参数。当需要尽可能的对服务产生小的影响，则需要加上–max-load参数。</font></li>
+</ol>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/mysql/" rel="tag">#mysql</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/03/14/nginx-access-log/" rel="next">nginx access_log日志</a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <div class="ds-share flat" data-thread-key="2016/03/26/mysql-pt-online-schema-change/"
+     data-title="mysql在线修改表结构 pt-online-schema-change"
+     data-content=""
+     data-url="http://yoursite.com/2016/03/26/mysql-pt-online-schema-change/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
+
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
+      
+    </div>
+  </div>
+
+ </div>
+
+        
+
+        
+          <div class="comments" id="comments">
+            
+              <div class="ds-thread" data-thread-key="2016/03/26/mysql-pt-online-schema-change/"
+                   data-title="mysql在线修改表结构 pt-online-schema-change" data-url="http://yoursite.com/2016/03/26/mysql-pt-online-schema-change/">
+              </div>
+            
+          </div>
+        
+      </div>
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="/images/lanjingling.jpg" alt="蓝精灵" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">蓝精灵</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">java程序员、爱开源、喜欢nodejs、前端js、oracle数据库、分布式技术...<br/>改变世界的是这么一群人,他们寻找梦想中的乐园,当他们找不到时,就亲手创造了她...</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">40</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">15</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">25</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/lanjingling" target="_blank">github</a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://blog.csdn.net/liuxiao723846" target="_blank">csdn</a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/1925780475" target="_blank">weibo</a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+            <p class="site-author-name">Links</p>
+            
+              <span class="links-of-author-item">
+              <a href="http://www.ruanyifeng.com/blog/" target="_blank">阮一峰</a>
+              </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://zipperary.com/" target="_blank">Zippera's Blog</a>
+              </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://wuchong.me/" target="_blank">Jark's Blog</a>
+              </span>
+            
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#percona-toolkit_介绍"><span class="nav-number">1.</span> <span class="nav-text">percona-toolkit 介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#pt-online-schema-change_工作原理"><span class="nav-number">2.</span> <span class="nav-text">pt-online-schema-change 工作原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#pt-online-schema-change_使用"><span class="nav-number">3.</span> <span class="nav-text">pt-online-schema-change 使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实例一"><span class="nav-number">4.</span> <span class="nav-text">实例一</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实例二（主从）"><span class="nav-number">5.</span> <span class="nav-text">实例二（主从）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实例三（外键）"><span class="nav-number">6.</span> <span class="nav-text">实例三（外键）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#综合实例"><span class="nav-number">7.</span> <span class="nav-text">综合实例</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner"> <div class="copyright" >
+  
+  &copy; &nbsp;  2014 - 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="icon-next-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">蓝精灵</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+ </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+  
+    
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"lanjingling"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+    
+     
+
+    
+  
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.1"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.1"></script>
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/js/motion_global.js?v=0.4.5.1" id="motion.global"></script>
+
+
+
+
+  <script type="text/javascript" src="/js/nav-toggle.js?v=0.4.5.1"></script>
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.1" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 0.4 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    var $tocContent = $('.post-toc-content');
+    if (isDesktop() && CONFIG.sidebar === 'post') {
+      if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+        displaySidebar();
+      }
+    }
+  });
+</script>
+
+
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      if (CONFIG.sidebar === 'always') {
+        displaySidebar();
+      }
+      if (isMobile()) {
+        FastClick.attach(document.body);
+      }
+    });
+  </script>
+
+  
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/lazyload.js"></script>
+  <script type="text/javascript">
+    $(function () {
+      $("#posts").find('img').lazyload({
+        placeholder: "/images/loading.gif",
+        effect: "fadeIn"
+      });
+    });
+  </script>
+</body>
+</html>
