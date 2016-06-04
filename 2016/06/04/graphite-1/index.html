@@ -1,0 +1,780 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.5.1"/>
+
+
+    <meta name="description" content="java程序员、爱开源、喜欢nodejs、前端js、oracle数据库、分布式技术...<br/>改变世界的是这么一群人,他们寻找梦想中的乐园,当他们找不到时,就亲手创造了她..." />
+
+
+
+  <meta name="keywords" content="grafana,graphite,python," />
+
+
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.1" />
+
+
+<meta name="description" content="Graphite 是一个企业级的监控工具，用 Python 编写，采用 django 框架，sqlite 数据库存储，自有简单文本协议通讯，绘图功能强大。Graphite由多个后端和前端组件组成。后端组件用于存储数值型的时间序列数据。前端组件则用于获取指标项数据并根据情况渲染图表。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="graphite 安装、配置、使用（一）">
+<meta property="og:url" content="http://yoursite.com/2016/06/04/graphite-1/index.html">
+<meta property="og:site_name" content="晓的技术博客">
+<meta property="og:description" content="Graphite 是一个企业级的监控工具，用 Python 编写，采用 django 框架，sqlite 数据库存储，自有简单文本协议通讯，绘图功能强大。Graphite由多个后端和前端组件组成。后端组件用于存储数值型的时间序列数据。前端组件则用于获取指标项数据并根据情况渲染图表。">
+<meta property="og:image" content="http://ww1.sinaimg.cn/mw690/72c913fbjw1f4j4v5ih3hj20ym0gxmzk.jpg">
+<meta property="og:image" content="http://ww4.sinaimg.cn/mw690/72c913fbjw1f4j4xjh9hcj20q00bx7bv.jpg">
+<meta property="og:updated_time" content="2016-06-04T05:50:00.148Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="graphite 安装、配置、使用（一）">
+<meta name="twitter:description" content="Graphite 是一个企业级的监控工具，用 Python 编写，采用 django 框架，sqlite 数据库存储，自有简单文本协议通讯，绘图功能强大。Graphite由多个后端和前端组件组成。后端组件用于存储数值型的时间序列数据。前端组件则用于获取指标项数据并根据情况渲染图表。">
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'post'
+  };
+</script>
+
+  <title> graphite 安装、配置、使用（一） | 晓的技术博客 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?93b1a723d246349c4cace650dee4a731";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand" rel="start">
+      <span class="logo">
+        <i class="icon-next-logo"></i>
+      </span>
+      <span class="site-title">晓的技术博客</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu menu-left">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            <i class="menu-item-icon icon-next-home"></i> <br />
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            <i class="menu-item-icon icon-next-archives"></i> <br />
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            <i class="menu-item-icon icon-next-categories"></i> <br />
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            <i class="menu-item-icon icon-next-tags"></i> <br />
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            <i class="menu-item-icon icon-next-about"></i> <br />
+            关于
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <form class="site-search-form">
+    <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+  </form>
+
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'iSunJWoZvxV9mKcJc6QU','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content"> 
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+
+      
+      
+        <h1 class="post-title" itemprop="name headline">
+          
+          
+            
+              graphite 安装、配置、使用（一）
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于
+          <time itemprop="dateCreated" datetime="2016-06-04T12:08:57+08:00" content="2016-06-04">
+            2016-06-04
+          </time>
+        </span>
+
+        
+          <span class="post-category" >
+            &nbsp; | &nbsp; 分类于
+            
+              <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                <a href="/categories/graphite/" itemprop="url" rel="index">
+                  <span itemprop="name">graphite</span>
+                </a>
+              </span>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+            <span class="post-comments-count">
+              &nbsp; | &nbsp;
+              <a href="/2016/06/04/graphite-1/#comments" itemprop="discussionUrl">
+                <span class="post-comments-count ds-thread-count" data-thread-key="2016/06/04/graphite-1/" itemprop="commentsCount"></span>
+              </a>
+            </span>
+          
+        
+      </div>
+    </header>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><h2 id="graphite_安装前准备——升级python、easy_install和pip">graphite 安装前准备——升级python、easy_install和pip</h2><p>CENTOS 6.X 系列默认安装的 Python 2.6 ，而目前主流开发软件都在使用Python-2.7，最新版本的graphite也不例外，所以需要先升级系统默认的Python环境，才能安装最新版本graphite。</p>
+<p>1、升级python 到 2.7：<br>1）查看python 版本：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># python -V</span><br><span class="line">Python 2.6.6</span><br></pre></td></tr></table></figure></p>
+<p>2）下载、解压：python  2.7.3<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># wget http://python.org/ftp/python/2.7.3/Python-2.7.3.tar.bz2</span><br><span class="line">解压：</span><br><span class="line"># tar -xvjf Python-2.7.3.tar.bz2</span><br></pre></td></tr></table></figure></p>
+<p>2、准备工作：<br>1）安装openssl：<br>解决在安装Python2.7 时报错 ImportError: cannot import name HTTPSHandler</p>
+<blockquote>
+<h1 id="yum_install_openssl_openssl-devel_-y">yum install openssl openssl-devel -y</h1></blockquote>
+<p>2）安装zlib：<br>解决安装Python-2.7对应的easy_install和pip时报错：</p>
+<blockquote>
+<h1 id="yum_install_zlib_zlib-devel_readline_readline-devel_-y">yum install zlib zlib-devel readline readline-devel -y</h1></blockquote>
+<p>3）安装sqlite-devel:<br>解决在安装graphite-web时报错：Error loading either pysqlite2 or sqlite3 modules。安装sqlite-devel之后，重新编译安装Python（<a href="http://blog.csdn.net/nuccch/article/details/42132267）" target="_blank" rel="external">http://blog.csdn.net/nuccch/article/details/42132267）</a></p>
+<blockquote>
+<h1 id="yum_install_sqlite-devel">yum install sqlite-devel</h1></blockquote>
+<p>3、编译、安装：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># cd Python-2.7.3</span><br><span class="line"># ./configure</span><br><span class="line"># make</span><br><span class="line"># make install</span><br><span class="line">安装过程没有报错，证明安装成功。</span><br></pre></td></tr></table></figure></p>
+<p>4、修改环境：<br>1）建立软连接，使系统默认的 python指向 python2.7：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">#mv /usr/bin/python /usr/bin/python2.6.6  </span><br><span class="line">#ln -s /usr/local/bin/python2.7 /usr/bin/python</span><br><span class="line"> 查看/usr/bin/目录下python信息：</span><br><span class="line"># ll /usr/bin/python*</span><br><span class="line">lrwxrwxrwx  1 root root   24 May 22 21:30 /usr/bin/python -&gt; /usr/local/bin/python2.7</span><br><span class="line">lrwxrwxrwx. 1 root root    6 Mar  9  2015 /usr/bin/python2 -&gt; python</span><br><span class="line">-rwxr-xr-x. 2 root root 9032 Jan 22  2014 /usr/bin/python2.6</span><br><span class="line">-rwxr-xr-x. 2 root root 9032 Jan 22  2014 /usr/bin/python2.6.6</span><br></pre></td></tr></table></figure></p>
+<p>2）由于yum没有兼容python2.7，修改yum文件：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">vi /usr/bin/yum，第一行</span><br><span class="line">#!/usr/bin/python</span><br><span class="line">修改为：</span><br><span class="line">#!/usr/bin/python2.6.6</span><br></pre></td></tr></table></figure><br>3）退出当前控制台，重新登录后查看python版本：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># python -V</span><br><span class="line">Python 2.7.3</span><br></pre></td></tr></table></figure><br>参考：<a href="http://blog.csdn.net/jcjc918/article/details/11022345" target="_blank" rel="external">http://blog.csdn.net/jcjc918/article/details/11022345</a></p>
+<p>5、安装Python 2.7.3对应的easy_install和pip：<br>1）安装easy_install：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># wget https://pypi.python.org/packages/source/s/setuptools/setuptools-7.0.zip --no-check-certificate</span><br><span class="line"># unzip setuptools-7.0.zip </span><br><span class="line"># cd setuptools-7.0</span><br><span class="line"># python setup.py install</span><br><span class="line">最后提示如下信息表示安装成功：</span><br><span class="line">Installed /usr/local/lib/python2.7/site-packages/setuptools-7.0-py2.7.egg</span><br><span class="line">Processing dependencies for setuptools==7.0</span><br><span class="line">Finished processing dependencies for setuptools==7.0</span><br></pre></td></tr></table></figure></p>
+<p>2）安装pip：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># wget --no-check-certificate https://github.com/pypa/pip/archive/1.5.5.tar.gz</span><br><span class="line"># tar -xvzf 1.5.5.tar.gz</span><br><span class="line"># cd pip-1.5.5/</span><br><span class="line"># python setup.py  install</span><br><span class="line">最后提示如下信息表示安装成功：</span><br><span class="line">Installed /usr/local/lib/python2.7/site-packages/pip-1.5.5-py2.7.egg</span><br><span class="line">Processing dependencies for pip==1.5.5</span><br><span class="line">Finished processing dependencies for pip==1.5.5</span><br></pre></td></tr></table></figure></p>
+<p>3）验证：<br>需要退出当前控制台窗口，重新登录后，输入如下命令：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># easy_install --version</span><br><span class="line">setuptools 7.0</span><br><span class="line"># pip -V</span><br><span class="line">pip 1.5.5 from /usr/local/lib/python2.7/site-packages/pip-1.5.5-py2.7.egg (python 2.7)</span><br></pre></td></tr></table></figure></p>
+<h2 id="graphite_安装">graphite 安装</h2><p>1、使用pip安装graphite、whisper、carbon ：（默认安装到了/opt下面）<br>1）安装graphite：</p>
+<blockquote>
+<p>pip install <a href="https://github.com/graphite-project/ceres/tarball/master" target="_blank" rel="external">https://github.com/graphite-project/ceres/tarball/master</a></p>
+</blockquote>
+<p>2）安装whisper：</p>
+<blockquote>
+<p>pip install whisper</p>
+</blockquote>
+<p>安装好whisper后，会有如下文件：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"># ls -l /usr/local/bin/whisper*</span><br><span class="line">-rwxr-xr-x 1 root root 2843 May 22 22:35 /usr/local/bin/whisper-create.py</span><br><span class="line">-rwxr-xr-x 1 root root 2208 May 22 22:35 /usr/local/bin/whisper-diff.py</span><br><span class="line">-rwxr-xr-x 1 root root 2908 May 22 22:35 /usr/local/bin/whisper-dump.py</span><br><span class="line">-rwxr-xr-x 1 root root 1786 May 22 22:35 /usr/local/bin/whisper-fetch.py</span><br><span class="line">-rwxr-xr-x 1 root root 4305 May 22 22:35 /usr/local/bin/whisper-fill.py</span><br><span class="line">-rwxr-xr-x 1 root root 1077 May 22 22:35 /usr/local/bin/whisper-info.py</span><br><span class="line">-rwxr-xr-x 1 root root  681 May 22 22:35 /usr/local/bin/whisper-merge.py</span><br><span class="line">-rwxr-xr-x 1 root root 5990 May 22 22:35 /usr/local/bin/whisper-resize.py</span><br><span class="line">-rwxr-xr-x 1 root root  925 May 22 22:35 /usr/local/bin/whisper-set-aggregation-method.py</span><br><span class="line">-rwxr-xr-x 1 root root  976 May 22 22:35 /usr/local/bin/whisper-update.py</span><br></pre></td></tr></table></figure></p>
+<p>3）安装carbon ：</p>
+<blockquote>
+<p>pip install carbon  </p>
+</blockquote>
+<p>安装好carbon后，会在/opt/graphite/bin下有carbon 相关的文件；<br>注：安装carbon 时可能会报错CompressionError: bz2 module is not available（因为carbon时使用Twisted作为事件驱动网络引擎监听时间序列数据），解决方法如下（ <a href="http://www.ithao123.cn/content-1273730.html" target="_blank" rel="external">http://www.ithao123.cn/content-1273730.html</a> ）：</p>
+<blockquote>
+<p>wget <a href="https://pypi.python.org/packages/source/T/Twisted/Twisted-14.0.0.tar.bz2#md5=9625c094e0a18da77faa4627b98c9815" target="_blank" rel="external">https://pypi.python.org/packages/source/T/Twisted/Twisted-14.0.0.tar.bz2#md5=9625c094e0a18da77faa4627b98c9815</a> –no-check-certificate<br>tar -jxf  Twisted-14.0.0.tar.bz2<br>cd Twisted-14.0.0;<br>python setup.py install</p>
+</blockquote>
+<p>4）安装graphite-web：</p>
+<blockquote>
+<p>pip install graphite-web</p>
+</blockquote>
+<p>2、配置、启动carbon：<br>1）graphite目录：（使用pip安装，默认会将graphite安装到/opt目录下）</p>
+<ul>
+<li>bin ： 二进制文件目录，包括carbon-cache.py、carbon-relay.py、validate-storage-schemas.py、carbon-aggregator.py、carbon-client.py等程序</li>
+<li>build</li>
+<li>conf ： 配置文件目录</li>
+<li>lib ： 库目录</li>
+<li>storage ： 数据存放目录，包括log，whisper数据库，索引，rrd数据等</li>
+<li>webapp ： webapp文件存放目录</li>
+</ul>
+<p>2）配置carbon相关参数 ：<br>Carbon安装包中包含了关于端口号和其他多个配置参数的明确缺省值。拷贝这些已有的示例配置文件：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"># cd /opt/graphite/conf</span><br><span class="line"># cp aggregation-rules.conf.example aggregation-rules.conf</span><br><span class="line"># cp blacklist.conf.example blacklist.conf</span><br><span class="line"># cp carbon.conf.example carbon.conf</span><br><span class="line"># cp carbon.amqp.conf.example carbon.amqp.conf</span><br><span class="line"># cp relay-rules.conf.example relay-rules.conf</span><br><span class="line"># cp rewrite-rules.conf.example rewrite-rules.conf</span><br><span class="line"># cp storage-schemas.conf.example storage-schemas.conf</span><br><span class="line"># cp storage-aggregation.conf.example storage-aggregation.conf</span><br><span class="line"># cp whitelist.conf.example whitelist.conf</span><br></pre></td></tr></table></figure><br>进入/opt/graphite/bin目录，执行如下命令启动（之后可以看到carbon-cache进程）：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># ./carbon-cache.py start</span><br></pre></td></tr></table></figure><br>Starting carbon-cache (instance a)<br>注：carbon.conf文件中，在cache区段下，接收端口这一行包含一个默认值，用于通过平文本协议（plaintext protocol ）接受输入指标项（如下所示）：<br>[cache]<br>LINE_RECEIVER_INTERFACE = 0.0.0.0<br>LINE_RECEIVER_PORT = 2003<br>3）测试：<br>为了简单起见，在本文示例中我将通过netcat命令用平文本协议发布指标项。<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># yum install nc</span><br><span class="line"># echo "carbon.agents.graphite-tutorial.metricsReceived 28198 `date +%s`" | nc localhost 2003</span><br></pre></td></tr></table></figure></p>
+<p>Carbon与Whisper交互，将这些时间序列数据存储到文件系统中，可以用whisper-info脚本获取为这些指标项创建的Whisper文件的元数据信息：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># whisper-info.py /opt/graphite/storage/whisper/carbon/agents/graphite-tutorial/metricsReceived.wsp</span><br></pre></td></tr></table></figure></p>
+<p>3、Graphite Web应用：<br>1）配置Graphite-web：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># cd /opt/graphite/webapp/graphite</span><br><span class="line"># cp local_settings.py.example local_settings.py</span><br></pre></td></tr></table></figure></p>
+<p>Graphite Web应用中包含默认的仪表盘和图表模版：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># cp dashboard.conf.example dashboard.conf</span><br><span class="line"># cp graphTemplates.conf.example graphTemplates.conf</span><br></pre></td></tr></table></figure></p>
+<p>2）初始化数据库：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># python manage.py syncdb</span><br></pre></td></tr></table></figure><br>可能会报错：ImportError: No module named django.core.management，解决：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># pip install Django==1.8</span><br></pre></td></tr></table></figure><br>之后再运行# python manage.py syncdb可能会报错：ImportError: No module named tagging，解决：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># pip install django-tagging</span><br></pre></td></tr></table></figure><br>之后再运行# python manage.py syncdb就可以安装成功，在安装过程中需要输入用户名、密码、邮件等信息。</p>
+<p>4、启动graphite：<br>1）启动：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># cd /opt/graphite</span><br><span class="line"># PYTHONPATH=`pwd`/storage/whisper ./bin/run-graphite-devel-server.py --port=8085 --libs=`pwd`/webapp /opt/graphite 1&gt;/opt/graphite/storage/log/webapp/process.log 2&gt;&amp;1 &amp;</span><br><span class="line"># tail -f /opt/graphite/storage/log/webapp/process.log</span><br></pre></td></tr></table></figure><br>默认会在8058端口运行，浏览器输入：<a href="http://192.168.137.122:8085/" target="_blank" rel="external">http://192.168.137.122:8085/</a></p>
+<p><img src="http://ww1.sinaimg.cn/mw690/72c913fbjw1f4j4v5ih3hj20ym0gxmzk.jpg" alt=""></p>
+<p>2）图片无法显示：<br>启动后，图片无法显示，提示如下错误。<br><img src="http://ww4.sinaimg.cn/mw690/72c913fbjw1f4j4xjh9hcj20q00bx7bv.jpg" alt=""></p>
+<p>需要安装：</p>
+<blockquote>
+<h1 id="pip_install_cairocffi">pip install cairocffi</h1></blockquote>
+<p>在安装时可能会报错：No package ‘libffi’ found，解决：</p>
+<blockquote>
+<p>yum install libffi-devel</p>
+</blockquote>
+<p>参考：<br><a href="http://www.infoq.com/cn/articles/graphite-intro" target="_blank" rel="external">http://www.infoq.com/cn/articles/graphite-intro</a><br><a href="http://wrox.cn/tag/graphite/" target="_blank" rel="external">http://wrox.cn/tag/graphite/</a>   （<a href="http://wrox.cn/article/100000312/" target="_blank" rel="external">http://wrox.cn/article/100000312/</a>     <a href="http://wrox.cn/article/100039828/）" target="_blank" rel="external">http://wrox.cn/article/100039828/）</a><br><a href="http://www.cnblogs.com/zhengyun_ustc/archive/2015/01/23/55solution9.html" target="_blank" rel="external">http://www.cnblogs.com/zhengyun_ustc/archive/2015/01/23/55solution9.html</a><br><a href="http://blog.csdn.net/iloveyin/article/details/17069257" target="_blank" rel="external">http://blog.csdn.net/iloveyin/article/details/17069257</a></p>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/grafana/" rel="tag">#grafana</a>
+          
+            <a href="/tags/graphite/" rel="tag">#graphite</a>
+          
+            <a href="/tags/python/" rel="tag">#python</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/03/26/mysql-pt-online-schema-change/" rel="next">mysql在线修改表结构 pt-online-schema-change</a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <div class="ds-share flat" data-thread-key="2016/06/04/graphite-1/"
+     data-title="graphite 安装、配置、使用（一）"
+     data-content=""
+     data-url="http://yoursite.com/2016/06/04/graphite-1/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
+
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
+      
+    </div>
+  </div>
+
+ </div>
+
+        
+
+        
+          <div class="comments" id="comments">
+            
+              <div class="ds-thread" data-thread-key="2016/06/04/graphite-1/"
+                   data-title="graphite 安装、配置、使用（一）" data-url="http://yoursite.com/2016/06/04/graphite-1/">
+              </div>
+            
+          </div>
+        
+      </div>
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="/images/lanjingling.jpg" alt="蓝精灵" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">蓝精灵</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">java程序员、爱开源、喜欢nodejs、前端js、oracle数据库、分布式技术...<br/>改变世界的是这么一群人,他们寻找梦想中的乐园,当他们找不到时,就亲手创造了她...</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">41</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">16</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">28</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/lanjingling" target="_blank">github</a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://blog.csdn.net/liuxiao723846" target="_blank">csdn</a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/1925780475" target="_blank">weibo</a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+            <p class="site-author-name">Links</p>
+            
+              <span class="links-of-author-item">
+              <a href="http://www.ruanyifeng.com/blog/" target="_blank">阮一峰</a>
+              </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://zipperary.com/" target="_blank">Zippera's Blog</a>
+              </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://wuchong.me/" target="_blank">Jark's Blog</a>
+              </span>
+            
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#graphite_安装前准备——升级python、easy_install和pip"><span class="nav-number">1.</span> <span class="nav-text">graphite 安装前准备——升级python、easy_install和pip</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#yum_install_openssl_openssl-devel_-y"><span class="nav-number"></span> <span class="nav-text">yum install openssl openssl-devel -y</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#yum_install_zlib_zlib-devel_readline_readline-devel_-y"><span class="nav-number"></span> <span class="nav-text">yum install zlib zlib-devel readline readline-devel -y</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#yum_install_sqlite-devel"><span class="nav-number"></span> <span class="nav-text">yum install sqlite-devel</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#graphite_安装"><span class="nav-number">1.</span> <span class="nav-text">graphite 安装</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#pip_install_cairocffi"><span class="nav-number"></span> <span class="nav-text">pip install cairocffi</span></a></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner"> <div class="copyright" >
+  
+  &copy; &nbsp;  2014 - 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="icon-next-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">蓝精灵</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+ </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+  
+    
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"lanjingling"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+    
+     
+
+    
+  
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.1"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.1"></script>
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/js/motion_global.js?v=0.4.5.1" id="motion.global"></script>
+
+
+
+
+  <script type="text/javascript" src="/js/nav-toggle.js?v=0.4.5.1"></script>
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.1" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 0.4 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    var $tocContent = $('.post-toc-content');
+    if (isDesktop() && CONFIG.sidebar === 'post') {
+      if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+        displaySidebar();
+      }
+    }
+  });
+</script>
+
+
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      if (CONFIG.sidebar === 'always') {
+        displaySidebar();
+      }
+      if (isMobile()) {
+        FastClick.attach(document.body);
+      }
+    });
+  </script>
+
+  
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/lazyload.js"></script>
+  <script type="text/javascript">
+    $(function () {
+      $("#posts").find('img').lazyload({
+        placeholder: "/images/loading.gif",
+        effect: "fadeIn"
+      });
+    });
+  </script>
+</body>
+</html>
