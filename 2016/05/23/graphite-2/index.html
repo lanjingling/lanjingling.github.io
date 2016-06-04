@@ -1,0 +1,800 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.5.1"/>
+
+
+    <meta name="description" content="java程序员、爱开源、喜欢nodejs、前端js、oracle数据库、分布式技术...<br/>改变世界的是这么一群人,他们寻找梦想中的乐园,当他们找不到时,就亲手创造了她..." />
+
+
+
+  <meta name="keywords" content="grafana,graphite,python," />
+
+
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.1" />
+
+
+<meta name="description" content="Graphite 是一个企业级的监控工具，用 Python 编写，采用 django 框架，sqlite 数据库存储，自有简单文本协议通讯，绘图功能强大。Graphite由多个后端和前端组件组成。后端组件用于存储数值型的时间序列数据。前端组件则用于获取指标项数据并根据情况渲染图表。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="graphite-2">
+<meta property="og:url" content="http://yoursite.com/2016/05/23/graphite-2/index.html">
+<meta property="og:site_name" content="晓的技术博客">
+<meta property="og:description" content="Graphite 是一个企业级的监控工具，用 Python 编写，采用 django 框架，sqlite 数据库存储，自有简单文本协议通讯，绘图功能强大。Graphite由多个后端和前端组件组成。后端组件用于存储数值型的时间序列数据。前端组件则用于获取指标项数据并根据情况渲染图表。">
+<meta property="og:image" content="http://ww3.sinaimg.cn/mw690/72c913fbjw1f4j5p03yexj208f04mjrd.jpg">
+<meta property="og:updated_time" content="2016-06-04T06:16:20.502Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="graphite-2">
+<meta name="twitter:description" content="Graphite 是一个企业级的监控工具，用 Python 编写，采用 django 框架，sqlite 数据库存储，自有简单文本协议通讯，绘图功能强大。Graphite由多个后端和前端组件组成。后端组件用于存储数值型的时间序列数据。前端组件则用于获取指标项数据并根据情况渲染图表。">
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'post'
+  };
+</script>
+
+  <title> graphite-2 | 晓的技术博客 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?93b1a723d246349c4cace650dee4a731";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand" rel="start">
+      <span class="logo">
+        <i class="icon-next-logo"></i>
+      </span>
+      <span class="site-title">晓的技术博客</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu menu-left">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            <i class="menu-item-icon icon-next-home"></i> <br />
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            <i class="menu-item-icon icon-next-archives"></i> <br />
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            <i class="menu-item-icon icon-next-categories"></i> <br />
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            <i class="menu-item-icon icon-next-tags"></i> <br />
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            <i class="menu-item-icon icon-next-about"></i> <br />
+            关于
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <form class="site-search-form">
+    <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+  </form>
+
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'iSunJWoZvxV9mKcJc6QU','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content"> 
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+
+      
+      
+        <h1 class="post-title" itemprop="name headline">
+          
+          
+            
+              graphite-2
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于
+          <time itemprop="dateCreated" datetime="2016-05-23T19:38:17+08:00" content="2016-05-23">
+            2016-05-23
+          </time>
+        </span>
+
+        
+          <span class="post-category" >
+            &nbsp; | &nbsp; 分类于
+            
+              <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                <a href="/categories/graphite/" itemprop="url" rel="index">
+                  <span itemprop="name">graphite</span>
+                </a>
+              </span>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+            <span class="post-comments-count">
+              &nbsp; | &nbsp;
+              <a href="/2016/05/23/graphite-2/#comments" itemprop="discussionUrl">
+                <span class="post-comments-count ds-thread-count" data-thread-key="2016/05/23/graphite-2/" itemprop="commentsCount"></span>
+              </a>
+            </span>
+          
+        
+      </div>
+    </header>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><p>Graphite 是一个企业级的监控工具，用 Python 编写，采用 django 框架，sqlite 数据库存储，自有简单文本协议通讯，绘图功能强大。Graphite由多个后端和前端组件组成。后端组件用于存储数值型的时间序列数据。前端组件则用于获取指标项数据并根据情况渲染图表。</p>
+<h2 id="一、graphite组成：">一、graphite组成：</h2><p>1、carbon：<br>Carbon 实际上是一系列守护进程，组成一个Graphite安装的存储后端。这些守护进程用一个名为 <font color="red">Twisted</font> 的事件驱动网络引擎监听时间序列数据。Twisted框架让 Carbon 守护进程能够以很低的开销处理大量的客户端和流量。/opt/graphite/bin下有三种不同类型的 Carbon 守护进程：</p>
+<ul>
+<li>Cache ：接受通过各种协议传输来的指标项数据并以尽可能高的效率将它们写入磁盘；在接收到指标项时，将指标项值缓存在RAM中，并用底层的Whisper库按照指定的时间间隔将这些值写入磁盘。</li>
+<li>Relay ：有两个不同的用途：将输入的指标项复制并分区。</li>
+<li>Aggregator ： 运行于cache前方，在Whisper中记录指标项之前，缓存这些指标项一段时间。</li>
+</ul>
+<p>2、whisper：<br>一个简单的数据库库，用来存储时间序列数据，在设计上类似于RRD。之后应用程序可以用 create ，update 和fetch 操作获取并操作这些数据。Whisper脚本在/usr/local/bin下存放</p>
+<p>3、graphite webapp：<br> 一个Django webapp，使用<font color="red"> Cairo</font>来根据需要呈现图形。<br><img src="http://ww3.sinaimg.cn/mw690/72c913fbjw1f4j5p03yexj208f04mjrd.jpg" alt=""></p>
+<h2 id="二、carbon和whisper">二、carbon和whisper</h2><p>1、指标项和数据点：<br>指标项（metric ） 是一种随着时间不断变化的可度量的数量（例如：每秒请求数、CPU使用情况等），数据点（datapoint） 是包含如下信息的三元组：</p>
+<ul>
+<li>指标项名称</li>
+<li>度量值</li>
+<li>时间序列上某个特定的点（通常是一个时间戳）</li>
+</ul>
+<p>应用程序在Carbon进程所监听的端口上建立TCP连接，然后以简单平文本格式发送数据点信息到Carbon。客户端应用程序发布指标项的方式可以有多种：</p>
+<ul>
+<li>通过像 netcat （nc）命令这样的工具，使用 平文本协议 发布</li>
+<li>使用 pickle协议</li>
+<li>使用 高级消息队列协议（AMQP）</li>
+<li>用 函数库 ，如 Dropwizard Metrics库</li>
+</ul>
+<p>2、Carbon与Whisper交互，将这些时间序列数据存储到文件系统中：<br>可以用 whisper-info脚本获取为这些指标项创建的Whisper文件的元数据信息。例如：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"># whisper-info.py /opt/graphite/storage/whisper/PRODUCTION/host/graphite-tutorial/responseTime/p95.wsp </span><br><span class="line">maxRetention: 86400</span><br><span class="line">xFilesFactor: 0.5</span><br><span class="line">aggregationMethod: average</span><br><span class="line">fileSize: 17308</span><br><span class="line"></span><br><span class="line">Archive 0</span><br><span class="line">retention: 86400</span><br><span class="line">secondsPerPoint: 60</span><br><span class="line">points: 1440</span><br><span class="line">size: 17280</span><br><span class="line">offset: 28</span><br></pre></td></tr></table></figure></p>
+<h2 id="三、Whisper存储模式和聚合">三、Whisper存储模式和聚合</h2><p>1、Whisper是如何存储数据的？<br>首先我们需要理解数据是如何在Whisper文件中存储的。当Whisper文件被创建时，将拥有一个固定的文件尺寸，这个尺寸永远不会再改变。在Whisper文件中可能会包含多个用于不同分辨率的数据点的“ 存储区（ bucket ） ”，这些存储区是在配置文件中定义的。<br>例如：</p>
+<ul>
+<li>存储器A：拥有10秒分辨率的数据点</li>
+<li>存储区B：拥有60秒分辨率的数据点</li>
+<li>存储区C：拥有10分钟分辨率的数据点</li>
+</ul>
+<p>每个存储区还拥有一个保留期（retention）属性用于标识该存储区中的数据点应该保留的时间长度。例如：</p>
+<ul>
+<li>存储区A：分辨率为10秒，保留时间6小时的数据点</li>
+<li>存储区B：分辨率为60秒，保留时间1天的数据点</li>
+<li>存储区C：分辨率为10分钟，保留时间7天的数据点</li>
+</ul>
+<p>根据上述两种信息，Whisper可以进行一些简单的数学计算，计算出在每个存储区中实际需要保存多少数据点。</p>
+<ul>
+<li>存储区A：6小时 x 60分钟/小时 x 6数据点/分钟 = 2160点</li>
+<li>存储区B：1天 x 24小时/天 x 60分钟/小时 x 1数据点/分钟 = 1440点</li>
+<li>存储区C：7天 x 24小时/天 x 6数据点/小时 = 1008点</li>
+</ul>
+<p>如果根据这个存储模式配置创建Whisper文件，该文件大小是56KB。如果在这个文件上执行 whisper-dump.py 脚本，会有如下输出。需要注意的是，一个 archive 对应一个 存储区 ， 每点秒数（ seconds per point ） 和 点数（ points ） 属性则与我们之前的计算相匹配。</p>
+<p>2、关于聚合<br>当数据从一个较高精度的存储区移动到一个较低精度的存储区时，聚合开始发挥作用。让我们以前一个示例中的存储区A和存储区B为例：<br>存储区A：分辨率为10秒，保留时间6小时的数据点（较高精度）<br>存储区B：分辨率为60秒，保留时间1天的数据点（较低精度）<br>我们可能有一个每10秒钟发布一个数据点的应用程序。在存储区A中可以找到6小时之内发布的任何数据点。不过，如果我开始查询6小时之前发布的数据点，就可以在存储区B中找到它们。</p>
+<p>3、数据点如何移动到存储区B？<br>用高精度值除以低精度值，以确定需要聚合的数据点的数量。<br>l 60秒（存储区B）/10秒（存储区A）= 6个数据点需要聚合<br>注： Whisper需要较高精度的值能够整除较低精度的值（也就是说，相除的结果必须是整数）。否则聚合的结果可能会不准确。<br>聚合数据时，Whisper从存储区A中读取6个10秒数据点，然后将函数应用于这些数据点上，得出一个将被存储在存储区B中的60秒数据点。有5个聚合函数选项： average ，sum ，max ，min 和last 。 聚合函数的选择取决于需要处理的数据点。例如，第95百分位的值可能应该用 max 函数聚合。另一方面，对于计数器来说， sum 函数可能更合适。<br>在聚合数据点时，Whisper还处理了xFilesFactor的概念。xFilesFactor表示为了保证聚合准确，一个存储区必须包含的数据点比率。在我们之前的示例中，Whisper确定了它需要聚合6个10秒数据点。由于网络问题，应用重启等原因，可能只有4个数据点有数据而其他2个数据点是空值。<br>如果我们的Whisper文件的xFilesFactor是0.5，这意味着只有存在至少50%的数据点时，Whisper才会聚合数据。如果超过50%的数据点为空时，Whisper会创建一个空值聚合。在我们的例子中，即6个数据点中的4个——也就是66%。聚合函数会被应用在非空数据点上，创建聚合值。<br>你可以将xFilesFactor设置为0到1之间的任意值。值0表示即使只有一个有效数据点，就会执行聚合。值1则表示只有全部的数据点都有效，才会执行聚合。<br>在前一章节中，我们将所有的样例配置文件拷贝到了 /opt/graphite/conf 文件夹中。控制Whisper文件如何创建的配置文件如下：<br>/opt/graphite/conf/storage-schemas.conf<br>/opt/graphite/conf/storage-aggregation.conf</p>
+<p>4、默认存储模式（storage-schemas.conf）<br>存储模式（storage-schemas ） 配置文件由多个条目组成，每个条目中包含一个模式，用于匹配指标项名称和保留期定义。默认情况下，包含两个条目：Carbon和 全部其他 。<br>carbon 条目匹配以“carbon”字符串开头的指标项名称。默认情况下，Carbon守护进程每60秒发布一次它们自己内部的指标项（这一间隔是可以更改的）。例如，carbon-cache进程会发布指标项，用于标识该进程每分钟创建的指标项文件的数量。保留期的定义则表示数据点每60秒记录一次，并保存90天。<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[carbon]</span><br><span class="line">pattern = ^carbon\.</span><br><span class="line">retentions = 60s:90d</span><br></pre></td></tr></table></figure><br>全部其他 条目通过指定带星号的模式捕捉全部其他与 Carbon 无关的指标项。这个保留期的定义表示数据点每60秒记录一次，并保存1天。<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[default_1min_for_1day]</span><br><span class="line">pattern = .*</span><br><span class="line">retentions = 60s:1d</span><br></pre></td></tr></table></figure></p>
+<p>5、默认存储聚合（storage-aggregation.conf）<br>storage-aggregation 配置文件也是由多个条目组成，其中包括：</p>
+<ul>
+<li>匹配指标项名称的模式</li>
+<li>一个xFilesFactor值</li>
+<li>一个聚合函数</li>
+</ul>
+<p>默认情况下，包含4个条目：</p>
+<ul>
+<li><p>以.min结尾的指标项</p>
+<ul>
+<li>使用min聚合函数</li>
+<li>至少有10%数据点才可以聚合</li>
+</ul>
+</li>
+<li><p>以.max结尾的指标项</p>
+<ul>
+<li>使用max聚合函数</li>
+<li>至少有10%数据点才可以聚合</li>
+</ul>
+</li>
+<li><p>以.sum结尾的指标项</p>
+<ul>
+<li>使用sum聚合函数</li>
+<li>聚合的前提是至少要有一个数据点</li>
+</ul>
+</li>
+<li><p>其他指标项</p>
+<ul>
+<li>使用average聚合函数</li>
+<li>至少有10%数据点才可以聚合</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">[min]</span><br><span class="line">pattern = \.min$</span><br><span class="line">xFilesFactor = 0.1</span><br><span class="line">aggregationMethod = min</span><br><span class="line"></span><br><span class="line">[max]</span><br><span class="line">pattern = \.max$</span><br><span class="line">xFilesFactor = 0.1</span><br><span class="line">aggregationMethod = max</span><br><span class="line"></span><br><span class="line">[sum]</span><br><span class="line">pattern = \.count$</span><br><span class="line">xFilesFactor = 0</span><br><span class="line">aggregationMethod = sum</span><br><span class="line"></span><br><span class="line">[default_average]</span><br><span class="line">pattern = .*</span><br><span class="line">xFilesFactor = 0.5</span><br><span class="line">aggregationMethod = average</span><br></pre></td></tr></table></figure>
+<p>在测试环境下，默认的存储模式和存储聚合函数可以很好的完成任务，不过真正应用到生产指标项时，可能还要修改配置文件。</p>
+<p>6）存储模式修改<br>首先，我会修改Carbon条目。我希望Carbon每60秒记录一次指标项，并将这些指标项保存180天（6个月）。180天之后，我希望能够以10分钟的精度将这些指标项归档，再保存180天。<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[carbon]</span><br><span class="line">pattern = ^carbon\.</span><br><span class="line">retentions = 1min:180d,10min:180d</span><br></pre></td></tr></table></figure></p>
+<p>在Squarespace，我们用 Dropwizard 框架构建RESTful的Web Service。在准生产环境和生产环境中，我们运行了许多这样的服务，所有这些服务都使用 Dropwizard Metrics 库以每10秒一次的速度发布应用和业务指标项。这种10秒一次的数据我会保存3天。3天后，这些数据将被聚合为1分钟数据并保存180天（6个月）。最后，6个月之后，这些数据将被聚合为10分钟数据并再保存180天。<br>注： 如果我的指标项库以不同的速度发布数据点，我就需要修改保留的定义以匹配新的速度。<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[production_staging]</span><br><span class="line">pattern = ^(PRODUCTION|STAGING).*</span><br><span class="line">retentions = 10s:3d,1min:180d,10min:180d</span><br></pre></td></tr></table></figure><br>而Carbon，生产环境或准生产环境之外的指标项，可能只是用于测试。我会将这些数据保存1天并且假设他们会每1分钟发布一次。<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[default_1min_for_1day]</span><br><span class="line">pattern = .*</span><br><span class="line">retentions = 60s:1d</span><br></pre></td></tr></table></figure></p>
+<p>7）修改存储聚合<br>我会保留默认的存储聚合条目，不过会增加几条新的条目用于以ratio，m1_rate和p95结尾的指标项。<br>注： 新增的条目需要添加到 default 条目之前。<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">[ratio]</span><br><span class="line">pattern = \.ratio$</span><br><span class="line">xFilesFactor = 0.1</span><br><span class="line">aggregationMethod = average</span><br><span class="line"></span><br><span class="line">[m1_rate]</span><br><span class="line">pattern = \.m1_rate$</span><br><span class="line">xFilesFactor = 0.1</span><br><span class="line">aggregationMethod = sum</span><br><span class="line"></span><br><span class="line">[p95]</span><br><span class="line">pattern = \.p95$</span><br><span class="line">xFilesFactor = 0.1</span><br><span class="line">aggregationMethod = max</span><br></pre></td></tr></table></figure></p>
+<p>目前为止，你已经完成了Graphite后端的配置以匹配应用程序发布数据点的速率并且已经完全理解数据点是如何在文件系统中存储的。接下来的一章，我们将尝试用graphite-webapp将这些数据可视化。</p>
+<p>参考：<a href="http://www.tuicool.com/articles/j6FBvq" target="_blank" rel="external">http://www.tuicool.com/articles/j6FBvq</a></p>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/grafana/" rel="tag">#grafana</a>
+          
+            <a href="/tags/graphite/" rel="tag">#graphite</a>
+          
+            <a href="/tags/python/" rel="tag">#python</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/05/04/graphite-1/" rel="next">graphite 安装、配置、使用（一）</a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <div class="ds-share flat" data-thread-key="2016/05/23/graphite-2/"
+     data-title="graphite-2"
+     data-content=""
+     data-url="http://yoursite.com/2016/05/23/graphite-2/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
+
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
+      
+    </div>
+  </div>
+
+ </div>
+
+        
+
+        
+          <div class="comments" id="comments">
+            
+              <div class="ds-thread" data-thread-key="2016/05/23/graphite-2/"
+                   data-title="graphite-2" data-url="http://yoursite.com/2016/05/23/graphite-2/">
+              </div>
+            
+          </div>
+        
+      </div>
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="/images/lanjingling.jpg" alt="蓝精灵" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">蓝精灵</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">java程序员、爱开源、喜欢nodejs、前端js、oracle数据库、分布式技术...<br/>改变世界的是这么一群人,他们寻找梦想中的乐园,当他们找不到时,就亲手创造了她...</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">42</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">16</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">28</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/lanjingling" target="_blank">github</a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://blog.csdn.net/liuxiao723846" target="_blank">csdn</a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/1925780475" target="_blank">weibo</a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+            <p class="site-author-name">Links</p>
+            
+              <span class="links-of-author-item">
+              <a href="http://www.ruanyifeng.com/blog/" target="_blank">阮一峰</a>
+              </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://zipperary.com/" target="_blank">Zippera's Blog</a>
+              </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://wuchong.me/" target="_blank">Jark's Blog</a>
+              </span>
+            
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、graphite组成："><span class="nav-number">1.</span> <span class="nav-text">一、graphite组成：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、carbon和whisper"><span class="nav-number">2.</span> <span class="nav-text">二、carbon和whisper</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三、Whisper存储模式和聚合"><span class="nav-number">3.</span> <span class="nav-text">三、Whisper存储模式和聚合</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner"> <div class="copyright" >
+  
+  &copy; &nbsp;  2014 - 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="icon-next-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">蓝精灵</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+ </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+  
+    
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"lanjingling"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+    
+     
+
+    
+  
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.1"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.1"></script>
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/js/motion_global.js?v=0.4.5.1" id="motion.global"></script>
+
+
+
+
+  <script type="text/javascript" src="/js/nav-toggle.js?v=0.4.5.1"></script>
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.1" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 0.4 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    var $tocContent = $('.post-toc-content');
+    if (isDesktop() && CONFIG.sidebar === 'post') {
+      if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+        displaySidebar();
+      }
+    }
+  });
+</script>
+
+
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      if (CONFIG.sidebar === 'always') {
+        displaySidebar();
+      }
+      if (isMobile()) {
+        FastClick.attach(document.body);
+      }
+    });
+  </script>
+
+  
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/lazyload.js"></script>
+  <script type="text/javascript">
+    $(function () {
+      $("#posts").find('img').lazyload({
+        placeholder: "/images/loading.gif",
+        effect: "fadeIn"
+      });
+    });
+  </script>
+</body>
+</html>
