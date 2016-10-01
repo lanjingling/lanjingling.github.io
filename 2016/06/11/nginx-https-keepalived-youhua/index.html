@@ -1,0 +1,794 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.5.1"/>
+
+
+    <meta name="description" content="java程序员、爱开源、喜欢nodejs、前端js、oracle数据库、分布式技术...<br/>改变世界的是这么一群人,他们寻找梦想中的乐园,当他们找不到时,就亲手创造了她..." />
+
+
+
+  <meta name="keywords" content="nginx,集群," />
+
+
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.1" />
+
+
+<meta name="description" content="Nginx反向代">
+<meta property="og:type" content="article">
+<meta property="og:title" content="nginx优化——包括https、keepalive等">
+<meta property="og:url" content="http://yoursite.com/2016/06/11/nginx-https-keepalived-youhua/index.html">
+<meta property="og:site_name" content="晓的技术博客">
+<meta property="og:description" content="Nginx反向代">
+<meta property="og:updated_time" content="2016-10-01T09:28:55.144Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="nginx优化——包括https、keepalive等">
+<meta name="twitter:description" content="Nginx反向代">
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'post'
+  };
+</script>
+
+  <title> nginx优化——包括https、keepalive等 | 晓的技术博客 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?93b1a723d246349c4cace650dee4a731";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand" rel="start">
+      <span class="logo">
+        <i class="icon-next-logo"></i>
+      </span>
+      <span class="site-title">晓的技术博客</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu menu-left">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            <i class="menu-item-icon icon-next-home"></i> <br />
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            <i class="menu-item-icon icon-next-archives"></i> <br />
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            <i class="menu-item-icon icon-next-categories"></i> <br />
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            <i class="menu-item-icon icon-next-tags"></i> <br />
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            <i class="menu-item-icon icon-next-about"></i> <br />
+            关于
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <form class="site-search-form">
+    <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+  </form>
+
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'iSunJWoZvxV9mKcJc6QU','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content"> 
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+
+      
+      
+        <h1 class="post-title" itemprop="name headline">
+          
+          
+            
+              nginx优化——包括https、keepalive等
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于
+          <time itemprop="dateCreated" datetime="2016-06-11T13:51:23+08:00" content="2016-06-11">
+            2016-06-11
+          </time>
+        </span>
+
+        
+          <span class="post-category" >
+            &nbsp; | &nbsp; 分类于
+            
+              <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                <a href="/categories/nginx/" itemprop="url" rel="index">
+                  <span itemprop="name">nginx</span>
+                </a>
+              </span>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+            <span class="post-comments-count">
+              &nbsp; | &nbsp;
+              <a href="/2016/06/11/nginx-https-keepalived-youhua/#comments" itemprop="discussionUrl">
+                <span class="post-comments-count ds-thread-count" data-thread-key="2016/06/11/nginx-https-keepalived-youhua/" itemprop="commentsCount"></span>
+              </a>
+            </span>
+          
+        
+      </div>
+    </header>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><h2 id="一、nginx之tcp_nopush、tcp_nodelay、sendfile">一、nginx之tcp_nopush、tcp_nodelay、sendfile</h2><p>1、TCP_NODELAY<br>你怎么可以强制 socket 在它的缓冲区里发送数据？<br>一个解决方案是 TCP 堆栈的 TCP_NODELAY选项。这样就可以使缓冲区中的数据立即发送出去。</p>
+<p>Nginx的 TCP_NODELAY 选项使得在打开一个新的 socket 时增加了TCP_NODELAY选项。但这时会造成一种情况：<br>终端应用程序每产生一次操作就会发送一个包，而典型情况下一个包会拥有一个字节的数据以及40个字节长的包头，于是产生4000%的过载，很轻易地就能令网络发生拥塞。<font color="red">为了避免这种情况，TCP堆栈实现了等待数据 0.2秒钟，因此操作后它不会发送一个数据包，而是将这段时间内的数据打成一个大的包。这一机制是由<strong>Nagle算法</strong>保证。</font></p>
+<p>Nagle化后来成了一种标准并且立即在因特网上得以实现。它现在已经成为默认配置了，但有些场合下把这一选项关掉也是合乎需要的。现在假设某个应用程序发出了一个请求，希望发送小块数据。我们可以选择立即发送数据或者等待产生更多的数据然后再一次发送两种策略。<br>如果我们马上发送数据，那么交互性的以及客户/服务器型的应用程序将极大地受益。如果请求立即发出那么响应时间也会快一些。<font color="red">以上操作可以通过设置套接字的 TCP_NODELAY = on 选项来完成，这样就禁用了Nagle 算法。（不需要等待0.2s）</font></p>
+<p>2、TCP_NOPUSH<br>在 nginx 中，tcp_nopush 配置和 tcp_nodelay “互斥”。<font color="red">它可以配置一次发送数据的包大小。也就是说，它不是按时间累计  0.2 秒后发送包，而是当包累计到一定大小后就发送。</font></p>
+<blockquote>
+<p>注：在 nginx 中，tcp_nopush 必须和 sendfile 搭配使用。</p>
+</blockquote>
+<p>3、sendfile<br>现在流行的web 服务器里面都提供 sendfile选项用来提高服务器性能，那到底 sendfile是什么，怎么影响性能的呢？<br>sendfile实际上是 Linux2.0+以后的推出的一个系统调用，web服务器可以通过调整自身的配置来决定是否利用 sendfile这个系统调用。先来看一下不用 sendfile的传统网络传输过程：<br>read(file,tmp_buf, len);<br>write(socket,tmp_buf, len);</p>
+<blockquote>
+<p>硬盘 &gt;&gt; kernel buffer &gt;&gt; user buffer&gt;&gt; kernel socket buffer &gt;&gt;协议栈</p>
+</blockquote>
+<p>1）一般来说一个网络应用是通过读硬盘数据，然后写数据到socket 来完成网络传输的。上面2行用代码解释了这一点，不过上面2行简单的代码掩盖了底层的很多操作。来看看底层是怎么执行上面2行代码的：</p>
+<ol>
+<li>系统调用 read()产生一个上下文切换：从 user mode 切换到 kernel mode，然后 DMA 执行拷贝，把文件数据从硬盘读到一个 kernel buffer 里。</li>
+<li>数据从 kernel buffer拷贝到 user buffer，然后系统调用 read() 返回，这时又产生一个上下文切换：从kernel mode 切换到 user mode。</li>
+<li>系统调用write()产生一个上下文切换：从 user mode切换到 kernel mode，然后把步骤2读到 user buffer的数据拷贝到 kernel buffer（数据第2次拷贝到 kernel buffer），不过这次是个不同的 kernel buffer，这个 buffer和 socket相关联。</li>
+<li>系统调用 write()返回，产生一个上下文切换：从 kernel mode 切换到 user mode（第4次切换了），然后 DMA 从 kernel buffer拷贝数据到协议栈（第4次拷贝了）。</li>
+</ol>
+<p>上面4个步骤有4次上下文切换，有4次拷贝，我们发现如果能减少切换次数和拷贝次数将会有效提升性能。在kernel2.0+ 版本中，系统调用 sendfile() 就是用来简化上面步骤提升性能的。<font color="red">sendfile() 不但能减少切换次数而且还能减少拷贝次数。</font></p>
+<p>2）再来看一下用 sendfile()来进行网络传输的过程：<br>sendfile(socket,file, len);</p>
+<blockquote>
+<p>硬盘 &gt;&gt; kernel buffer (快速拷贝到kernelsocket buffer) &gt;&gt;协议栈</p>
+</blockquote>
+<ol>
+<li>系统调用sendfile()通过 DMA把硬盘数据拷贝到 kernel buffer，然后数据被 kernel直接拷贝到另外一个与 socket相关的 kernel buffer。这里没有 user mode和 kernel mode之间的切换，在 kernel中直接完成了从一个 buffer到另一个 buffer的拷贝。</li>
+<li>DMA 把数据从 kernelbuffer 直接拷贝给协议栈，没有切换，也不需要数据从 user mode 拷贝到 kernel mode，因为数据就在 kernel 里。</li>
+</ol>
+<p>步骤减少了，切换减少了，拷贝减少了，自然性能就提升了。这就是为什么说在Nginx 配置文件里打开 sendfile on 选项能提高 web server性能的原因。</p>
+<blockquote>
+<p>综上，这三个参数都应该配置成on：sendfile on;   tcp_nopush on; tcp_nodelay on;</p>
+</blockquote>
+<h2 id="二、nginx长连接——keepalive">二、nginx长连接——keepalive</h2><p>当使用nginx作为反向代理时，为了支持长连接，需要做到两点：</p>
+<ul>
+<li>从client到nginx的连接是长连接</li>
+<li>从nginx到server的连接是长连接</li>
+</ul>
+<p>1、保持和client的长连接：</p>
+<p><font color="red">默认情况下，nginx已经自动开启了对client连接的keep alive支持（同时client发送的HTTP请求要求keep alive）</font>。一般场景可以直接使用，但是对于一些比较特殊的场景，还是有必要调整个别参数（keepalive_timeout和keepalive_requests）。<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">http &#123;</span><br><span class="line">    keepalive_timeout  120s 120s;</span><br><span class="line">    keepalive_requests 10000;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>1）keepalive_timeout<br>语法:</p>
+<blockquote>
+<p>keepalive_timeout timeout [header_timeout];</p>
+</blockquote>
+<ol>
+<li>第一个参数：设置keep-alive客户端连接在服务器端保持开启的超时值（默认75s）；值为0会禁用keep-alive客户端连接；</li>
+<li>第二个参数：可选、在响应的header域中设置一个值“Keep-Alive: timeout=time”；通常可以不用设置；</li>
+</ol>
+<p>注：keepalive_timeout默认75s，一般情况下也够用，对于一些请求比较大的内部服务器通讯的场景，适当加大为120s或者300s；</p>
+<p>2）keepalive_requests：<br>keepalive_requests指令用于<font color="red">设置一个keep-alive连接上可以服务的请求的最大数量，当最大请求数量达到时，连接被关闭。默认是100。</font>这个参数的真实含义，是指一个keep alive建立之后，nginx就会为这个连接设置一个计数器，记录这个keep alive的长连接上已经接收并处理的客户端请求的数量。如果达到这个参数设置的最大值时，则nginx会强行关闭这个长连接，逼迫客户端不得不重新建立新的长连接。<br>大多数情况下当QPS(每秒请求数)不是很高时，默认值100凑合够用。但是，对于一些QPS比较高（比如超过10000QPS，甚至达到30000,50000甚至更高) 的场景，默认的100就显得太低。<br>简单计算一下，QPS=10000时，客户端每秒发送10000个请求(通常建立有多个长连接)，每个连接只能最多跑100次请求，意味着平均每秒钟就会有100个长连接因此被nginx关闭。同样意味着为了保持QPS，客户端不得不每秒中重新新建100个连接。因此，就会发现有大量的TIME_WAIT的socket连接(即使此时keep alive已经在client和nginx之间生效)。<font color="red">因此对于QPS较高的场景，非常有必要加大这个参数，以避免出现大量连接被生成再抛弃的情况，减少TIME_WAIT</font>。</p>
+<p>2、保持和server的长连接：<br>为了让nginx和后端server（nginx称为upstream）之间保持长连接，典型设置如下：（<font color="red">默认nginx访问后端都是用的短连接(HTTP1.0)，一个请求来了，Nginx 新开一个端口和后端建立连接，后端执行完毕后主动关闭该链接</font>）</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">http &#123;</span><br><span class="line">    upstream  BACKEND &#123;</span><br><span class="line">        server   192.168.0.1：8080  weight=1 max_fails=2 fail_timeout=30s;</span><br><span class="line">        server   192.168.0.2：8080  weight=1 max_fails=2 fail_timeout=30s;</span><br><span class="line">        keepalive 300;        // 这个很重要！</span><br><span class="line">    &#125;</span><br><span class="line">server &#123;</span><br><span class="line">        listen 8080 default_server;</span><br><span class="line">        server_name "";</span><br><span class="line">        location /  &#123;</span><br><span class="line">            proxy_pass http://BACKEND;</span><br><span class="line">            proxy_set_header Host  $Host;</span><br><span class="line">            proxy_set_header x-forwarded-for $remote_addr;</span><br><span class="line">            proxy_set_header X-Real-IP $remote_addr;</span><br><span class="line">            add_header Cache-Control no-store;</span><br><span class="line">            add_header Pragma  no-cache;</span><br><span class="line">            proxy_http_version 1.1;         // 这两个最好也设置</span><br><span class="line">            proxy_set_header Connection "";</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>1）location中有两个参数需要设置：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">http &#123;</span><br><span class="line">    server &#123;</span><br><span class="line">        location /  &#123;</span><br><span class="line">            proxy_http_version 1.1; // 这两个最好也设置</span><br><span class="line">            proxy_set_header Connection "";</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>HTTP协议中对长连接的支持是从1.1版本之后才有的，因此最好通过proxy_http_version指令设置为”1.1”；<br>而”Connection” header应该被清理。清理的意思，我的理解，是清理从client过来的http header，因为即使是client和nginx之间是短连接，nginx和upstream之间也是可以开启长连接的。这种情况下必须清理来自client请求中的”Connection” header。</p>
+<p>2）upstream中的keepalive设置：<br>此处keepalive的含义不是开启、关闭长连接的开关；也不是用来设置超时的timeout；更不是设置长连接池最大连接数。官方解释：</p>
+<ol>
+<li>The connections parameter sets the maximum number of idle keepalive connections to upstream servers connections（<font color="red">设置到upstream服务器的空闲keepalive连接的最大数量</font>）</li>
+<li>When this number is exceeded, the least recently used connections are closed. （<font color="red">当这个数量被突破时，最近使用最少的连接将被关闭</font>）</li>
+<li>It should be particularly noted that the keepalive directive does not limit the total number of connections to upstream servers that an nginx worker process can open.（<font color="red">特别提醒：keepalive指令不会限制一个nginx worker进程到upstream服务器连接的总数量</font>）</li>
+</ol>
+<p>我们先假设一个场景： 有一个HTTP服务，作为upstream服务器接收请求，响应时间为100毫秒。如果要达到10000 QPS的性能，就需要在nginx和upstream服务器之间建立大约1000条HTTP连接。nginx为此建立连接池，然后请求过来时为每个请求分配一个连接，请求结束时回收连接放入连接池中，连接的状态也就更改为idle。我们再假设这个upstream服务器的keepalive参数设置比较小，比如常见的10.</p>
+<p>A、假设请求和响应是均匀而平稳的，那么这1000条连接应该都是一放回连接池就立即被后续请求申请使用，线程池中的idle线程会非常的少，趋进于零，不会造成连接数量反复震荡。</p>
+<p>B、显示中请求和响应不可能平稳，我们以10毫秒为一个单位，来看连接的情况(注意场景是1000个线程+100毫秒响应时间，每秒有10000个请求完成)，我们假设应答始终都是平稳的，只是请求不平稳，第一个10毫秒只有50,第二个10毫秒有150：</p>
+<ol>
+<li>下一个10毫秒，有100个连接结束请求回收连接到连接池，但是假设此时请求不均匀10毫秒内没有预计的100个请求进来，而是只有50个请求。注意此时连接池回收了100个连接又分配出去50个连接，因此连接池内有50个空闲连接。</li>
+<li>然后注意看keepalive=10的设置，这意味着连接池中最多容许保留有10个空闲连接。因此nginx不得不将这50个空闲连接中的40个关闭，只留下10个。</li>
+<li>再下一个10个毫秒，有150个请求进来，有100个请求结束任务释放连接。150 - 100 = 50,空缺了50个连接，减掉前面连接池保留的10个空闲连接，nginx不得不新建40个新连接来满足要求。</li>
+</ol>
+<p>C、同样，如果假设相应不均衡也会出现上面的连接数波动情况。</p>
+<p>造成连接数量反复震荡的一个推手，就是这个keepalive 这个最大空闲连接数。毕竟连接池中的1000个连接在频繁利用时，出现短时间内多余10个空闲连接的概率实在太高。<font color="red">因此为了避免出现上面的连接震荡，必须考虑加大这个参数</font>，比如上面的场景如果将keepalive设置为100或者200,就可以非常有效的缓冲请求和应答不均匀。</p>
+<p>总结：<br>keepalive 这个参数一定要小心设置，尤其对于QPS比较高的场景，推荐先做一下估算，根据QPS和平均响应时间大体能计算出需要的长连接的数量。比如前面10000 QPS和100毫秒响应时间就可以推算出需要的长连接数量大概是1000. 然后将keepalive设置为这个长连接数量的10%到30%。比较懒的同学，可以直接设置为keepalive=1000之类的，一般都OK的了。</p>
+<p>3、综上，出现大量TIME_WAIT的情况<br>1）导致 nginx端出现大量TIME_WAIT的情况有两种：</p>
+<ul>
+<li>keepalive_requests设置比较小，高并发下超过此值后nginx会强制关闭和客户端保持的keepalive长连接；（主动关闭连接后导致nginx出现TIME_WAIT）</li>
+<li>keepalive设置的比较小，高并发下nginx会强制关闭和后端server保持的keepalive长连接；</li>
+</ul>
+<p>2）导致后端server端出现大量TIME_WAIT的情况：<br>nginx没有打开和后端的长连接，即：没有设置proxy_http_version 1.1;和proxy_set_header Connection “”;从而导致后端server每次关闭连接，高并发下就会出现server端出现大量TIME_WAIT</p>
+<h2 id="三、nginx配置https">三、nginx配置https</h2><p>1、配置<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    listen                  80  default_server;</span><br><span class="line">    listen          443 ssl;</span><br><span class="line">    server_name     toutiao.iqiyi.com  toutiao.qiyi.domain m.toutiao.iqiyi.com;</span><br><span class="line">    root            /data/none;</span><br><span class="line">    index           index.php index.html index.htm;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    ###ssl settings start</span><br><span class="line">    ssl_protocols                   TLSv1 TLSv1.1 TLSv1.2;</span><br><span class="line">    ssl_certificate                 /usr/local/nginx/conf/server.pem;</span><br><span class="line">    ssl_certificate_key             /usr/local/nginx/conf/server.key;</span><br><span class="line">    ssl_session_cache               shared:SSL:10m;</span><br><span class="line">    ssl_session_timeout             10m;</span><br><span class="line">    ssl_ciphers ALL:!kEDH!ADH:RC4+RSA:+HIGH:+EXP;</span><br><span class="line">    ssl_prefer_server_ciphers       on;</span><br><span class="line">    ###ssl settings end</span><br><span class="line">…</span><br></pre></td></tr></table></figure></p>
+<p>2、性能比较：<br>通过https访问Nginx一般会比http访问慢30%（https方式访问主要是耗Nginx服务器的cpu）通过下面实验验证：</p>
+<ol>
+<li>nginx后端挂了5台java服务器，java服务器中有个简单的java程序，从redis缓存随机读取一个value值输出到前端；（挂的java服务器越多，对nginx压力越大）</li>
+<li>压测nginx，3000并发，一共请求30000次，返回结果都是200的情况下进行对比；<br>实验结果：<br>A、服务器负载对比：<br>https访问，服务器cpu最高可以达到20%，而http的访问，服务器cpu基本在1%左右；无论那种访问，nginx服务器负载、内存都不高；<br>B、nginx吞吐量对比（qps）：<br> • https访问，30000次请求花了28s；（是http的3倍）<br> • http访问，30000次请求花了9s；</li>
+</ol>
+<p>统计qps时，每次清空nginx日志，然后加压，执行完毕后使用如下命令查看qps：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># cat log.2.3000https | grep '/api/news/v1/info?newsId=' | awk '&#123;print$3&#125;'| uniq | wc -l</span><br><span class="line">37</span><br></pre></td></tr></table></figure><br>注：不能持续加压，否则无限加大压力后往往是后端java服务出现瓶颈，导致返回给nginx的响应变慢，从而使得nginx压力变小。</p>
+<p>3、优化：<br>Nginx默认使用DHE算法来产生密匙，该加密算法效率很低。可以通过如下命令，删掉了kEDH算法。<br>ssl_ciphers ALL:!kEDH!ADH:RC4+RSA:+HIGH:+EXP;</p>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/nginx/" rel="tag">#nginx</a>
+          
+            <a href="/tags/集群/" rel="tag">#集群</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/05/11/java-args-youhua/" rel="next">jvm参数优化</a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <div class="ds-share flat" data-thread-key="2016/06/11/nginx-https-keepalived-youhua/"
+     data-title="nginx优化——包括https、keepalive等"
+     data-content=""
+     data-url="http://yoursite.com/2016/06/11/nginx-https-keepalived-youhua/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
+
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
+      
+    </div>
+  </div>
+
+ </div>
+
+        
+
+        
+          <div class="comments" id="comments">
+            
+              <div class="ds-thread" data-thread-key="2016/06/11/nginx-https-keepalived-youhua/"
+                   data-title="nginx优化——包括https、keepalive等" data-url="http://yoursite.com/2016/06/11/nginx-https-keepalived-youhua/">
+              </div>
+            
+          </div>
+        
+      </div>
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="/images/lanjingling.jpg" alt="蓝精灵" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">蓝精灵</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">java程序员、爱开源、喜欢nodejs、前端js、oracle数据库、分布式技术...<br/>改变世界的是这么一群人,他们寻找梦想中的乐园,当他们找不到时,就亲手创造了她...</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">45</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">17</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">30</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/lanjingling" target="_blank">github</a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://blog.csdn.net/liuxiao723846" target="_blank">csdn</a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/1925780475" target="_blank">weibo</a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+            <p class="site-author-name">Links</p>
+            
+              <span class="links-of-author-item">
+              <a href="http://www.ruanyifeng.com/blog/" target="_blank">阮一峰</a>
+              </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://zipperary.com/" target="_blank">Zippera's Blog</a>
+              </span>
+            
+              <span class="links-of-author-item">
+              <a href="http://wuchong.me/" target="_blank">Jark's Blog</a>
+              </span>
+            
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、nginx之tcp_nopush、tcp_nodelay、sendfile"><span class="nav-number">1.</span> <span class="nav-text">一、nginx之tcp_nopush、tcp_nodelay、sendfile</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、nginx长连接——keepalive"><span class="nav-number">2.</span> <span class="nav-text">二、nginx长连接——keepalive</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三、nginx配置https"><span class="nav-number">3.</span> <span class="nav-text">三、nginx配置https</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner"> <div class="copyright" >
+  
+  &copy; &nbsp;  2014 - 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="icon-next-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">蓝精灵</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+ </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+  
+    
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"lanjingling"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+    
+     
+
+    
+  
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.1"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.1"></script>
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/js/motion_global.js?v=0.4.5.1" id="motion.global"></script>
+
+
+
+
+  <script type="text/javascript" src="/js/nav-toggle.js?v=0.4.5.1"></script>
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.1" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 0.4 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    var $tocContent = $('.post-toc-content');
+    if (isDesktop() && CONFIG.sidebar === 'post') {
+      if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+        displaySidebar();
+      }
+    }
+  });
+</script>
+
+
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      if (CONFIG.sidebar === 'always') {
+        displaySidebar();
+      }
+      if (isMobile()) {
+        FastClick.attach(document.body);
+      }
+    });
+  </script>
+
+  
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/lazyload.js"></script>
+  <script type="text/javascript">
+    $(function () {
+      $("#posts").find('img').lazyload({
+        placeholder: "/images/loading.gif",
+        effect: "fadeIn"
+      });
+    });
+  </script>
+</body>
+</html>
