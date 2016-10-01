@@ -39,16 +39,16 @@
   <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.1" />
 
 
-<meta name="description" content="Nginx反向代">
+<meta name="description" content="本文主要介绍了一些nginx优化的常见点，包括https访问网站如何加快速度、如何使用长连接提升网站性能，以及对于常见的time_wait问题的成因分析、解决。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="nginx优化——包括https、keepalive等">
 <meta property="og:url" content="http://yoursite.com/2016/06/11/nginx-https-keepalived-youhua/index.html">
 <meta property="og:site_name" content="晓的技术博客">
-<meta property="og:description" content="Nginx反向代">
-<meta property="og:updated_time" content="2016-10-01T09:28:55.144Z">
+<meta property="og:description" content="本文主要介绍了一些nginx优化的常见点，包括https访问网站如何加快速度、如何使用长连接提升网站性能，以及对于常见的time_wait问题的成因分析、解决。">
+<meta property="og:updated_time" content="2016-10-01T09:38:12.799Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="nginx优化——包括https、keepalive等">
-<meta name="twitter:description" content="Nginx反向代">
+<meta name="twitter:description" content="本文主要介绍了一些nginx优化的常见点，包括https访问网站如何加快速度、如何使用长连接提升网站性能，以及对于常见的time_wait问题的成因分析、解决。">
 
 
 <script type="text/javascript" id="hexo.configuration">
@@ -325,7 +325,7 @@
 <p>3、综上，出现大量TIME_WAIT的情况<br>1）导致 nginx端出现大量TIME_WAIT的情况有两种：</p>
 <ul>
 <li>keepalive_requests设置比较小，高并发下超过此值后nginx会强制关闭和客户端保持的keepalive长连接；（主动关闭连接后导致nginx出现TIME_WAIT）</li>
-<li>keepalive设置的比较小，高并发下nginx会强制关闭和后端server保持的keepalive长连接；</li>
+<li>keepalive设置的比较小（空闲数太小），导致高并发下nginx会频繁出现连接数震荡（超过该值会关闭连接），不停的关闭、开启和后端server保持的keepalive长连接；</li>
 </ul>
 <p>2）导致后端server端出现大量TIME_WAIT的情况：<br>nginx没有打开和后端的长连接，即：没有设置proxy_http_version 1.1;和proxy_set_header Connection “”;从而导致后端server每次关闭连接，高并发下就会出现server端出现大量TIME_WAIT</p>
 <h2 id="三、nginx配置https">三、nginx配置https</h2><p>1、配置<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    listen                  80  default_server;</span><br><span class="line">    listen          443 ssl;</span><br><span class="line">    server_name     toutiao.iqiyi.com  toutiao.qiyi.domain m.toutiao.iqiyi.com;</span><br><span class="line">    root            /data/none;</span><br><span class="line">    index           index.php index.html index.htm;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    ###ssl settings start</span><br><span class="line">    ssl_protocols                   TLSv1 TLSv1.1 TLSv1.2;</span><br><span class="line">    ssl_certificate                 /usr/local/nginx/conf/server.pem;</span><br><span class="line">    ssl_certificate_key             /usr/local/nginx/conf/server.key;</span><br><span class="line">    ssl_session_cache               shared:SSL:10m;</span><br><span class="line">    ssl_session_timeout             10m;</span><br><span class="line">    ssl_ciphers ALL:!kEDH!ADH:RC4+RSA:+HIGH:+EXP;</span><br><span class="line">    ssl_prefer_server_ciphers       on;</span><br><span class="line">    ###ssl settings end</span><br><span class="line">…</span><br></pre></td></tr></table></figure></p>
